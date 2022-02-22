@@ -27,6 +27,7 @@ app.use(express.json({limit: '1mb'})); // for read .JSON format
 // Routes
 app.use(require('./routes/account.route'));
 app.use(require('./routes/autentication.route'));
+app.use(require('./routes/admin.route'));
 
 app.listen(app.get('port'),function(){
     console.log('cema is working in port:', app.get('port'));
