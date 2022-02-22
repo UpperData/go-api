@@ -14,6 +14,7 @@ async function isInternetConnect(){
 
 
 async function sendMail(data){ //Envia Correo electronico
+    console.log( process.env.EMAIL_ADMIN);
     if(validMail){
         var transporter = nodemailer.createTransport({
             //GOOGLE SMTP

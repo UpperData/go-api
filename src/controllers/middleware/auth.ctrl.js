@@ -12,7 +12,7 @@ var autorizedRole=function(roles){
 
             }else{                
                 const token = req.header('Authorization').replace('Bearer ', ''); 
-                console.log(token);                  
+                                  
                 if(token){
                     try{ 
                         var payload= await jwt.decode(token,process.env.JWT_SECRET);
