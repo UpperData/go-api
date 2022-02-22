@@ -6,11 +6,13 @@ var autorizedRole=function(roles){
         return async function (req,res,next){
             const authorized=roles;   
             var isValid=false;  
-            if(!req.headers.authorization){                
+            if(!req.headers.authorization){    
+                        
                 res.status(403).json({"data":{"result":false,"message":"Usuario no autorizado"}});  
 
             }else{                
-                const token = req.header('Authorization').replace('Bearer ', '');                        
+                const token = req.header('Authorization').replace('Bearer ', ''); 
+                console.log(token);                  
                 if(token){
                     try{ 
                         var payload= await jwt.decode(token,process.env.JWT_SECRET);
@@ -49,6 +51,7 @@ var autorizedRole=function(roles){
                     }catch(error){
                        
                        // res.redirect(process.env.HOST_FRONT+"expired/error");  
+                       console.log(error);
                         res.status(403).json({"data":{"result":false,"message":"Usuario no autorizado"}});
                     }
                     

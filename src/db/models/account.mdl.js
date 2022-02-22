@@ -70,6 +70,10 @@ module.exports = (sequelize, DataTypes) => {
         }
       }
     },
+    token:{
+      allowNull: false,
+      type: DataTypes.STRING
+    },
     secret:{
       type:DataTypes.JSONB, 
     },

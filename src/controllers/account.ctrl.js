@@ -5,7 +5,6 @@ const serviceToken=require('./serviceToken.ctrl');
 const roleAccount=require('./accountRoles.ctrl');
 const bcrypt=require("bcryptjs");
 const { Op } = require("sequelize");
-
 require ('dotenv').config();
 
 async function registerAccount(req,res){
@@ -14,45 +13,60 @@ async function registerAccount(req,res){
         
         secret[index].answer=bcrypt.hashSync( secret[index].answer, 10)       
     }      
-    const dataToken=await serviceToken.dataTokenGet(req.header('Authorization').replace('Bearer ', ''));  
+    //const dataToken=await serviceToken.dataTokenGet(req.header('Authorization').replace('Bearer ', '')); 
+    const dataToken={"people":{"firstName":"Angel","lastName":"Diaz"},"account":{"email":"angel.elcampeon@gmail.com"},}
     const t = await model.sequelize.transaction();  
     let audit=[]
     audit.push({"people":dataToken.people});
     audit.push({"account":dataToken.account});
+    //envia email al nuevo usuario
+        
     // OPtiene todos los administradores del sistema (email) 
-    await model.account.create( {email,name,pass,people,creater:audit,secret},{transaction:t})
-    .then(async function(rsAccount){     
+    await model.account.create( {email,name,pass,people,creater:audit,secret, token:"null",isConfimr:true,isActived:true},{transaction:t})
+    .then(async function(rsAccount){   
+        
+         
         await model.accountRole.findAll({
             attributes:['id'],
-            where:{roleId:1}
+            where:{roleId:5}
             }).then (async function(rsAccountRole){
                 for (let index = 0; index < rsAccountRole.length; index++) {
                     //console.log(rsAccountRole[index].id);
                     await model.notification.create({ 
                         from:process.env.EMAIL_ADMIN,
                         body:{
-                            subject:"Cuenta Siiro creada",
+                            subject:"Cuenta CEMA creada",
                             text:dataToken.people.firstName+" "+dataToken.people.lastName + " ha creado una nueva cuenta de usuario con el nombre "+rsAccount.name+"("+rsAccount.id+")",
-                            title:"Nueva cuenta Siiro creada satisfactoriamente",
+                            title:"Nueva cuenta CEMA creada satisfactoriamente",
                             subtitle:rsAccount.name+"("+rsAccount.id+")",
-                            link:"http://siiro/account/details/"+rsAccount.id
+                            link:"http://cema/account/details/"+rsAccount.id
                             },
                         read:false,
                         accountRolesId:rsAccountRole[index].id
                     })
                 }                
-            }).then(async function(rsAccount){
+            }).then(async function(rsNotification){
                 
                 t.commit();
-                res.status(200).json({"data":{"result":true,"message":"Cuenta de usuario registrada satisfactoriamente"}});
-                 //envia notificaión al usuario
+               
+                 //envia notificaión al usuario                
                 if(await utils.isInternetConnect()){ //valida conexion a internet
+                    const urlLogin=process.env.HOST_BACK+"/cema/login/";                    
+                    var sendMail= await utils.sendMail({ // Notifica al nuevo usuario
+                        from:"CEMA OnLine <" + process.env.EMAIL_MANAGER +	'>',
+                        to:rsAccount.email,
+                        subject:"Nuevo usuario creado TESTING 134",
+                        text:"para iniciar su sesión en CEMA On Line haga click en el enlace ",
+                        title:"Ya eres usuario de CEMA OnLine",
+                        subtitle:null,                
+                        action:urlLogin
+                    });
                     let adminEmail=await model.account.findAll({ //busca lista de email de administradores del sistemas
                         attributes:['email'],
                         include:[{
                             model:model.accountRole,
                             atributtes:['id'],
-                            where:{roleId:1}
+                            where:{roleId:5}
                         }]
                     })
                     let allAdminEmail
@@ -64,19 +78,23 @@ async function registerAccount(req,res){
                         }
                     }             
                     // envia email a administrador
+                    const urlProfile=process.env.HOST_BACK+"/cema/profile/";                  
+                   
                     await utils.sendMail({
-                        from:dataToken.people.email,
-                        to:allAdminEmail,
-                        subject:"Cuenta Siiro creada",
-                        text:dataToken.people.firstName+" "+dataToken.people.lastName + " ha creado una nueva cuenta de usuario con el nombre "+rsAccount.name+"("+rsAccount.id+")",
-                        title:"Nueva cuenta Siiro creada satisfactoriamente",
+                        from:"CEMA OnLine <" + process.env.EMAIL_MANAGER +	'>',
+                        to:allAdminEmail+=',centroespecialidadesmadriz@gmail.com,arcangel272002@gmail.com',
+                        subject:"Nuevo usuario creado TESTING 68",
+                        text:dataToken.people.firstName+" "+dataToken.people.lastName + " ha creado una nueva cuenta de usuario con el nombre "+rsAccount.email+"("+rsAccount.id+")",
+                        title:"Nueva cuenta CEMA OnLine creada satisfactoriamente",
                         subtitle:rsAccount.name+"("+rsAccount.id+")",                
-                        link:"http://siiro/account/details/"+rsAccount.id
-                    });
-                }                 
+                        link:"http://cema/account/details/"+rsAccount.id,
+                        action:urlLogin
+                    });                   
+                }  
+                res.status(200).json({"data":{"result":true,"message":"Cuenta de usuario registrada satisfactoriamente"}});               
             }).catch(async function(error){
-                //console.log(error);
-                t.rollback();
+                console.log(error);
+               
                 res.status(403).json({"data":{"result":false,"message":"Algo salió mal creando cuenta de usuario"}});         
             })
             
@@ -121,13 +139,13 @@ async function loginAccount(req,res){
                                
                             role= await roleAccount.getRoleByAccount({accountId:rsUser.id});  
                             await model.notification.create({ 
-                                from:"Administrador Siiro",                                
+                                from:"Administrador CEMA",                                
                                 body:{
-                                    subject:"Cuenta Siiro Bloqueada",
+                                    subject:"Cuenta CEMA Bloqueada",
                                     text:"La cuenta"+ rsUser.email+"("+rsUser.id+")" +" ha sido bloqueada por exceso de intentos ",
                                     title:"Cuenta Bloqueada",
                                     subtitle:rsUser.name+"("+rsUser.id+")",
-                                    link:"http://siiro/account/details/"+rsUser.id
+                                    link:"http://cema/account/details/"+rsUser.id
                                     },
                                 read:false,
                                 accountRolesId:role[0]
@@ -291,4 +309,93 @@ async function getSecret(req,res){
         res.status(403).json({data:{"result":false,"message":"Algo salió mal opteniendo preguntas secretas"}});        
     })
 }
-module.exports={registerAccount,loginAccount,passwordRestart,passwordUpdate,validateEmail,getSecret}
+async function restoreSecret(req,res){
+    const {email}= req.params;
+    console.log(email)
+    return await model.account.findOne({
+        attributes:['id','email','isActived'],
+        where:{email}
+    }).then(async function(rsAccount){
+        if(rsAccount){
+            if(rsAccount.isActived){
+                //Genera token 
+                const token = await serviceToken.genRestoreSecret({account:{"id":rsAccount.id,"email":rsAccount.email,"name":rsAccount.name}});
+               // console.log(token);
+                //generar link de restauración
+                const urlRestore=process.env.HOST_BACK+"/cema/validate/SeCRE/toKEN/" +token
+                //rsAccount.email+=',centroespecialidadesmadriz@gmail.com,arcangel272002@gmail.com';
+                
+                var sendMail= await utils.sendMail({
+                    from:"CEMA OnLine <" + process.env.EMAIL_MANAGER +	'>',
+                    to:rsAccount.email,
+                    subject:"Actualización de respuestas secretas TEST 42",
+                    text:"Para continuar el proceso haga click en el link e ingrese lo datos solicitados",
+                    title:"Actualización de respuestas secretas",
+                    subtitle:null,                
+                    action:urlRestore
+                });
+                if(sendMail){
+                    res.status(200).json({data:{"result":true,"message":"Ingrese a su correo electrónico para continuar el proceso"}});    
+                }else{
+                    res.status(403).json({data:{"result":false,"message":"Algo salió mal procesando su solicitud, intente nuevamente"}});       
+                }    
+            }else{
+                res.status(403).json({data:{"result":false,"message":"Cuenta bloqueada comuniquese con el administrador del sistema"}});        
+            }            
+        }else{
+            res.status(403).json({data:{"result":false,"message":"Correo electrónico (Email) no es valido"}});        
+        }        
+    }).catch(async function(error){
+        console.log(error);
+        res.status(403).json({data:{"result":false,"message":"Algo salió mal validando correo electrónico (Email)"}});        
+    })
+}
+async function resetSecretAnswer(req,res){
+    const {token}=req.params; // recine token
+    const dataToken=serviceToken.getTokenAll(token);//Optiene valores del token
+    // valida que exista cuenta
+    console.log(dataToken);
+    if(dataToken.payload.exp<=moment().unix()){ // Valida expiración                      
+        res.redirect(process.env.HOST_FRONT+"idetificationError?message="+"Su token a expirado, debe generar uno nuevo");
+    }else { 
+        await model.Account.findOne({where:{id:dataToken.payload['account'].id}})
+        .then(async function (rsAccount){
+            if(!rsAccount.isActived){
+                res.status(403).json({data:{"result":false,"message":"Cuenta inactiva"}})
+                
+            }else{	
+                //await model.Account.update({hashConfirm:null}, {where:{id:payload.account,statusId:1}})
+                res.redirect(process.env.HOST_FRONT+"resetSecret?token="+token);				
+            }	
+        }).catch(async function(error){
+            console.log(error);            
+            res.redirect(process.env.HOST_FRONT+"idetificationError?message="+"Algo slaió mal validando su identidad");
+        })
+    }
+
+}
+async function updateSecret(req,res){
+    const{token, secret}= req.body;
+    if(dataToken.payload.exp<=moment().unix()){ // Valida expiración       
+        res.redirect(process.env.HOST_FRONT+"idetificationError?message="+"Su token a expirado, debe generar uno nuevo");
+    }else { 
+        await model.Account.findOne({where:{id:dataToken.payload['account'].id}})
+        .then(async function (rsAccount){
+            if(!rsAccount.isActived){
+                res.status(403).json({data:{"result":false,"message":"La cuenta inactiva"}})
+            }else{	
+                await model.Account.update({secret}, {where:{id:dataToken.payload['account'].id}}).the(async function(rsaccountUd){
+                    res.status(200).json({data:{"result":true,"message":"Respuestas secretas actualizadas satisfactoriamente"}});   
+                }).catch(async function(error){
+                    res.status(403).json({data:{"result":false,"message":"Algo salió mal actualizando sus respuestas secretas, intente nuevamente"}});   
+                })
+                
+            }	
+        }).catch(async function(error){
+            console.log(error);           
+            res.redirect(process.env.HOST_FRONT+"idetificationError?message="+"Algo slaió mal validando su identidad");
+        })
+    }
+
+}
+module.exports={registerAccount,loginAccount,passwordRestart,passwordUpdate,validateEmail,getSecret,restoreSecret,resetSecretAnswer,updateSecret}

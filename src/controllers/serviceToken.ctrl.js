@@ -1,12 +1,14 @@
+const res = require('express/lib/response');
 var jwt=require('jwt-simple');
 var moment=require('moment');
+const model=require('../db/models/index');
 require('dotenv').config();
 
  async function newToken(account,roles,type,dateTime,people){
 	var exp;
 	 if(type=="passwordReset"){
 		exp=moment().add(2,"hours").unix();
-	 }else if(type=="forgot"){
+	}else if(type=="forgot"){
 		exp=moment().add(1,"days").unix();
 	}else if(type=="newAccount"){
 		exp=moment().add(3,"days").unix();
@@ -16,8 +18,9 @@ require('dotenv').config();
 		exp=moment().add(1,"days").unix();
 	}else if(type=="test"){
 		exp=moment().add(1,"days").unix();
-	}else
-	{
+	}else if(type=="restoreSecret"){
+		exp=moment().add(2,"hours").unix();
+	}else	{
 		exp=moment().add(1,"days").unix()
 	}
 	 
@@ -50,4 +53,34 @@ async function dataTokenGet(token){
 		return false;
 	}
 }
-module.exports={newToken,dataTokenGet}
+async function genRestoreSecret(rsAccount){
+	try{
+		var exp=moment().add(2,"hours").unix();
+		var payload={	
+		account:{"id":rsAccount.id,"email":rsAccount.email,"name":rsAccount.name},			
+		rem:"lo-veremos-cara-a-cara",
+		iat:moment().unix(),
+		exp
+		};
+		var token= await jwt.encode(payload,process.env.JWT_SECRET);      
+		return token
+	}catch(error){
+		return false;
+	}
+	
+	
+}
+async function getTokenAll(token){
+	try{
+		var  payload= await jwt.decode(token,process.env.JWT_SECRET);
+		
+		if (Date.now() >= payload.exp * 1000) {
+			return false;
+		}else{			
+			return payload;  
+		}
+	}catch(error){
+		return false;
+	}
+}
+module.exports={newToken,dataTokenGet,genRestoreSecret,getTokenAll}
