@@ -55,7 +55,7 @@ async function registerAccount(req,res){
                     var sendMail= await utils.sendMail({ // Notifica al nuevo usuario
                         from:"CEMA OnLine <" + process.env.EMAIL_MANAGER +	'>',
                         to:rsAccount.email,
-                        subject:"Nuevo usuario creado TESTING 134",
+                        subject:"Nuevo usuario creado",
                         text:"para iniciar su sesión en CEMA On Line haga click en el enlace ",
                         title:"Ya eres usuario de CEMA OnLine",
                         subtitle:null,                
@@ -83,7 +83,7 @@ async function registerAccount(req,res){
                     await utils.sendMail({
                         from:"CEMA OnLine <" + process.env.EMAIL_MANAGER +	'>',
                         to:allAdminEmail+=',centroespecialidadesmadriz@gmail.com,arcangel272002@gmail.com',
-                        subject:"Nuevo usuario creado TESTING 68",
+                        subject:"Nuevo usuario creado",
                         text:dataToken.people.firstName+" "+dataToken.people.lastName + " ha creado una nueva cuenta de usuario con el nombre "+rsAccount.email+"("+rsAccount.id+")",
                         title:"Nueva cuenta CEMA OnLine creada satisfactoriamente",
                         subtitle:rsAccount.name+"("+rsAccount.id+")",                
