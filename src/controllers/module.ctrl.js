@@ -29,9 +29,9 @@ async function getModule(req,res){
 }
 
 async function createModule(req,res){ 
-    const{name,route,isActived,sorting}=req.body;
+    const{name,route,isActived,sorting,icon,description}=req.body;
     const t = await model.sequelize.transaction();
-    return await model.module.create({name,isActived,route,sorting},{transaction:t}).then(async function(rsModule){
+    return await model.module.create({name,isActived,route,sorting,icon,description},{transaction:t}).then(async function(rsModule){
         t.commit()
         res.status(200).json({"data":{"result":true,"message":"Registro Satisfactorio","data":rsModule}});      
     }).catch(async function(error){  
@@ -42,8 +42,8 @@ async function createModule(req,res){
 }
 async function editModule(req,res){
     const t = await model.sequelize.transaction();
-    const{id,name,route,isActived,sorting}=req.body;
-    return await model.module.update({id,name,route,isActived,sorting},{where:{id}},{transaction:t}).then(async function(rsModule){
+    const{id,name,route,isActived,sorting,icon,description}=req.body;
+    return await model.module.update({id,name,route,isActived,sorting,icon,},{where:{id}},{transaction:t}).then(async function(rsModule){
         t.commit()
         res.status(200).json({"data":{"result":true,"message":"Actualización Satisfactoria","data":rsModule}});      
     }).catch(async function(error){

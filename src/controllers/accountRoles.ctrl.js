@@ -15,8 +15,7 @@ async function getRoleByAccount(req,res){
 	})
 	.then(async function(srResult){		
 		return srResult; 		
-	}).catch(async function(error){
-		console.log(error);
+	}).catch(async function(error){		
 		return { data:{"result":false,"message":"Algo salió mal, no se pudo buscar "}};		
 	})	
 }

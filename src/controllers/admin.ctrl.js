@@ -1,6 +1,7 @@
 const model=require('../db/models/index');
 var crypto = require("crypto"); 
 const { Op } = require("sequelize");
+const utils = require('./utils.ctrl');
 async function passwordResetEnable(req,res){ // hablita el cambio de password
     const {accountId}=req.params
     const t = await model.sequelize.transaction();  	
@@ -36,7 +37,26 @@ async function activateAccount(req,res){
     await model.account.update(
         {isActived:true,tries:6} ,
         {where:{email}}).then(async function (rsAcitvteAccount){
-        res.status(200).json({data:{"result":true,"message":"Cuenta reactivada satisfactoriamente"}});
+            if(await utils.isInternetConnect()){ //valida conexion a internet
+                const urlLogin=process.env.HOST_BACK+"/cema/login/";                    
+                var sendMail= await utils.sendMail({ // Notifica al nuevo usuario
+                    from:"CEMA OnLine <" + process.env.EMAIL_MANAGER +	'>',
+                    to:email,
+                    subject:"Cuenta Reactiva",
+                    text:"Puedes continuar usando el servicio, para iniciar sesión en CEMA OnLine haga click en el enlace ",
+                    title:"Tu cuenta CEMA OnLine a sido reactivada ",
+                    subtitle:null,                
+                    action:urlLogin
+                });
+                if (sendMail){
+                    res.status(200).json({data:{"result":true,"message":"Cuenta reactivada satisfactoriamente"}});
+                }else{
+                    res.status(200).json({data:{"result":true,"message":"Cuenta reactivada sin notificación de email"}});
+                }
+            }else{
+                res.status(200).json({data:{"result":true,"message":"Cuenta reactivada satisfactoriamente"}});
+            }
+        
     }).catch(async function(error){        
         res.status(403).json({data:{"result":false,"message":"Algo salió mal reactivando cuenta de usuario"}});
     })
@@ -53,4 +73,23 @@ async function getAccountWithToken(req,res){
         res.status(403).json({data:{"result":false,"message":"Algo salió mal obteniendo registros"}});
     })
 }
-module.exports={passwordResetEnable,activateAccount,getAccountWithToken};
+async function getRoleByAccount(req,res){
+	const{accountId}=req.params;
+	return await model.accountRole.findAll({ 
+        attributes:['id','roleId','isActived'],
+		where:{accountId},
+		include:[			
+			{
+                model:model.role,
+                attributes:['id','name']
+			}
+		]
+	})
+	.then(async function(rsResult){				
+        res.status(200).json( { data:{"result":true,"message":"Busqueda satisfactoria","data":rsResult}});				
+	}).catch(async function(error){	
+        
+		res.status(403).json({ data:{"result":false,"message":"Algo salió mal, no se pudo buscar "}})
+	})	
+}
+module.exports={passwordResetEnable,activateAccount,getAccountWithToken,getRoleByAccount};

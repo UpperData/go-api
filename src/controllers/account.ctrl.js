@@ -374,6 +374,7 @@ async function resetSecretAnswer(req,res){
     }
 
 }
+
 async function updateSecret(req,res){
     const{token, secret}= req.body;
     if(dataToken.payload.exp<=moment().unix()){ // Valida expiración       
@@ -398,4 +399,5 @@ async function updateSecret(req,res){
     }
 
 }
+
 module.exports={registerAccount,loginAccount,passwordRestart,passwordUpdate,validateEmail,getSecret,restoreSecret,resetSecretAnswer,updateSecret}

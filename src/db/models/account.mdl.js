@@ -86,7 +86,8 @@ module.exports = (sequelize, DataTypes) => {
     },
     tries:{
       type:DataTypes.INTEGER,
-      allowNull:true
+      allowNull:true,
+      defaultValue:0
     },
     people: {
       type: DataTypes.JSONB,

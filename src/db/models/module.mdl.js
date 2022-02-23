@@ -17,7 +17,9 @@ module.exports = (sequelize, DataTypes) => {
     name: DataTypes.STRING,
     rute: DataTypes.STRING,
     isActived: DataTypes.BOOLEAN,
-    sorting: DataTypes.INTEGER
+    sorting: DataTypes.INTEGER,
+    icon: DataTypes.STRING,
+    description:DataTypes.STRING
   }, {
     sequelize,
     modelName: 'module',
