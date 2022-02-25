@@ -19,11 +19,11 @@ async function addGrantRole(req,res){
             });           
         }
         t.commit();
-        res.status(200).json({"data":{"result":true,"message":"Operación realizada satisfactoriamente"}});
+        res.status(200).json({"data":{"result":true,"message":"Proceso Satisfactorio"}});
     }catch(error){
         console.log(error);
         t.rollback();        
-        res.status(403).json({"data":{"result":false,"message":"Algo salió mal registrando permisos"}});
+        res.status(403).json({"data":{"result":false,"message":"Algo salió mal, intente nuevamente"}});
     
 
     }    

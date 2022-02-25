@@ -197,7 +197,7 @@ async function loginAccount(req,res){
 				
 			}
 			else {
-				res.status(200).json({data:{"result":false,"message":"Usuario no registrado"}});
+				res.status(403).json({data:{"result":false,"message":"Usuario no registrado"}});
 			}			
         })
 }
