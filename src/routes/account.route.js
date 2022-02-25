@@ -11,7 +11,8 @@ router.get('/accoUnt/EmAIl/VALIDAtor/:email',forceBrute.notBruteSecure,account.v
 router.get('/aCCoUnt/EMAIl/Get/QUEStIOns/:email',forceBrute.notBruteSecure,account.getSecret); //Optienes respuestas secretas
 router.get('/ACCounT/restoRe/SeCReCT/:email',forceBrute.notBruteSecure,account.restoreSecret);
 router.get('/cema/validate/SeCRE/toKEN/:token',forceBrute.notBruteSecure,account.resetSecretAnswer); //Evalua token de solicitud de actualización de secret answer
-router.get('/cema/security/cont/:token',forceBrute.notBruteSecure,account.updateSecret); //Actualiza Respuesta secreta
+router.get('/cema/security/cont/:token',forceBrute.notBruteSecure,account.updateSecret); //Actualiza Respuesta secreta 
+router.get('/login/:token',account.loginToken); // autenticación por token
 
 
 module.exports=router;

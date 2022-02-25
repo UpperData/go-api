@@ -135,8 +135,7 @@ async function loginAccount(req,res){
                     res.status(403).json({"data":{"result":false,"message":"Usuario Bloqueado, comuniquese con el administrador del sistema"}})        
                 }else{
                     if(rsUser.tries>5){                        
-                        await model.account.update({isActived:false,hashConfirm:null},{where:{id:rsUser.id}}).then(async function(rsStatus){ //Actualiza status
-                               
+                        await model.account.update({isActived:false,hashConfirm:null},{where:{id:rsUser.id}}).then(async function(rsStatus){ //Actualiza status                               
                             role= await roleAccount.getRoleByAccount({accountId:rsUser.id});  
                             await model.notification.create({ 
                                 from:"Administrador CEMA",                                
@@ -151,11 +150,9 @@ async function loginAccount(req,res){
                                 accountRolesId:role[0]
                             }) 
                             res.status(403).json({"data":{"result":false,"message":"su cuenta a sido bloqueda por exceder limite de intentos"}}) 
-                        }).catch(async function(error){     
-                            console.log(error)
+                        }).catch(async function(error){
                             res.status(403).json({data:{"result":false,"message":"Algo salió mal actualizando cuenta de usuario"}});        
-                        })
-                        
+                        })                        
                     }else{
                         return await  bcrypt.compare(pass,rsUser.pass)
                         .then(async  function (rsPass){
@@ -399,5 +396,46 @@ async function updateSecret(req,res){
     }
 
 }
-
-module.exports={registerAccount,loginAccount,passwordRestart,passwordUpdate,validateEmail,getSecret,restoreSecret,resetSecretAnswer,updateSecret}
+async function loginToken(req,res){	
+	const {token}= req.params		
+	if(!token){
+		res.status(403).json({"data":{"result":false,"messaje":"Sesión expirada"}});
+	}else{
+		try{			
+			await serviceToken.dataTokenGet(token)//extrae información del token		
+			.then(async function(rsCurrentAccount){	
+				if(!rsCurrentAccount){
+					res.status(403).json({"data":{"result":false,"messaje":"Sesión expirada"}});
+				}else{					
+                    res.status(200).json({"data":{
+                        "result":true,
+                        "message":"Usted a iniciado sesión como "+rsCurrentAccount.account.email,
+                        token,
+                        "people":rsCurrentAccount.people,
+                        "account":rsCurrentAccount.account,
+                        "role":rsCurrentAccount.role
+                    }});						
+				}						
+			}).catch(async function(error){
+                console.log(error);	
+				res.status(403).json({"data":{"result":false,"message":"Su token no es valido"}})
+			})	
+		}
+		catch(error){
+			console.log(error);			
+			res.status(403).json({"data":{"result":false,"message":"No se pudo valida su identidad"}})
+		}
+	}
+	
+}
+module.exports={
+    registerAccount,
+    loginAccount,
+    passwordRestart,
+    passwordUpdate,
+    validateEmail,
+    getSecret,
+    restoreSecret,
+    resetSecretAnswer,
+    updateSecret,
+    loginToken}
