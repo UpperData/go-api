@@ -34,6 +34,8 @@ app.use(require('./routes/roles.route'));
 app.use(require('./routes/panel.route'));
 app.use(require('./routes/permission.route'));
 app.use(require('./routes/grantRoles.route'));
+app.use(require('./routes/departament.route'));
+app.use(require('./routes/employeefile.route'));
 
 app.listen(app.get('port'),function(){
     console.log('cema is working in port:', app.get('port'));

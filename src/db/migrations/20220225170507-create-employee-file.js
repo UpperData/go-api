@@ -26,11 +26,15 @@ module.exports = {
       email: {
         type: Sequelize.STRING
       },
-      cargoId: {
-        type: Sequelize.INTEGER
+      cargo: {
+        type: Sequelize.JSONB
       },
-      departamentId: {
-        type: Sequelize.INTEGER
+      accountId: {
+        type: Sequelize.INTEGER,
+        references:{
+          model:{tableName:'accounts',schema:'public'},
+          key:'id'
+        }
       },
       phone: {
         type: Sequelize.JSONB
@@ -41,7 +45,7 @@ module.exports = {
       digitalDoc: {
         type: Sequelize.STRING
       },
-      onservation: {
+      observation: {
         type: Sequelize.TEXT
       },
       academic: {

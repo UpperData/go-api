@@ -4,7 +4,7 @@ var moment=require('moment');
 const model=require('../db/models/index');
 require('dotenv').config();
 
- async function newToken(account,roles,type,dateTime,people){
+ async function newToken(account,roles,type,dateTime,people){ //Genera un token con una estructura especifica -->newToken(account,roles,type,dateTime,people)
 	var exp;
 	 if(type=="passwordReset"){
 		exp=moment().add(2,"hours").unix();
@@ -39,21 +39,21 @@ require('dotenv').config();
       
     return token;
 }
-async function dataTokenGet(token){
+async function dataTokenGet(token){ // obtiene informacion del token con la estructura --> newToken(account,roles,type,dateTime,people)
 	try{
 		var  payload= await jwt.decode(token,process.env.JWT_SECRET);
 		
 		if (Date.now() >= payload.exp * 1000) {
 			return false;
 		}else{
-			const dataToken={"account":payload.account,"role":payload.role, "people":payload.people,"dateStart":payload.dateTimeLogin}
+			const dataToken={"account":payload.account,"role":payload.role, "people":payload.people,"dateStart":payload.dateTimeLogin,"type":payload.type}
 			return dataToken;  
 		}
 	}catch(erro){
 		return false;
 	}
 }
-async function genRestoreSecret(rsAccount){
+async function genRestoreSecret(rsAccount){ //genera toke sin estructura especifica
 	try{
 		var exp=moment().add(2,"hours").unix();
 		var payload={	
@@ -70,7 +70,7 @@ async function genRestoreSecret(rsAccount){
 	
 	
 }
-async function getTokenAll(token){
+async function getTokenAll(token){ // obtiene token sin estructura especifica --> payload
 	try{
 		var  payload= await jwt.decode(token,process.env.JWT_SECRET);
 		

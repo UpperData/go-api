@@ -3,10 +3,10 @@ var crypto = require("crypto");
 const { Op } = require("sequelize");
 const utils = require('./utils.ctrl');
 async function passwordResetEnable(req,res){ // hablita el cambio de password
-    const {accountId}=req.params
+    const {email}=req.params
     const t = await model.sequelize.transaction();  	
     return await model.account.findOne({       
-    where: {id:accountId},
+    where: {email},
     }).then(async function (rsUser){	
         if(rsUser){
             //general codigo 4 digitos 

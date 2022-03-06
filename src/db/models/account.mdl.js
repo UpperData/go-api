@@ -89,6 +89,10 @@ module.exports = (sequelize, DataTypes) => {
       allowNull:true,
       defaultValue:0
     },
+    photo:{
+      type:DataTypes.STRING,
+      allowNull:true
+    },
     people: {
       type: DataTypes.JSONB,
       validate:{   

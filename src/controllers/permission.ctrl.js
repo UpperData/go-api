@@ -110,4 +110,40 @@ async function updatePermission(req,res){ //actualiza el estatus de un permiso
     } 
 }
 
-module.exports={getPermission,getPermisionByGroup,addPermision,updatePermission}
+async function endPermission(req,res){
+    const{groupId,moduleId,subModuleId}=req.params;
+    await model.grantRole.findAll({
+        attributes:[['id','grantRoleId'],'roleId','permissionId','isActived'],
+        where:{isActived:true,roleId:groupId},
+        include:[
+            {
+                model:model.permission,
+                attributes:[['id','permissionId'],'operationId','subModuleId'],
+                where:{subModuleId},
+                include:[
+                    {
+                        model:model.operation,
+                        attributes:[['id','operationId'],'name']
+                    },
+                    {
+                        model:model.subModule,
+                        attributes:[['id','subMduleId'],'name','moduleId'],
+                        where:{moduleId},
+                        include:[
+                            {
+                                model:model.module,
+                                attributes:[['id','moduleId'],'name'],                           
+                            }
+                        ]
+                    }
+                ]
+            }    
+            
+        ]
+    }).then(async function(rsEndPermission){
+        res.status(200).json({"data":{"result":true,"message":"Busqueda Satisfactoria","data":rsEndPermission}}); 
+    }).catch(async function(error){
+        res.status(403).json({"data":{"result":false,"message":"Algo salió mal, intente nuevamente"}}); 
+    })
+}
+module.exports={getPermission,getPermisionByGroup,addPermision,updatePermission,endPermission}

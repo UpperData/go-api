@@ -59,7 +59,8 @@ async function registerAccount(req,res){
                         text:"para iniciar su sesión en CEMA On Line haga click en el enlace ",
                         title:"Ya eres usuario de CEMA OnLine",
                         subtitle:null,                
-                        action:urlLogin
+                        action:urlLogin,
+                        actionLabel:"Iniciar Sesión"
                     });
                     let adminEmail=await model.account.findAll({ //busca lista de email de administradores del sistemas
                         attributes:['email'],
@@ -250,17 +251,39 @@ async function passwordUpdate(req,res){
     //opteiner id de cuenta actual
     const dataToken=await serviceToken.dataTokenGet(req.header('Authorization').replace('Bearer ', ''));
     const t = await model.sequelize.transaction();    
-    const {newPassword}=req.body; 
-    return await model.account.update({pass:newPassword},{where:{id:dataToken.account.id}},{transaction:t}).then(async function(rsNewPassword){ //Actualiza password
-        t.commit();
-        res.status(200).json({data:{"result":true,"message":"Password actualizado satisfactoriamente"}});        
-    }).catch(async function(error){
-        console.log(error);
-        t.rollback();
-        res.status(403).json({data:{"result":false,"message":"Algo salió mal actualizando password"}});        
+    const {newPassword,currentPassword}=req.body; 
+    await model.account.findOne({attributes:['pass','email'],where:{id:dataToken['account'].id}}).then(async function(rsAccount){
+        await  bcrypt.compare(currentPassword,rsAccount.pass).then(async function(rsValid){
+            if(rsValid){
+                return await model.account.update({pass:newPassword},{where:{id:dataToken.account.id}},{transaction:t}).then(async function(rsNewPassword){ //Actualiza password                    
+                    const urlRestore=process.env.HOST_FRONT+"/login" 
+                    var sendMail= await utils.sendMail({
+                        from:"CEMA OnLine <" + process.env.EMAIL_MANAGER +	'>',
+                        to:rsAccount.email,
+                        subject:"Cambio de Password",
+                        text:"Se proceso satisfactoriamente el cambio del password de su cuenta CEMA OnLine",
+                        title:"A cambiado el password de su cuenta",
+                        subtitle:null,                
+                        action:urlRestore,
+                        actionLabel:"Iniciar Sesión"
+                    });
+                    if(sendMail){
+                        t.commit();
+                        res.status(200).json({data:{"result":true,"message":"Password actualizado satisfactoriamente"}});    
+                    }else{
+                        res.status(403).json({data:{"result":false,"message":"Algo salió mal procesando su solicitud, intente nuevamente"}});       
+                    }                          
+                }).catch(async function(error){                    
+                    t.rollback();
+                    res.status(403).json({data:{"result":false,"message":"Algo salió mal actualizando password"}});        
+                })
+            }else{
+                res.status(403).json({data:{"result":false,"message":"Password actual incorrecto"}});  
+            }
+        })
     })
 }
-async function validateEmail(req,res){
+async function validateEmail(req,res){ // valida exitencia de email
     const {email}= req.params;
     return await model.account.findOne({
         attributes:['id','email','isActived'],
@@ -325,11 +348,12 @@ async function restoreSecret(req,res){
                 var sendMail= await utils.sendMail({
                     from:"CEMA OnLine <" + process.env.EMAIL_MANAGER +	'>',
                     to:rsAccount.email,
-                    subject:"Actualización de respuestas secretas TEST 42",
+                    subject:"Actualización de respuestas",
                     text:"Para continuar el proceso haga click en el link e ingrese lo datos solicitados",
                     title:"Actualización de respuestas secretas",
                     subtitle:null,                
-                    action:urlRestore
+                    action:urlRestore,
+                    actionLabel:"Actualizar Respuestas Secretas"
                 });
                 if(sendMail){
                     res.status(200).json({data:{"result":true,"message":"Ingrese a su correo electrónico para continuar el proceso"}});    
@@ -342,8 +366,7 @@ async function restoreSecret(req,res){
         }else{
             res.status(403).json({data:{"result":false,"message":"Correo electrónico (Email) no es valido"}});        
         }        
-    }).catch(async function(error){
-        console.log(error);
+    }).catch(async function(error){       
         res.status(403).json({data:{"result":false,"message":"Algo salió mal validando correo electrónico (Email)"}});        
     })
 }
@@ -373,25 +396,36 @@ async function resetSecretAnswer(req,res){
 }
 
 async function updateSecret(req,res){
-    const{token, secret}= req.body;
-    if(dataToken.payload.exp<=moment().unix()){ // Valida expiración       
-        res.redirect(process.env.HOST_FRONT+"idetificationError?message="+"Su token a expirado, debe generar uno nuevo");
+    const dataToken=await serviceToken.dataTokenGet(req.header('Authorization').replace('Bearer ', '')); 
+    const{secret,currentPassword}= req.body;
+    if(!dataToken){ // Valida expiración       
+        res.status(403).json({data:{"result":false,"message":"Sesion expirada"}});  
     }else { 
-        await model.Account.findOne({where:{id:dataToken.payload['account'].id}})
+        const t = await model.sequelize.transaction();    
+        await model.account.findOne({where:{id:dataToken['account'].id}})
         .then(async function (rsAccount){
-            if(!rsAccount.isActived){
-                res.status(403).json({data:{"result":false,"message":"La cuenta inactiva"}})
-            }else{	
-                await model.Account.update({secret}, {where:{id:dataToken.payload['account'].id}}).the(async function(rsaccountUd){
-                    res.status(200).json({data:{"result":true,"message":"Respuestas secretas actualizadas satisfactoriamente"}});   
-                }).catch(async function(error){
-                    res.status(403).json({data:{"result":false,"message":"Algo salió mal actualizando sus respuestas secretas, intente nuevamente"}});   
-                })
-                
-            }	
-        }).catch(async function(error){
-            console.log(error);           
-            res.redirect(process.env.HOST_FRONT+"idetificationError?message="+"Algo slaió mal validando su identidad");
+            await  bcrypt.compare(currentPassword,rsAccount.pass).then(async function(rsValid){ // Valida password
+                if(rsValid){
+                    if(!rsAccount.isActived){
+                        res.status(403).json({data:{"result":false,"message":"La cuenta inactiva"}})
+                    }else{	
+                        await model.account.update({secret}, {where:{id:dataToken['account'].id}},{transaction:t}).then(async function(rsaccountUd){                        
+                            t.commit();
+                            res.status(200).json({data:{"result":true,"message":"Respuestas secretas actualizadas satisfactoriamente"}});   
+                        }).catch(async function(error){
+                            t.rollback();
+                            res.status(403).json({data:{"result":false,"message":"Algo salió mal actualizando sus respuestas secretas, intente nuevamente"}});   
+                        })
+                        
+                    }	
+                }else{
+                    res.status(403).json({data:{"result":false,"message":"Password no valido"}});   
+                }
+            }).catch(async function(error){                
+                res.status(403).json({data:{"result":false,"message":"Algo salió mal, intente nuevamente"}});   
+            })
+        }).catch(async function(error){            
+            res.status(403).json({data:{"result":false,"message":"Algo salió mal actualizando sus respuestas secretas, intente nuevamente"}});   
         })
     }
 
@@ -406,27 +440,241 @@ async function loginToken(req,res){
 			.then(async function(rsCurrentAccount){	
 				if(!rsCurrentAccount){
 					res.status(403).json({"data":{"result":false,"messaje":"Sesión expirada"}});
-				}else{					
-                    res.status(200).json({"data":{
-                        "result":true,
-                        "message":"Usted a iniciado sesión como "+rsCurrentAccount.account.email,
-                        token,
-                        "people":rsCurrentAccount.people,
-                        "account":rsCurrentAccount.account,
-                        "role":rsCurrentAccount.role
-                    }});						
+				}else{	
+                    if(rsCurrentAccount.type=='login'){
+                        res.status(200).json({"data":{
+                            "result":true,
+                            "message":"Usted a iniciado sesión como "+rsCurrentAccount.account.email,
+                            token,
+                            "people":rsCurrentAccount.people,
+                            "account":rsCurrentAccount.account,
+                            "role":rsCurrentAccount.role
+                        }});
+                    }else{
+                        res.status(403).json({"data":{"result":false,"messaje":"Su token no es valido"}});
+                    }				
+                    						
 				}						
-			}).catch(async function(error){
-                console.log(error);	
+			}).catch(async function(error){                
 				res.status(403).json({"data":{"result":false,"message":"Su token no es valido"}})
 			})	
 		}
-		catch(error){
-			console.log(error);			
+		catch(error){					
 			res.status(403).json({"data":{"result":false,"message":"No se pudo valida su identidad"}})
 		}
 	}
 	
+}
+async function getProfile(req,res){  //optiene el perfil de un usuario
+    const token= req.header('Authorization').replace('Bearer ', '');
+    const  currentAccount=await serviceToken.dataTokenGet(token);   
+    await model.account.findOne({    
+        attributes:[['id','accountId'],'email','name','isConfirmed','photo','people'],
+        where:{id:currentAccount['account'].id }
+    }).then(async function(rsProfile){
+        res.status(200).json({"data":{
+            "result":true,
+            "message":"Proceso satisfatorio",
+            "data":rsProfile
+        }})
+    }).catch(async function(error){
+        res.status(403).json({"data":{"result":false,"message":"Algo salió mal, intente nuevamente"}});
+    })
+}
+async function getRoleByAccount(req,res){ // OBTIENE ROLES DE CUENTA ACTUAL
+	const token= req.header('Authorization').replace('Bearer ', '');
+    const  currentAccount=await serviceToken.dataTokenGet(token);  
+	return await model.account.findAll({  
+        attributes:[['id','accountId']],      
+		where:{id:currentAccount['account'].id,isActived:true},
+		include:[
+			{
+			model:model.accountRole,
+            attributes:[['id','accountRoleId'],'isActived'],
+            include:[
+                {
+                    model:model.role,
+                    attributes:[['id','roleId'],'name'],
+
+                }
+            ]
+			},
+			
+		]
+	})
+	.then(async function(srResult){		
+		res.status(200).json({"data":{
+            "result":true,
+            "message":"Proceso satisfatorio",
+            "data":srResult
+        }})		
+	}).catch(async function(error){		
+        console.log(error);
+        res.status(403).json({"data":{"result":false,"message":"Algo salió mal, intente nuevamente"}});		
+	})	
+}
+async function emailUpdate(req,res){
+    //opteiner id de cuenta actual
+    const dataToken=await serviceToken.dataTokenGet(req.header('Authorization').replace('Bearer ', ''));    
+    const t = await model.sequelize.transaction();    
+    const {newEmail,currentPassword}=req.body; 
+    await model.account.findOne({attributes:['pass','email'],where:{id:dataToken['account'].id}}).then(async function(rsAccount){ // valida cuenta
+        await  bcrypt.compare(currentPassword,rsAccount.pass).then(async function(rsValid){ // Valida password
+            if(rsValid){
+                return await model.account.update({email:newEmail,isConfirmed:false},{where:{id:dataToken['account'].id}},{transaction:t}).then(async function(rsNewEmail){ //Actualiza password
+                    
+                    var account={"id":dataToken['account'].id,"email":rsAccount.email};
+                    const token = await serviceToken. newToken(account,roles=null,type="updateEmail",dateTime=new Date(),people=null);
+                    const urlRestore=process.env.HOST_FRONT+"/email/verify/"+token; 
+                    var sendMail= await utils.sendMail({ // envia email para veridicar cuenta
+                        from:"CEMA OnLine <" + process.env.EMAIL_MANAGER +	'>',
+                        to:rsAccount.email,
+                        subject:"Cambio de Email",
+                        text:"Haga clic en el enlace para certificar el Email ",
+                        title:"Cambio de Email satisfactorio",
+                        subtitle:null,                
+                        action:urlRestore,
+                        actionLabel:"Certificar Email"
+                    });
+                    if(sendMail){
+                        t.commit(); // actializa email
+                        res.status(200).json({data:{"result":true,"message":"Operación procesada satisfactoriamente, recibirá  un Email para certificar el cambio"}});    
+                    }else{
+                        res.status(403).json({data:{"result":false,"message":"Algo salió mal procesando su solicitud, intente nuevamente"}});       
+                    }    
+                            
+                }).catch(async function(error){
+                    console.log(error)
+                    t.rollback();
+                    if(error.name=='SequelizeUniqueConstraintError'){
+                        res.status(403).json({data:{"result":false,"message":"Ya existe una cuenta con este email"}});            
+                    }else{
+                        res.status(403).json({data:{"result":false,"message":"Algo salió mal actualizando email"}});        
+                    }
+                    
+                })
+            }else{
+                res.status(403).json({data:{"result":false,"message":"Password actual incorrecto"}});  
+            }
+        }).catch(async function(error){
+            res.status(403).json({data:{"result":false,"message":"Algo salio mal validando información, intente nuevamente"}});  
+        })
+    }).catch(async function(error){
+        res.status(403).json({data:{"result":false,"message":"Algo salio mal validando información, intente nuevamente"}});  
+    })
+}
+async function emailCertificationToken(req,res){ //Genera y envia  token para certificacion de email
+    //optiene email
+    const dataToken=await serviceToken.dataTokenGet(req.header('Authorization').replace('Bearer ', ''));
+    if(dataToken){
+        //Genera token
+        var account={"id":dataToken['account'].id,"email":dataToken['account'].email}
+        var token= await serviceToken.newToken(account,roles=null,type=null,dateTime=new Date(),people=null)
+        //Envia correa de certifiación
+        const urlRestore=process.env.HOST_BACK+"/email/verify/"+token; 
+        var sendMail= await utils.sendMail({ 
+            from:"CEMA OnLine <" + process.env.EMAIL_MANAGER +	'>',
+            to:dataToken['account'].email,
+            subject:"Certificación de Email",
+            text:"Haga clic en el enlace para certificar su Email ",
+            title:"Certificaicón de Email en CEMA Online",
+            subtitle:null,                
+            action:urlRestore,
+            actionLabel:"Certificar Email"
+        });
+        if(sendMail){           
+            res.status(200).json({data:{"result":true,"message":"Operación procesada satisfactoriamente, recibira un Email para certificar el cambio"}});    
+        }else{
+            res.status(403).json({data:{"result":false,"message":"Algo salió mal procesando su solicitud, intente nuevamente"}});       
+        }  
+    }else{
+        res.status(403).json({data:{"result":false,"message":"Token no valido"}})
+    }        
+      
+}
+async function emailVerify(req,res){ //certifica email
+    //Decodifica token
+    const {token}=req.params;
+    const dataToken=await serviceToken.dataTokenGet(token);  
+    //Actualiza cuenta isConfirm=true
+    const t = await model.sequelize.transaction();
+    if(!dataToken){
+        res.status(403).json({data:{"result":false,"message":"Token expirado, de reiniciar el proceso de certificación de email"}});  
+    }else{
+        await model.account.update({isConfirmed:true},{where:{id:dataToken['account'].id},transaction:t}).then(async function(rsAccount){
+            const urlRestore=process.env.HOST_FRONT+"/login"; 
+            var sendMail= await utils.sendMail({ 
+                from:"CEMA OnLine <" + process.env.EMAIL_MANAGER +	'>',
+                to:dataToken['account'].email,
+                subject:"Certificación de Email",
+                text:"Su Email a sido certificado satisfactoriamente ",
+                title:"Email certificado en CEMA Online",
+                subtitle:null,                
+                action:urlRestore,
+                actionLabel:"Iniciar Sessión"
+            });
+            if(sendMail){
+                t.commit();
+                res.redirect(process.env.HOST_FRONT+"/verify/email?success=true");
+                //res.status(200).json({data:{"result":true,"message":"Operación procesada satisfactoriamente"}});    
+            }else{
+                t.rollback();
+                res.redirect(process.env.HOST_FRONT+"/verify/email?success=false");
+                //res.status(403).json({data:{"result":false,"message":"Algo salió mal procesando su solicitud, intente nuevamente"}});       
+            }    
+        }).catch(async function(error){
+            console.log(error);
+            res.status(403).json({data:{"result":false,"message":"Algo salió mal procesando su solicitud, intente nuevamente"}});       
+        })
+    }
+}
+async function isCertificated(req,res){ // Verifica si un email esta certificado    
+    const dataToken=await serviceToken.dataTokenGet(req.header('Authorization').replace('Bearer ', ''));      
+    if(dataToken){
+        await model.account.findOne({attributes:['id','isConfirmed'],where:{id:dataToken['account'].id}}).then(async function(rsAccount){
+            if(rsAccount.isConfirmed){
+                res.status(200).json({data:{"result":true,"message":"Email certificado"}}); 
+            }else{
+                res.status(403).json({data:{"result":false,"message":"Tu email no se ha certificado, muchas tareas requieren que su email esté certificado"}})
+            }
+        }).catch(async function(error){
+            res.status(403).json({data:{"result":false,"message":"Algo salió mal, intente nuevames"}})
+        })
+    }else{
+        res.status(403).json({data:{"result":false,"message":"Token no valido"}})
+    }
+}
+async function getSecretCurrent(req,res){ // obtiene preguntas secretas del sesion actual
+    const dataToken=await serviceToken.dataTokenGet(req.header('Authorization').replace('Bearer ', ''));    
+    if(dataToken){
+        return await model.account.findOne({
+            attributes:['secret','isActived'],
+            where:{id:dataToken['account'].id}
+        }).then(async function(rsAccount){
+            if(rsAccount){
+                if(rsAccount.isActived){
+                    if(rsAccount.secret.length>1){
+                        let question=[];
+                        for (let index = 0; index < rsAccount.secret.length; index++) {                        
+                            question.push(rsAccount['secret'][index].question);                       
+                        }                    
+                        res.status(200).json({data:{"result":true,"message":"Preguntas secretas retornadas con éxito","data":question}});
+                    }else{
+                        res.status(403).json({data:{"result":false,"message":"Usuario no ha configurado sus preguntas secretas, generar o renovar preguntas secretas"}});                
+                    }                
+                }else{
+                    res.status(403).json({data:{"result":false,"message":"Cuenta bloqueada comuniquese con el administrador del sistema"}});        
+                }             
+            }else{
+                res.status(403).json({data:{"result":false,"message":"Cuenta de usuario no registrada"}});        
+            }        
+        }).catch(async function(error){        
+            res.status(403).json({data:{"result":false,"message":"Algo salió mal opteniendo preguntas secretas"}});        
+        })
+    }else{
+        res.status(403).json({data:{"result":false,"message":"Sesión expirada"}});    
+    }
+    
 }
 module.exports={
     registerAccount,
@@ -434,8 +682,17 @@ module.exports={
     passwordRestart,
     passwordUpdate,
     validateEmail,
-    getSecret,
+    getSecret, // obtiene preguntas secretas del usuario actual
     restoreSecret,
     resetSecretAnswer,
     updateSecret,
-    loginToken}
+    loginToken,
+    getProfile,
+    getRoleByAccount,
+    emailUpdate,
+    emailCertificationToken, //genera token para veridicar email
+    emailVerify, //Certifica email
+    isCertificated, // Verifica si un email esta certificado
+    getSecretCurrent,// obtiene preguntas secretas del usuario actual
+
+}

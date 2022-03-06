@@ -57,6 +57,10 @@ module.exports = {
       secret: {
         type: Sequelize.JSONB
       },
+      photo: {
+        type: Sequelize.BLOB,
+        allowNull:false
+      },
       updatedAt: {
         allowNull: false,
         type: Sequelize.DATE

@@ -45,7 +45,7 @@ async function sendMail(data){ //Envia Correo electronico
 							<h2 style="font-family:sans-serif; color:#ff4338;" >¡`+data.title+`!</h2>
 							<br>
                             <p>`+ data.text + ` </p>
-                            <p> <a href=`+ data.action + `> Enviar </a> </p>
+                            <p> <a href=`+ data.action + `>` +data.actionLabel+ `</a> </p>
 							<p style="font-family:sans-serif; font-size: 19px;" >`+"Si desconoce esta operación comuniquece con info@cema.com.ve"+`</p>
 							
 							<br>

@@ -33,8 +33,7 @@ async  function getAllPanel(req,res){
 			}]
 	}]
 	})
-	.then(async function (rsMenu){	
-		console.log("Primer console")	
+	.then(async function (rsMenu){			
 	// *** OPTIENE TODOS SUBMODULOS SIN DUPLICADOS
 		var seenNames = {};
 		var rsMenuS = rsMenu.filter(function(currentObject) { 			
