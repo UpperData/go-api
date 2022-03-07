@@ -15,10 +15,7 @@ module.exports = {
         type: Sequelize.STRING
       },
       documentId: {
-        type: Sequelize.STRING
-      },
-      nationality: {
-        type: Sequelize.BOOLEAN
+        type: Sequelize.JSONB
       },
       address: {
         type: Sequelize.JSONB

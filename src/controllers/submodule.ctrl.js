@@ -60,9 +60,32 @@ async function editSubModule(req,res){
         t.commit();
         res.status(200).json({"data":{"result":true,"message":"Actualización Satisfactoria","data":rsSubModule}});      
     }).catch(async function(error){
-        t.rollback();
-        console.log(error)
+        t.rollback();        
         res.status(403).json({"data":{"result":false,"message":"Algo salió mal actualizando registro"}});  
     })
 }
-module.exports={getSubModule,createSubModule,editSubModule}
+async function getPermissionBySubModule(req,res){
+    const{subModuleId}=req.params;
+    await model.subModule.findAll({
+        attributes:[['id','subModuleId'],'name'],   
+        where:{id:subModuleId},     
+        include:[
+            {
+                model:model.permission,
+                attributes:[['id','permissionId'],'operationId'],
+               
+                include:[
+                    {
+                        model:model.operation,
+                        attributes:[['id','operationId'],'name']
+                    }
+                ]
+            }
+        ]
+    }).then(async function(rsSubModule){
+        res.status(200).json({"data":{"result":true,"message":"Actualización Satisfactoria","data":rsSubModule}});  
+    }).catch(async function(error){           
+        res.status(403).json({"data":{"result":false,"message":"Algo salió mal, intente nuevamente"}});  
+    })
+}
+module.exports={getSubModule,createSubModule,editSubModule,getPermissionBySubModule}

@@ -11,7 +11,8 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      subModule.belongsTo(models.module)
+      subModule.belongsTo(models.module);
+      subModule.hasMany(models.permission);
     }
   };
   subModule.init({

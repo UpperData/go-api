@@ -1,4 +1,12 @@
+
 'use strict';
+var revalidator = require('revalidator');
+var schemaValidator = function (schema) {
+  return function (value) {
+      var results = revalidator.validate(value, schema);
+      if (!results.valid) throw new Error(JSON.stringify(results.errors));
+  };
+};
 const {
   Model
 } = require('sequelize');
@@ -23,11 +31,7 @@ module.exports = (sequelize, DataTypes) => {
       allowNull:false
     },
     documentId: {
-      type:DataTypes.STRING,
-      allowNull:false
-    },
-    nationality: {
-      type:DataTypes.BOOLEAN,
+      type:DataTypes.JSONB,
       allowNull:false
     },
     address: {
@@ -48,10 +52,19 @@ module.exports = (sequelize, DataTypes) => {
       type:DataTypes.JSONB,
       allowNull:false
     },
-    phone: {
+    phone:{
       type:DataTypes.JSONB,
-      allowNull:false
-    },
+      allowNull:false,
+        validate: {
+           schema: schemaValidator({
+               type: "array",
+               properties: {
+                   phoneType: { type: "string",uniqueItems: true, required: true },
+                   phoneNumber:{ type: "string", dependencies: 'phoneType', required: true }                                  
+               }
+           })
+        }    
+      },
     photo: {
       type:DataTypes.STRING
     },
