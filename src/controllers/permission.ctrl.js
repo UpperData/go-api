@@ -84,8 +84,8 @@ async function addPermision(req,res){ //regsitra un nuevo permiso
         res.status(403).json({"data":{"result":false,"message":"Algo salió mal procesando registro"}}); 
     } 
 }
-async function updatePermission(req,res){ //actualiza el estatus de un permiso
-    const{subModuleId,operations}=req.body;       
+async function updatePermission(req,res){ //actualiza un permiso
+    const{permissionId,subModuleId,operations,isActived}=req.body;       
     const t = await model.sequelize.transaction();
     try{
         for (let index = 0; index < operations.length; index++) {
@@ -97,11 +97,12 @@ async function updatePermission(req,res){ //actualiza el estatus de un permiso
             if(countPermition.count>0){ // siexiste                
                 await model.permission.update(
                     {isActived:operations[index].isActived},
-                    {where:{subModuleId,operationId:operations[index].id}},
+                    {where:{id:permissionId}},
                     {transaction:t}
                 );
             }                
-        }   
+        } 
+
         res.status(200).json({"data":{"result":true,"message":"Proceso Satisfactorio"}}); 
         t.commit();  
     }catch(error){
@@ -109,7 +110,22 @@ async function updatePermission(req,res){ //actualiza el estatus de un permiso
         res.status(403).json({"data":{"result":false,"message":"Algo salió mal procesando registro"}}); 
     } 
 }
+async function updatePermissionStatus(req,res){ //actualiza estsus de un permiso habilita/deshabilita
+    const{permissionId,isActived}=req.body;       
+    const t = await model.sequelize.transaction();
 
+    await model.permission.update(
+        {isActived},
+        {where:{id:permissionId}},
+        {transaction:t}
+    ).then(async function(rsPermission){
+        t.commit();  
+        res.status(200).json({"data":{"result":true,"message":"Proceso Satisfactorio"}});         
+    }).catch(async function(error){
+        t.rollback();       
+        res.status(403).json({"data":{"result":false,"message":"Algo salió mal procesando registro"}}); 
+    })
+}
 async function endPermission(req,res){
     const{groupId,moduleId,subModuleId}=req.params;
     await model.grantRole.findAll({
@@ -146,4 +162,4 @@ async function endPermission(req,res){
         res.status(403).json({"data":{"result":false,"message":"Algo salió mal, intente nuevamente"}}); 
     })
 }
-module.exports={getPermission,getPermisionByGroup,addPermision,updatePermission,endPermission}
+module.exports={getPermission,getPermisionByGroup,addPermision,updatePermission,endPermission,updatePermissionStatus}
