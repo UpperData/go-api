@@ -29,7 +29,6 @@ async function getRole(req,res){
     }
     
 }
-
 async function createRole(req,res){ 
     const{name,isActived}=req.body;
     const t = await model.sequelize.transaction();
@@ -53,5 +52,6 @@ async function editRole(req,res){
         res.status(403).json({"data":{"result":false,"message":"Algo salió mal actualizando grupo"}});  
     })
 }
+
 module.exports={getRole,createRole,editRole}
 
