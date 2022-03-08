@@ -199,6 +199,9 @@ async function loginAccount(req,res){
 			else {
 				res.status(403).json({data:{"result":false,"message":"Usuario no registrado"}});
 			}			
+        }).catch(async function(error){                        
+            console.log(error);
+            res.status(403).json({data:{"result":false,"message":" Algo salió mal, Intente nuenvamente"}});        
         })
 }
 async function passwordRestart(req,res){
