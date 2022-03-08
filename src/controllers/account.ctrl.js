@@ -39,7 +39,7 @@ async function registerAccount(req,res){
                             text:dataToken.people.firstName+" "+dataToken.people.lastName + " ha creado una nueva cuenta de usuario con el nombre "+rsAccount.name+"("+rsAccount.id+")",
                             title:"Nueva cuenta CEMA creada satisfactoriamente",
                             subtitle:rsAccount.name+"("+rsAccount.id+")",
-                            link:"http://cema/account/details/"+rsAccount.id
+                            link:"http://account/details/"+rsAccount.id
                             },
                         read:false,
                         accountRolesId:rsAccountRole[index].id
@@ -51,13 +51,13 @@ async function registerAccount(req,res){
                
                  //envia notificaión al usuario                
                 if(await utils.isInternetConnect()){ //valida conexion a internet
-                    const urlLogin=process.env.HOST_BACK+"/cema/login/";                    
+                    const urlLogin=process.env.HOST_BACK+"/login";                    
                     var sendMail= await utils.sendMail({ // Notifica al nuevo usuario
                         from:"CEMA OnLine <" + process.env.EMAIL_MANAGER +	'>',
                         to:rsAccount.email,
-                        subject:"Nuevo usuario creado",
+                        subject:"CEMA Online",
                         text:"para iniciar su sesión en CEMA On Line haga click en el enlace ",
-                        title:"Ya eres usuario de CEMA OnLine",
+                        title:"Ya eres usuario de CEMA Online",
                         subtitle:null,                
                         action:urlLogin,
                         actionLabel:"Iniciar Sesión"
@@ -79,17 +79,19 @@ async function registerAccount(req,res){
                         }
                     }             
                     // envia email a administrador
-                    const urlProfile=process.env.HOST_BACK+"/cema/profile/";                  
+                    //token=serviceToken.newToken()
+                    const tokenProfeile=null;
+                    const urlProfile=process.env.HOST_BACK+"/profile/"+tokenProfeile;                  
                    
                     await utils.sendMail({
                         from:"CEMA OnLine <" + process.env.EMAIL_MANAGER +	'>',
-                        to:allAdminEmail+=',centroespecialidadesmadriz@gmail.com,arcangel272002@gmail.com',
+                        to:allAdminEmail,
                         subject:"Nuevo usuario creado",
                         text:dataToken.people.firstName+" "+dataToken.people.lastName + " ha creado una nueva cuenta de usuario con el nombre "+rsAccount.email+"("+rsAccount.id+")",
                         title:"Nueva cuenta CEMA OnLine creada satisfactoriamente",
-                        subtitle:rsAccount.name+"("+rsAccount.id+")",                
-                        link:"http://cema/account/details/"+rsAccount.id,
-                        action:urlLogin
+                        subtitle:rsAccount.name+"("+rsAccount.id+")",
+                        action:urlProfile,                                       
+                        actionLabel:'Ver Detalles'
                     });                   
                 }  
                 res.status(200).json({"data":{"result":true,"message":"Cuenta de usuario registrada satisfactoriamente"}});               
@@ -439,7 +441,7 @@ async function loginToken(req,res){
 			await serviceToken.dataTokenGet(token)//extrae información del token		
 			.then(async function(rsCurrentAccount){	
 				if(!rsCurrentAccount){
-					res.status(403).json({"data":{"result":false,"messaje":"Sesión expirada"}});
+					res.status(401).json({"data":{"result":false,"messaje":"Sesión expirada"}});
 				}else{	
                     if(rsCurrentAccount.type=='login'){
                         res.status(200).json({"data":{
