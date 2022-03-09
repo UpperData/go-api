@@ -51,7 +51,7 @@ async function registerAccount(req,res){
                
                  //envia notificaión al usuario                
                 if(await utils.isInternetConnect()){ //valida conexion a internet
-                    const urlLogin=process.env.HOST_BACK+"/login";                    
+                    const urlLogin=process.env.HOST_FRONT+"/login";                    
                     var sendMail= await utils.sendMail({ // Notifica al nuevo usuario
                         from:"CEMA OnLine <" + process.env.EMAIL_MANAGER +	'>',
                         to:rsAccount.email,
@@ -81,7 +81,7 @@ async function registerAccount(req,res){
                     // envia email a administrador
                     //token=serviceToken.newToken()
                     const tokenProfeile=null;
-                    const urlProfile=process.env.HOST_BACK+"/profile/"+tokenProfeile;                  
+                    const urlProfile=process.env.HOST_FRONT+"/profile/"+tokenProfeile;                  
                    
                     await utils.sendMail({
                         from:"CEMA OnLine <" + process.env.EMAIL_MANAGER +	'>',
@@ -96,8 +96,7 @@ async function registerAccount(req,res){
                 }  
                 res.status(200).json({"data":{"result":true,"message":"Cuenta de usuario registrada satisfactoriamente"}});               
             }).catch(async function(error){
-                console.log(error);
-               
+                console.log(error);               
                 res.status(403).json({"data":{"result":false,"message":"Algo salió mal creando cuenta de usuario"}});         
             })
             

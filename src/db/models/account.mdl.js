@@ -1,4 +1,5 @@
 'use strict';
+
 const bcrypt = require('bcryptjs');
 var revalidator = require('revalidator');
 var schemaValidator = function (schema) {
