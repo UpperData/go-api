@@ -12,18 +12,54 @@ async function getEmployeeFile(req,res){
 
 }
 async function addEmployeeFile(req,res){
-    const{fisrtName, lastName,documentId,address,email,accountId,cargo,
+    const{fisrtName, lastName,documentId,address,email,cargo,birthdate,
         phone,photo,digitalDoc,observation,academic,cursos,experience,contacto}=req.body;
-
+    
     if(fisrtName==null || lastName==null || documentId==null ||email==null,cargo==null,phone==null,academic==null,experience==null){
+        const t = await model.sequelize.transaction(); 
+        const accountFinded=await model.account.findOne({attributes:['id'],where:{email}});         
+        let accountId=null;
+        if(accountFinded.dataValues.id>0){
+            accountId=accountFinded.dataValues.id;
+            //Actualiza informacion personal de la cuenta
+            let people= {
+                "document":documentId,
+                "firstName":fisrtName,
+                "lastName":lastName,
+                "birthdate":birthdate                     
+              }
+            await model.account.update({people},{where:{email}},{transaction:t});
+        }
         await model.employeeFile.create({fisrtName, lastName,documentId,address,email,accountId,cargo,
-        phone,photo,digitalDoc,observation,academic,cursos,experience,contacto}).then(async function(rsEmployeeFile){
+        phone,photo,digitalDoc,observation,academic,cursos,experience,contacto},{transaction:t}).then(async function(rsEmployeeFile){
+            t.commit();
             res.status(200).json({"data":{"result":true,"message":"Procesado Satisfactoriamente","data":rsEmployeeFile}});
         }).catch(async function(error){
-            console.log(error.name);
-            res.status(403).json({"data":{"result":false,"message":"Algo salió mal, intente nuevamente"}});
+            t.rollback(); 
+            console.log(error);           
+            if(error.name='SequelizeUniqueConstraintError'){
+                res.status(403).json({"data":{"result":false,"message":"Email ya existe, ingrese uno diferente"}});    
+            }else{
+                res.status(403).json({"data":{"result":false,"message":"Algo salió mal, intente nuevamente"}});
+            }
         })
     }
     
 }
-module.exports={getEmployeeFile,addEmployeeFile}
+async function editEmployeeFile(req,res){
+    const{id,fisrtName, lastName,documentId,address,email,cargo,
+        phone,photo,digitalDoc,observation,academic,cursos,experience,contacto}=req.body;
+    
+    if(fisrtName==null || lastName==null || documentId==null ||email==null,cargo==null,phone==null,academic==null,experience==null){
+        const t = await model.sequelize.transaction();  
+        await model.employeeFile.update({fisrtName, lastName,documentId,address,email,accountId,cargo,
+        phone,photo,digitalDoc,observation,academic,cursos,experience,contacto},{where:{id}},{transaction:t}).then(async function(rsEmployeeFile){
+            t.commit();
+            res.status(200).json({"data":{"result":true,"message":"Procesado Satisfactoriamente","data":rsEmployeeFile}});
+        }).catch(async function(error){
+            t.commit();
+            res.status(403).json({"data":{"result":false,"message":"Algo salió mal, intente nuevamente"}});
+        })
+    }  
+}
+module.exports={getEmployeeFile,addEmployeeFile,editEmployeeFile}

@@ -46,7 +46,7 @@ module.exports = (sequelize, DataTypes) => {
       }
     },
     accountId: {
-      type: DataTypes.JSONB,
+      type: DataTypes.INTEGER,
       allowNull:true
     },cargo: {
       type:DataTypes.JSONB,
@@ -76,7 +76,7 @@ module.exports = (sequelize, DataTypes) => {
     },
     academic: {
       type:DataTypes.JSONB,
-      allowNull:false
+      allowNull:true
     },
     cursos: {
       type:DataTypes.JSONB

@@ -21,7 +21,8 @@ module.exports = {
         type: Sequelize.JSONB
       },
       email: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
+        unique:true
       },
       cargo: {
         type: Sequelize.JSONB
@@ -46,7 +47,8 @@ module.exports = {
         type: Sequelize.TEXT
       },
       academic: {
-        type: Sequelize.JSONB
+        type: Sequelize.JSONB,
+        allowNull: true
       },
       cursos: {
         type: Sequelize.JSONB

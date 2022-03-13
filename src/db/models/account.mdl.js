@@ -66,10 +66,10 @@ module.exports = (sequelize, DataTypes) => {
         }
       },
       set(value) {
-        if (value.length >= 8 && value.length <= 20) {
+        if (value.length >= 6 && value.length <= 20) {
           this.setDataValue('pass', bcrypt.hashSync(value, 10));
         } else {
-          throw new Error('su password debe tener entre 8-20 caracteres!');
+          throw new Error('su password debe tener entre 6-20 caracteres!');
         }
       }
     },
@@ -97,52 +97,7 @@ module.exports = (sequelize, DataTypes) => {
       allowNull:true
     },
     people: {
-      type: DataTypes.JSONB,
-      validate:{   
-        schema: schemaValidator({
-          type: "object",
-          items: {
-            type: "array",
-            required: true,
-            properties: {                               
-              document: {
-                type: "array",
-                required: true,
-                properties: {
-                  id:{type:"number",required:true},
-                  name:{type:"string",required:true},
-                  number:{type:"string",required:true}
-                }
-              },
-              firstName:{
-                type:"string",required:true
-              },
-              lastName:{
-                type:"string",required:true
-              },
-              birthdate:{
-                type:"string",required:false
-              },
-              gender: {
-                type: "array",
-                required: true,
-                properties: {
-                  id:{type:"number",required:true},
-                  name:{type:"string",required:true}
-                }
-              },
-              nationality: {
-                type: "array",
-                required: true,
-                properties: {
-                  id:{type:"number",required:true},
-                  name:{type:"string",required:true}
-                }
-              }              
-            }
-          }
-        })
-      }
+      type: DataTypes.JSONB     
     }/*,departaments:{
       type: DataTypes.JSONB,
       validate:{

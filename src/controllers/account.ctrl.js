@@ -3,29 +3,44 @@ const model=require('../db/models/index');
 const utils = require('./utils.ctrl');
 const serviceToken=require('./serviceToken.ctrl');
 const roleAccount=require('./accountRoles.ctrl');
-const bcrypt=require("bcryptjs");
+const bcrypt=require("bcryptjs"); // encripta caracteres
+var crypto = require("crypto"); // valor aleatorio
 const { Op } = require("sequelize");
+//const { token } = require('morgan');
 require ('dotenv').config();
 
 async function registerAccount(req,res){
-    const {email,name,pass,people,secret,roleId}=req.body  
-    for (let index = 0; index < secret.length; index++) { //Encripta respuestas secretas
-        
-        secret[index].answer=bcrypt.hashSync( secret[index].answer, 10)       
-    }      
-    //const dataToken=await serviceToken.dataTokenGet(req.header('Authorization').replace('Bearer ', '')); 
-    const dataToken={"people":{"firstName":"Angel","lastName":"Diaz"},"account":{"email":"angel.elcampeon@gmail.com"},}
+    const {email,people,role}=req.body  
+      //general password 8 dogotpd
+    var now=new Date();                  
+    let pass= crypto.randomBytes(4).toString('hex')+now.getTime();
+    pass = pass.slice(-6);      
+    //genera username
+    let name
+    var aleatorio=crypto.randomBytes(8).toString('hex')+now.getTime();    
+    name=aleatorio.slice(0,2)+email.slice(0,-12)+aleatorio.slice(aleatorio.length-3,aleatorio.length);       
+    const dataToken=await serviceToken.dataTokenGet(req.header('Authorization').replace('Bearer ', '')); 
+    //const dataToken={"people":{"firstName":"Angel","lastName":"Diaz"},"account":{"email":"angel.elcampeon@gmail.com"},}
     const t = await model.sequelize.transaction();  
     let audit=[]
     audit.push({"people":dataToken.people});
     audit.push({"account":dataToken.account});
-    //envia email al nuevo usuario
-        
+            
     // OPtiene todos los administradores del sistema (email) 
-    await model.account.create( {email,name,pass,people,creater:audit,secret, token:"null",isConfimr:true,isActived:true},{transaction:t})
+    await model.account.create( {email,name,pass,people,creater:audit,secret:null, token:"null",isConfimr:true,isActived:true},{transaction:t})
     .then(async function(rsAccount){   
         
-         
+        // asocia a perosna si existe con el mismo correo
+        let existPeople=await model.employeeFile.findAndCountAll({attributes:['id'],where:{email}});
+        console.log("ID Ficha: "+existPeople.rows[0].id)
+        console.log(existPeople);
+        console.log("New ID: "+rsAccount.id);
+        if(existPeople.count>0){
+            await model.employeeFile.update({accountId:rsAccount.id},{where:{id:existPeople.rows[0].id}},{transaction:t})
+        }
+         //aplica membresías 
+
+
         await model.accountRole.findAll({
             attributes:['id'],
             where:{roleId:5}
@@ -39,29 +54,33 @@ async function registerAccount(req,res){
                             text:dataToken.people.firstName+" "+dataToken.people.lastName + " ha creado una nueva cuenta de usuario con el nombre "+rsAccount.name+"("+rsAccount.id+")",
                             title:"Nueva cuenta CEMA creada satisfactoriamente",
                             subtitle:rsAccount.name+"("+rsAccount.id+")",
-                            link:"http://account/details/"+rsAccount.id
+                            link:"http://"+process.env.HOST_FRONT+"/account/details/"+rsAccount.id
                             },
                         read:false,
                         accountRolesId:rsAccountRole[index].id
                     })
                 }                
-            }).then(async function(rsNotification){
-                
-                t.commit();
-               
+            }).then(async function(rsNotification){       
                  //envia notificaión al usuario                
-                if(await utils.isInternetConnect()){ //valida conexion a internet
+               // if(await utils.isInternetConnect()){ //valida conexion a internet
+               t.commit();
                     const urlLogin=process.env.HOST_FRONT+"/login";                    
                     var sendMail= await utils.sendMail({ // Notifica al nuevo usuario
                         from:"CEMA OnLine <" + process.env.EMAIL_MANAGER +	'>',
                         to:rsAccount.email,
-                        subject:"CEMA Online",
-                        text:"para iniciar su sesión en CEMA On Line haga click en el enlace ",
+                        subject:"Cuenta Creada",
+                        text:"para iniciar su sesión en CEMA On Line haga click en el enlace, su password es: "+ pass,
                         title:"Ya eres usuario de CEMA Online",
                         subtitle:null,                
                         action:urlLogin,
                         actionLabel:"Iniciar Sesión"
                     });
+                    if(sendMail){
+//                        t.commit();
+                        res.status(200).json({"data":{"result":true,"message":"Cuenta de usuario registrada satisfactoriamente"}});
+                    }else{
+                        res.status(403).json({"data":{"result":false,"message":"Algo salió mal creando cuenta de usuario, intente nuevamente"}}); 
+                    }
                     let adminEmail=await model.account.findAll({ //busca lista de email de administradores del sistemas
                         attributes:['email'],
                         include:[{
@@ -93,8 +112,9 @@ async function registerAccount(req,res){
                         action:urlProfile,                                       
                         actionLabel:'Ver Detalles'
                     });                   
-                }  
-                res.status(200).json({"data":{"result":true,"message":"Cuenta de usuario registrada satisfactoriamente"}});               
+                /*}else{
+                    res.status(403).json({"data":{"result":false,"message":"No hay conexión a Internet"}});       
+                }  */                            
             }).catch(async function(error){
                 console.log(error);               
                 res.status(403).json({"data":{"result":false,"message":"Algo salió mal creando cuenta de usuario"}});         
@@ -105,7 +125,7 @@ async function registerAccount(req,res){
         if(error.name=='SequelizeUniqueConstraintError'){
             res.status(403).json({"data":{"result":false,"message":error.parent.detail}})	    
         }else{
-            res.status(403).json({"data":{"result":false,"message":"Algo salio mal procesando registro","code":"P006"}})	
+            res.status(403).json({"data":{"result":false,"message":"Algo salio mal procesando registro:"+error,"code":"P006"}})	
         }
         
     })
