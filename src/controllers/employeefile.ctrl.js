@@ -1,5 +1,5 @@
 const model=require('../db/models/index');
-
+const { Op } = require("sequelize");
 async function getEmployeeFile(req,res){
     const {id}=req.params;
     await model.employeeFile.findOne({        
@@ -62,4 +62,40 @@ async function editEmployeeFile(req,res){
         })
     }  
 }
-module.exports={getEmployeeFile,addEmployeeFile,editEmployeeFile}
+async function getEmployeeFileByGroups(req,res){
+    const {grp} =req.query;  
+    return await model.role.findAll({
+        attributes:[['id','roleId'],'name','isActived'],
+        where:{
+            isActived:true,
+            id:{
+                [Op.or]:[grp]
+            }
+        },
+        include:[{
+            model:model.accountRole,
+            require:false,
+            attributes:[['id','roleAccountId']],
+            include:[
+                {
+                    model:model.account,
+                    require:false,
+                    attributes:[['id','accountId'],'name','email'],
+                    include:[
+                        {
+                            model:model.employeeFile                           
+                        }
+                    ]
+                    
+                   
+                }
+            ]
+        }]
+    }).then(async function(rsEmploye){
+        res.status(200).json({"data":{"result":true,"message":"Busqueda satisfactoria","data":rsEmploye}});
+    }).catch(async function(error){
+        console.log(error);
+        res.status(403).json({"data":{"result":false,"message":"Algo salió mal, intente nuevamente"}});
+    })
+}
+module.exports={getEmployeeFile,addEmployeeFile,editEmployeeFile,getEmployeeFileByGroups}

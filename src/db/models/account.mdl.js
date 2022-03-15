@@ -21,6 +21,7 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       // define association here
       account.hasMany(models.accountRole);
+      account.hasMany(models.employeeFile);
     }
   };
   account.init({    

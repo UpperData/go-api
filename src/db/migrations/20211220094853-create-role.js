@@ -16,6 +16,10 @@ module.exports = {
         type: Sequelize.BOOLEAN,
         allowNull: false
       },
+        icon:{
+          type: Sequelize.STRING,
+          allowNull: true
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE

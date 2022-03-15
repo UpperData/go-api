@@ -1,4 +1,5 @@
 const model=require('../db/models/index');
+const { Op } = require("sequelize");
 async function currentAccount(token){
 	try{
 		var  payload= await jwt.decode(token,process.env.JWT_SECRET);
@@ -162,4 +163,31 @@ async function getCargo(req,res){
         })
     } 
 }
-module.exports={getCivil,currentAccount,getPhoneType,getDepartament,getSubDepartament,getCargo}
+async function getPatienType(req,res){
+	const {id}=req.params;
+    if(id!='*'){
+        //Busca un Departamento
+        return await model.patientType.findAll({
+            attributes:['id','name'],
+            where:{id}
+        }).then(async function(rsPatientType){
+            if(rsPatientType){
+                res.status(200).json({"data":{"result":true,"message":"Busqueda satisfatoria","data":rsPatientType}});        
+            }else{
+                res.status(403).json({"data":{"result":false,"message":"No existe registro con este código"}});            
+            }            
+        }).catch(async function(errror){            
+            res.status(403).json({"data":{"result":false,"message":"Algo salió mal buscando registro"}});        
+        })
+    }else{
+        //Busca todos Cargos de un departamento
+        return await model.patientType.findAll(            
+            { attributes:['id','name'],
+            order:['id']}).then(async function(rsPatientType){
+            res.status(200).json({"data":{"result":true,"message":"Busqueda satisfatoria","data":rsPatientType}});        
+        }).catch(async function(errror){            
+            res.status(403).json({"data":{"result":false,"message":"Algo salió mal buscando registro"}});        
+        })
+    } 
+}
+module.exports={getCivil,currentAccount,getPhoneType,getDepartament,getSubDepartament,getCargo,getPatienType}
