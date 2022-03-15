@@ -30,9 +30,9 @@ async function getRole(req,res){
     
 }
 async function createRole(req,res){ 
-    const{name,isActived}=req.body;
+    const{name,isActived,icon}=req.body;
     const t = await model.sequelize.transaction();
-    return await model.role.create({name,isActived:true},{transaction:t}).then(async function(rsRole){
+    return await model.role.create({name,isActived:true,icon},{transaction:t}).then(async function(rsRole){
         t.commit();
         res.status(200).json({"data":{"result":true,"message":"Registro Satisfactorio","data":rsRole}});      
     }).catch(async function(error){        
@@ -41,9 +41,9 @@ async function createRole(req,res){
     })
 }
 async function editRole(req,res){
-    const{id,name,isActived}=req.body;
+    const{id,name,isActived,icon}=req.body;
     const t = await model.sequelize.transaction();
-    return await model.role.update({name,isActived},{where:{id}},{transaction:t}).then(async function(rsRole){
+    return await model.role.update({name,isActived,icon},{where:{id}},{transaction:t}).then(async function(rsRole){
         t.commit();
         res.status(200).json({"data":{"result":true,"message":"Actualización Satisfactoria","data":rsRole}});      
     }).catch(async function(error){
