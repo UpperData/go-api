@@ -190,4 +190,151 @@ async function getPatienType(req,res){
         })
     } 
 }
-module.exports={getCivil,currentAccount,getPhoneType,getDepartament,getSubDepartament,getCargo,getPatienType}
+async function getState(req,res){ 
+    const {id}=req.params;
+    if(id!='*'){
+        //Busca un estados de Venezuela
+        return await model.state.findOne({
+            attributes:['id','name'],
+            where:{id}
+        }).then(async function(rsState){
+            if(rsState){
+                res.status(200).json({"data":{"result":true,"message":"Busqueda satisfatoria","data":rsState}});        
+            }else{
+                res.status(403).json({"data":{"result":false,"message":"No existe registro con este código"}});            
+            }            
+        }).catch(async function(errror){            
+            res.status(403).json({"data":{"result":false,"message":"Algo salió mal buscando registro"}});        
+        })
+    }else{
+        //Busca todos de estados de Venezuela
+        return await model.state.findAll(            
+            { attributes:['id','name']           ,
+           order:['id']}).then(async function(rsState){
+            res.status(200).json({"data":{"result":true,"message":"Busqueda satisfatoria","data":rsState}});        
+        }).catch(async function(errror){            
+            res.status(403).json({"data":{"result":false,"message":"Algo salió mal buscando registro"}});        
+        })
+    }    
+}
+async function getCitiesByState(req,res){ 
+    const {stateId}=req.params;
+    if(stateId!='*'){
+        //Busca un estados de Venezuela
+        return await model.city.findAll({
+            attributes:['id','name','isCapital'],
+            where:{stateId},
+            include:[
+                {
+                    model:model.state,
+                    attributes:['id','name']
+                }
+            ]
+        }).then(async function(rsCity){
+            if(rsCity){
+                res.status(200).json({"data":{"result":true,"message":"Busqueda satisfatoria","data":rsCity}});        
+            }else{
+                res.status(403).json({"data":{"result":false,"message":"No existe registro con este código"}});            
+            }            
+        }).catch(async function(error){  
+            console.log(error)    
+            res.status(403).json({"data":{"result":false,"message":"Algo salió mal buscando registro"}});        
+        })
+    }else{
+        //Busca todos de estados de Venezuela
+        return await model.city.findAll(            
+            { attributes:['id','name','isCapital'],
+            include:[
+                {
+                    model:model.state,
+                    attributes:['id','name']
+                }
+            ],
+           order:['id']}).then(async function(rsCity){
+            res.status(200).json({"data":{"result":true,"message":"Busqueda satisfatoria","data":rsCity}});        
+        }).catch(async function(errror){            
+            res.status(403).json({"data":{"result":false,"message":"Algo salió mal buscando registro"}});        
+        })
+    }    
+}
+async function getProvincesByState(req,res){ 
+    const {stateId}=req.params;
+    if(stateId!='*'){
+        //Busca un estados de Venezuela
+        return await model.province.findAll({
+            attributes:['id','name'],
+            where:{stateId},
+            include:[
+                {
+                    model:model.state,
+                    attributes:['id','name']
+                }
+            ]
+        }).then(async function(rsProvince){
+            if(rsProvince){
+                res.status(200).json({"data":{"result":true,"message":"Busqueda satisfatoria","data":rsProvince}});        
+            }else{
+                res.status(403).json({"data":{"result":false,"message":"No existe registro con este código"}});            
+            }            
+        }).catch(async function(error){  
+            console.log(error)    
+            res.status(403).json({"data":{"result":false,"message":"Algo salió mal buscando registro"}});        
+        })
+    }else{
+        //Busca todos de estados de Venezuela
+        return await model.province.findAll(            
+            { attributes:['id','name'],
+            include:[
+                {
+                    model:model.state,
+                    attributes:['id','name']
+                }
+            ],
+           order:['id']}).then(async function(rsProvince){
+            res.status(200).json({"data":{"result":true,"message":"Busqueda satisfatoria","data":rsProvince}});        
+        }).catch(async function(errror){            
+            res.status(403).json({"data":{"result":false,"message":"Algo salió mal buscando registro"}});        
+        })
+    }    
+}
+async function getParroquiaByProvince(req,res){ 
+    const {provinceId}=req.params;
+    if(provinceId!='*'){
+        //Busca un estados de Venezuela
+        return await model.parroquia.findAll({
+            attributes:['id','name'],
+            where:{provinceId},
+            include:[
+                {
+                    model:model.province,
+                    attributes:['id','name']
+                }
+            ]
+        }).then(async function(rsParroquia){
+            if(rsParroquia){
+                res.status(200).json({"data":{"result":true,"message":"Busqueda satisfatoria","data":rsParroquia}});        
+            }else{
+                res.status(403).json({"data":{"result":false,"message":"No existe registro con este código"}});            
+            }            
+        }).catch(async function(error){  
+            console.log(error)    
+            res.status(403).json({"data":{"result":false,"message":"Algo salió mal buscando registro"}});        
+        })
+    }else{
+        //Busca todos de estados de Venezuela
+        return await model.parroquia.findAll(            
+            { attributes:['id','name'],
+            include:[
+                {
+                    model:model.province,
+                    attributes:['id','name']
+                }
+            ],
+           order:['id']}).then(async function(rsParroquia){
+            res.status(200).json({"data":{"result":true,"message":"Busqueda satisfatoria","data":rsParroquia}});        
+        }).catch(async function(error){            
+            res.status(403).json({"data":{"result":false,"message":"Algo salió mal buscando registro"}});        
+        })
+    }    
+}
+module.exports={getCivil,currentAccount,getPhoneType,getDepartament,getSubDepartament,getCargo,getPatienType,getState,getCitiesByState,getProvincesByState,getParroquiaByProvince}
