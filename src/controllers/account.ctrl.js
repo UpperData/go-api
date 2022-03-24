@@ -10,7 +10,7 @@ const { Op } = require("sequelize");
 require ('dotenv').config();
 
 async function registerAccount(req,res){
-    const {email,people,role}=req.body  
+    const {email,people,merberships}=req.body  
       //general password 8 dogotpd
     var now=new Date();                  
     let pass= crypto.randomBytes(4).toString('hex')+now.getTime();
@@ -31,16 +31,15 @@ async function registerAccount(req,res){
     .then(async function(rsAccount){   
         
         // asocia a perosna si existe con el mismo correo
-        let existPeople=await model.employeeFile.findAndCountAll({attributes:['id'],where:{email}});
-        console.log("ID Ficha: "+existPeople.rows[0].id)
-        console.log(existPeople);
-        console.log("New ID: "+rsAccount.id);
+        let existPeople=await model.employeeFile.findAndCountAll({attributes:['id'],where:{email}});        
         if(existPeople.count>0){
             await model.employeeFile.update({accountId:rsAccount.id},{where:{id:existPeople.rows[0].id}},{transaction:t})
         }
          //aplica membresías 
-
-
+         for (let index = 0; index < merberships.length; index++) {
+            await model.accountRole.create({roleId:merberships[index],accountId:rsAccount.id,isActived:true},{transaction:t});
+         }
+        //Fin aplica membresias
         await model.accountRole.findAll({
             attributes:['id'],
             where:{roleId:5}

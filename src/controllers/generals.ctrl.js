@@ -337,4 +337,33 @@ async function getParroquiaByProvince(req,res){
         })
     }    
 }
-module.exports={getCivil,currentAccount,getPhoneType,getDepartament,getSubDepartament,getCargo,getPatienType,getState,getCitiesByState,getProvincesByState,getParroquiaByProvince}
+async function getAppointmentTpye(req,res){ 
+    const {id}=req.params;
+    if(id!='*'){
+        //Busca un estados de Venezuela
+        return await model.appointmentType.findAll({
+            attributes:['id','name','icon'],
+            where:{id}
+        }).then(async function(rsAppointmentType){
+            if(rsAppointmentType){
+                res.status(200).json({"data":{"result":true,"message":"Busqueda satisfatoria","data":rsAppointmentType}});        
+            }else{
+                res.status(403).json({"data":{"result":false,"message":"No existe registro con este código"}});            
+            }            
+        }).catch(async function(error){  
+            console.log(error)    
+            res.status(403).json({"data":{"result":false,"message":"Algo salió mal buscando registro"}});        
+        })
+    }else{
+        //Busca todos de estados de Venezuela
+        return await model.appointmentType.findAll(            
+            { attributes:['id','name','icon'],
+           order:['id']}).then(async function(rsAppointmentType){
+            res.status(200).json({"data":{"result":true,"message":"Busqueda satisfatoria","data":rsAppointmentType}});        
+        }).catch(async function(error){            
+            res.status(403).json({"data":{"result":false,"message":"Algo salió mal buscando registro"}});        
+        })
+    }    
+}
+module.exports={getCivil,currentAccount,getPhoneType,getDepartament,getSubDepartament,getCargo,getPatienType,getState,getCitiesByState,
+    getProvincesByState,getParroquiaByProvince,getAppointmentTpye}

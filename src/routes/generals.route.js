@@ -14,4 +14,5 @@ router.get('/StaTES/VZLA/gET/:id',forceBrute.notBruteSecure,auth.autorizedRole([
 router.get('/citIes/VZlA/STAte/:stateId',forceBrute.notBruteSecure,auth.autorizedRole(['*']), general.getCitiesByState); // retorna ciudades de un estado
 router.get('/PROvInCES/VzlA/State/:stateId',forceBrute.notBruteSecure,auth.autorizedRole(['*']), general.getProvincesByState); // retorna municipios de un estado
 router.get('/pARRoQuiaS/vzlA/PROVINCes/:provinceId',forceBrute.notBruteSecure,auth.autorizedRole(['*']), general.getParroquiaByProvince); // retorna parroquias de municipio
+router.get('/APpOINtMENt/typE/:id',forceBrute.notBruteSecure,auth.autorizedRole(['*']), general.getAppointmentTpye); // Tipos de citas
 module.exports=router;

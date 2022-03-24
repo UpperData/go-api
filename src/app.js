@@ -38,6 +38,8 @@ app.use(require('./routes/departament.route'));
 app.use(require('./routes/employeefile.route'));
 app.use(require('./routes/membership.route'));
 app.use(require('./routes/generals.route'));
+app.use(require('./routes/appointmet.route'));
+app.use(require('./routes/medicalReport.route'));
 
 app.listen(app.get('port'),function(){
     console.log('cema is working in port:', app.get('port'));
