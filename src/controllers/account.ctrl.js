@@ -663,13 +663,16 @@ async function emailVerify(req,res){ //certifica email
 async function isCertificated(req,res){ // Verifica si un email esta certificado    
     const dataToken=await serviceToken.dataTokenGet(req.header('Authorization').replace('Bearer ', ''));      
     if(dataToken){
-        await model.account.findOne({attributes:['id','isConfirmed'],where:{id:dataToken['account'].id}}).then(async function(rsAccount){
-            if(rsAccount.isConfirmed){
+       
+        await model.account.findAndCountAll({attributes:['id','isConfirmed'],where:{id:dataToken['account'].id}}).then(async function(rsAccount){
+            //console.log(rsAccount);
+            if(rsAccount.count>0){
                 res.status(200).json({data:{"result":true,"message":"Email certificado"}}); 
             }else{
                 res.status(403).json({data:{"result":false,"message":"Tu email no se ha certificado, muchas tareas requieren que su email esté certificado"}})
             }
         }).catch(async function(error){
+            console.log(error);
             res.status(403).json({data:{"result":false,"message":"Algo salió mal, intente nuevames"}})
         })
     }else{
