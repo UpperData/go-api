@@ -10,7 +10,7 @@ const { Op } = require("sequelize");
 require ('dotenv').config();
 
 async function registerAccount(req,res){
-    const {email,people,merberships}=req.body  
+    const {email,people,memberships}=req.body  
       //general password 8 dogotpd
     var now=new Date();                  
     let pass= crypto.randomBytes(4).toString('hex')+now.getTime();
@@ -36,9 +36,12 @@ async function registerAccount(req,res){
             await model.employeeFile.update({accountId:rsAccount.id},{where:{id:existPeople.rows[0].id}},{transaction:t})
         }
          //aplica membresías 
-         for (let index = 0; index < merberships.length; index++) {
-            await model.accountRole.create({roleId:merberships[index],accountId:rsAccount.id,isActived:true},{transaction:t});
+         if(memberships){
+            for (let index = 0; index < memberships.length; index++) {
+                await model.accountRole.create({roleId:memberships[index],accountId:rsAccount.id,isActived:true},{transaction:t});
+             }
          }
+         
         //Fin aplica membresias
         await model.accountRole.findAll({
             attributes:['id'],
