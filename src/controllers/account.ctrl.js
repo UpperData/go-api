@@ -501,7 +501,7 @@ async function getProfile(req,res){  //optiene el perfil de un usuario
     const token= req.header('Authorization').replace('Bearer ', '');
     const  currentAccount=await serviceToken.dataTokenGet(token);   
     await model.account.findOne({    
-        attributes:[['id','accountId'],'email','name','isConfirmed','photo','people'],
+        attributes:[['id','accountId'],'email','name','isConfirmed','photo','people','createdAt','updatedAt'],
         where:{id:currentAccount['account'].id }
     }).then(async function(rsProfile){
         res.status(200).json({"data":{
