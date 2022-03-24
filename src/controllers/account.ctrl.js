@@ -306,7 +306,11 @@ async function passwordUpdate(req,res){
             }else{
                 res.status(403).json({data:{"result":false,"message":"Password actual incorrecto"}});  
             }
+        }).catch(async function(error){
+            res.status(403).json({data:{"result":false,"message":"Algo salió mal procesando cambio de password"}});  
         })
+    }).catch(async function(error){
+        res.status(403).json({data:{"result":false,"message":"Algo salió mal validando cuenta de usuario"}});  
     })
 }
 async function validateEmail(req,res){ // valida exitencia de email
