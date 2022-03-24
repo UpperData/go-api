@@ -299,14 +299,16 @@ async function passwordUpdate(req,res){
                     }else{
                         res.status(403).json({data:{"result":false,"message":"Algo salió mal procesando su solicitud, intente nuevamente"}});       
                     }                          
-                }).catch(async function(error){                    
+                }).catch(async function(error){                                        
                     t.rollback();
                     res.status(403).json({data:{"result":false,"message":"Algo salió mal actualizando password"}});        
                 })
             }else{
+                console.log(error);
                 res.status(403).json({data:{"result":false,"message":"Password actual incorrecto"}});  
             }
         }).catch(async function(error){
+            console.log(error);
             res.status(403).json({data:{"result":false,"message":"Algo salió mal procesando cambio de password"}});  
         })
     }).catch(async function(error){
