@@ -365,5 +365,33 @@ async function getAppointmentTpye(req,res){
         })
     }    
 }
+async function getExams(req,res){ 
+    const {id}=req.params;
+    if(id!='*'){
+        //Busca un estados de Venezuela
+        return await model.exam.findAll({
+            attributes:['id','name'],
+            where:{id}
+        }).then(async function(rsExam){
+            if(rsExam){
+                res.status(200).json({"data":{"result":true,"message":"Busqueda satisfatoria","data":rsExam}});        
+            }else{
+                res.status(403).json({"data":{"result":false,"message":"No existe registro con este código"}});            
+            }            
+        }).catch(async function(error){  
+            console.log(error)    
+            res.status(403).json({"data":{"result":false,"message":"Algo salió mal buscando registro"}});        
+        })
+    }else{
+        //Busca todos de estados de Venezuela
+        return await model.exam.findAll(            
+            { attributes:['id','name'],
+           order:['id']}).then(async function(rsExam){
+            res.status(200).json({"data":{"result":true,"message":"Busqueda satisfatoria","data":rsExam}});        
+        }).catch(async function(error){            
+            res.status(403).json({"data":{"result":false,"message":"Algo salió mal buscando registro"}});        
+        })
+    }    
+}
 module.exports={getCivil,currentAccount,getPhoneType,getDepartament,getSubDepartament,getCargo,getPatienType,getState,getCitiesByState,
-    getProvincesByState,getParroquiaByProvince,getAppointmentTpye}
+    getProvincesByState,getParroquiaByProvince,getAppointmentTpye,getExams}

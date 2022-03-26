@@ -647,12 +647,10 @@ async function emailVerify(req,res){ //certifica email
             });
             if(sendMail){
                 t.commit();
-                res.redirect(process.env.HOST_FRONT+"/verify/email?success=true");
-                //res.status(200).json({data:{"result":true,"message":"Operación procesada satisfactoriamente"}});    
+                res.redirect(process.env.HOST_FRONT+"/verify/email?success=true");                
             }else{
                 t.rollback();
-                res.redirect(process.env.HOST_FRONT+"/verify/email?success=false");
-                //res.status(403).json({data:{"result":false,"message":"Algo salió mal procesando su solicitud, intente nuevamente"}});       
+                res.redirect(process.env.HOST_FRONT+"/verify/email?success=false");                
             }    
         }).catch(async function(error){
             console.log(error);
