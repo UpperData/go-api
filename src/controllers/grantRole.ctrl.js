@@ -9,12 +9,12 @@ async function addGrantRole(req,res){
                 attributes:['id','permissionId','isActived'],
                 where:{roleId,permissionId:permission[index].id}
             }).then(async function(rsGrantRole){               
-                
+                console.log(rsGrantRole['rows'][0].id)
                 if(rsGrantRole.count==0){
                     await model.grantRole.create({roleId,permissionId:permission[index].id,isActived:permission[index].isActived},{transaction:t})
                 }else{
                     await model.grantRole.update({roleId,permissionId:permission[index].id,isActived:permission[index].isActived},
-                        {where:{id:rsGrantRole.id}},{transaction:t})
+                        {where:{id:rsGrantRole['rows'][0].id}},{transaction:t})
                     }
             });           
         }
