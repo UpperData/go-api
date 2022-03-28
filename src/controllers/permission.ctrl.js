@@ -130,7 +130,7 @@ async function endPermission(req,res){
     const{groupId,moduleId,subModuleId}=req.params;
     await model.grantRole.findAll({
         attributes:[['id','grantRoleId'],'roleId','permissionId','isActived'],
-        where:{isActived:true,roleId:groupId},
+        where:{roleId:groupId},
         include:[
             {
                 model:model.permission,
