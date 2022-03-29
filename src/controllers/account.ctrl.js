@@ -709,6 +709,7 @@ async function getSecretCurrent(req,res){ // obtiene preguntas secretas del sesi
     }
     
 }
+
 module.exports={
     registerAccount,
     loginAccount,
@@ -727,5 +728,6 @@ module.exports={
     emailVerify, //Certifica email
     isCertificated, // Verifica si un email esta certificado
     getSecretCurrent,// obtiene preguntas secretas del usuario actual
+
 
 }

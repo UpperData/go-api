@@ -17,7 +17,7 @@ async function passwordResetEnable(req,res){ // hablita el cambio de password
             await model.account.update({hashConfirm:token},{where:{id:rsUser.id}},{transaction:t})
             .then(async function(rsAccount){                 
                 await t.commit();                    
-                res.status(200).json({data:{"result":true,"message":"Se autorizó al usuario para actualizar su password","token":token}});
+                res.status(200).json({data:{"result":true,"message":"Se autorizó al usuario para restaurar su password","token":token}});
             }).catch(async function (error){
                 await t.rollback();
                 res.status(403).json({data:{"result":false,"message":"Algo salió mal autorizando cambio de password"}});
@@ -92,4 +92,29 @@ async function getRoleByAccount(req,res){
 		res.status(403).json({ data:{"result":false,"message":"Algo salió mal, no se pudo buscar "}})
 	})	
 }
-module.exports={passwordResetEnable,activateAccount,getAccountWithToken,getRoleByAccount};
+async function passwordResetRevoke(req,res){ // hablita el cambio de password
+    const {id}=req.params
+    const t = await model.sequelize.transaction();  	
+    return await model.account.findOne({       
+    where: {id},
+    }).then(async function (rsUser){	
+        if(rsUser){        
+            await model.account.update({hashConfirm:null},{where:{id:rsUser.id}},{transaction:t})
+            .then(async function(rsAccount){                 
+                await t.commit();                    
+                res.status(200).json({data:{"result":true,"message":"Se deshabilito para restaurar password"}});
+            }).catch(async function (error){
+                await t.rollback();
+                res.status(403).json({data:{"result":false,"message":"Algo salió mal, intente nuevamente"}});
+            })
+        }else{
+            await t.rollback();
+            res.status(403).json({data:{"result":false,"message":"Usuario no existe"}});
+        }
+    }).catch(async function(error){
+       // await t.rollback();
+        console.log(error);
+        res.status(403).json({data:{"result":false,"message":"Algo salió mal validando cuenta de usuario"}});
+    })
+}
+module.exports={passwordResetEnable,activateAccount,getAccountWithToken,getRoleByAccount,passwordResetRevoke};
