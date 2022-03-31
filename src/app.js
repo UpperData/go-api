@@ -8,10 +8,10 @@ const rateLimit = require("express-rate-limit");
 const app =express(); //incializa el framework
 
 // Configuraciones
-const apiLimiter = rateLimit({ // Limite de peticiones a una ruta
+/*const apiLimiter = rateLimit({ // Limite de peticiones a una ruta
     windowMs: 15 * 60 * 1000, // 15 minutes
     max: 1000 // Conexiones maximas 1000
-  });
+  });*/
 
 //app.set('trust proxy', 1); // trabaja en conjunto con el limite de peticiones a las ruta
 //app.use(apiLimiter); // Limita conexiones
