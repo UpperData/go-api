@@ -14,10 +14,24 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
   inventory.init({
-    articleId: DataTypes.INTEGER,
-    minStock: DataTypes.INTEGER,
-    existence: DataTypes.INTEGER,
-    price: DataTypes.DECIMAL
+    articleId: {
+      type: DataTypes.INTEGER,
+      unique:true,
+      references:{model:{tableName:'articles',schema:'public'},key:'id'}
+    },
+    minStock: {
+      type:DataTypes.INTEGER,
+      allowNull:false
+    },
+    existence: {
+      type:DataTypes.INTEGER,
+      allowNull:false
+    },
+    price: {
+      type:DataTypes.DECIMAL,
+      allowNull:false,
+      defaultValue:0
+  }
   }, {
     sequelize,
     modelName: 'inventory',

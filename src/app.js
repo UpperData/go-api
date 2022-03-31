@@ -10,7 +10,7 @@ const app =express(); //incializa el framework
 // Configuraciones
 const apiLimiter = rateLimit({ // Limite de peticiones a una ruta
     windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 1000000 // Conexiones maximas 1000
+    max: 1000 // Conexiones maximas 1000
   });
 
 //app.set('trust proxy', 1); // trabaja en conjunto con el limite de peticiones a las ruta
@@ -40,6 +40,7 @@ app.use(require('./routes/membership.route'));
 app.use(require('./routes/generals.route'));
 app.use(require('./routes/appointmet.route'));
 app.use(require('./routes/medicalReport.route'));
+app.use(require('./routes/inventory.route'));
 
 app.listen(app.get('port'),function(){
     console.log('cema is working in port:', app.get('port'));

@@ -1,6 +1,7 @@
 const model=require('../db/models/index');
 const { Op } = require("sequelize");
-var moment=require('moment');
+const serviceToken=require('./serviceToken.ctrl');
+
 async function appointmentNew(req,res){
     const{
         dateAppointment,hourAppointment,foreignId,siniestroId,address,isOpened,medialPersonal,appointmentTypeId,
@@ -17,6 +18,12 @@ async function appointmentNew(req,res){
         }
     }).then(async function(rsPatient){        
         const t = await model.sequelize.transaction();
+        let document={
+            "nationality":nationality,
+            "number":cedula,
+            "gender":gender ,
+            "civil":civil 
+        }
         if(rsPatient.count>0){    //exites el paciente  
             //patientId=  rsPatient['rows'][0].id;            
             await model.patient.update({                
@@ -27,19 +34,14 @@ async function appointmentNew(req,res){
                 phone: phone,
                 patientTypeId
             },{where:{id:rsPatient['rows'][0].id}},{transaction:t}).then(async function(rsPatientupdate){
-                patientId=rsPatientNew.id
+                patientId=rsPatient['rows'][0].id
             }).catch(async function(error){               
                 t.rollback()
                 res.status(403).json({data:{"result":false,"message":error.message}});
             })
         }
         else{ // registra paciente
-            document={
-                "nationality":nationality,
-                "number":cedula,
-                "gender":gender ,
-                "civil":civil 
-            }
+            
             await model.patient.create({
                 document,
                 nombre: firstName,
@@ -172,11 +174,51 @@ async function getAppointment(req,res){
             }else{
                 res.status(403).json({"data":{"result":false,"message":"No existe registro con este código"}});            
             }            
-        }).catch(async function(error){  
-            console.log(error)    
+        }).catch(async function(error){              
             res.status(403).json({"data":{"result":false,"message":"Algo salió mal buscando registro"}});        
         })
 
     }    
 }
-module.exports={appointmentNew,updateAppointment,getAppointment}
+async function getAppointmentByDoctor(req,res){    
+    const dataToken=await serviceToken.dataTokenGet(req.header('Authorization').replace('Bearer ', ''));    
+    if(dataToken){
+        await model.employeeFile.findOne({ // busca la ficha del empleado
+            where:{accountId:dataToken['account'].id}
+        }).then(async function(rsEmployee){
+            await model.patient.findAll(
+                {
+                    attributes:[['id','patientId'],'nombre','apellido','document'],
+                    include:[
+                        {
+                            model:model.appointment,
+                            attributes:[['id','appointmentId']],
+                            where:{
+                                medialPersonal:{
+                                    doctor:{
+                                        employeeId:rsEmployee.id
+                                        
+                                    }
+                                },isOpened:true
+                            }
+                        }
+                    ]
+                }
+            ).then(async function(rsPatient){
+                console.log(rsPatient);
+                res.status(200).json({"data":{"result":true,"message":"Busqueda satisfatoria","data":rsPatient}});  
+            }).catch(async function(error){  
+                console.log(error)    
+                res.status(403).json({"data":{"result":false,"message":"Algo salió mal buscando registro"}});        
+            })
+        }).catch(async function(error){  
+            console.log(error)    
+            res.status(403).json({"data":{"result":false,"message":"Algo salió mal buscando registro"}});        
+        })        
+    }
+}
+module.exports={appointmentNew, //Nueva cita
+    updateAppointment, //modifica cita
+    getAppointment, //busca cita
+    getAppointmentByDoctor //busca citas de un doctor
+} 

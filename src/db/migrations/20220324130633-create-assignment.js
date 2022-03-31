@@ -8,11 +8,13 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      doctorId: {
-        type: Sequelize.INTEGER
+      accountId: {
+        type: Sequelize.INTEGER,        
+        references:{model:{tableName:'accounts',schema:'public'},key:'id'}
       },
       articleId: {
-        type: Sequelize.INTEGER
+        type: Sequelize.INTEGER,
+        references:{model:{tableName:'articles',schema:'public'},key:'id'}
       },
       quantity: {
         type: Sequelize.INTEGER
@@ -27,6 +29,13 @@ module.exports = {
       updatedAt: {
         allowNull: false,
         type: Sequelize.DATE
+      }
+    },{
+      uniqueKeys: {
+        accountRolesKey: {
+          customIndex: true,
+          fields: ["articleId","accountId"]
+        }
       }
     });
   },
