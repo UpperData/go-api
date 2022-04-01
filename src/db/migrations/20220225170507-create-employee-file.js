@@ -38,10 +38,10 @@ module.exports = {
         type: Sequelize.JSONB
       },
       photo: {
-        type: Sequelize.STRING
+        type: Sequelize.TEXT
       },
       digitalDoc: {
-        type: Sequelize.STRING
+        type: Sequelize.TEXT
       },
       observation: {
         type: Sequelize.TEXT
