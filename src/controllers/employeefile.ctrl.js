@@ -18,17 +18,21 @@ async function addEmployeeFile(req,res){
     if(fisrtName==null || lastName==null || documentId==null ||email==null,cargo==null,phone==null,academic==null,experience==null){
         const t = await model.sequelize.transaction(); 
         const accountFinded=await model.account.findOne({attributes:['id'],where:{email}});         
-        let accountId=null;
-        if(accountFinded && accountFinded.id>0){            
-            accountId=accountFinded.id;
-            //Actualiza informacion personal de la cuenta
-            let people= {
-                "document":documentId,
-                "firstName":fisrtName,
-                "lastName":lastName,
-                "birthdate":birthdate                     
-              }
-            await model.account.update({people},{where:{email}},{transaction:t});
+        let accountId=null;        
+        if(accountFinded ){        
+
+            if(accountFinded.id>0){
+                accountId=accountFinded.id;
+                //Actualiza informacion personal de la cuenta
+                let people= {
+                    "document":documentId,
+                    "firstName":fisrtName,
+                    "lastName":lastName,
+                    "birthdate":birthdate                     
+                }
+                await model.account.update({people},{where:{email}},{transaction:t});
+            }
+            
         }
         await model.employeeFile.create({fisrtName, lastName,documentId,address,email,accountId,cargo,
         phone,photo,digitalDoc,observation,academic,cursos,experience,contacto},{transaction:t}).then(async function(rsEmployeeFile){
@@ -38,7 +42,7 @@ async function addEmployeeFile(req,res){
             t.rollback(); 
             console.log(error);           
             if(error.name='SequelizeUniqueConstraintError'){
-                res.status(403).json({"data":{"result":false,"message":"Email ya existe, ingrese uno diferente"}});    
+                res.status(403).json({"data":{"result":false,"message":error.message}});    
             }else{
                 res.status(403).json({"data":{"result":false,"message":"Algo salió mal, intente nuevamente"}});
             }
