@@ -10,8 +10,8 @@ const rateLimit = require("express-rate-limit");
     });
  }
  const notBruteSecure =rateLimit({
-    windowMs: 15 * 60 * 1000, // 15 min 
-    max: 50, // start blocking after 50 requests
+    windowMs: 15 * 60 * 1000, // 15 min  15 * 60 * 1000
+    max: 500000, // start blocking after 50 requests
     message:
     "Excediste el limite de peticiones, debe esperar una hora intentar nuevamente ",
     handler:
