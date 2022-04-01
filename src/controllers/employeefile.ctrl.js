@@ -42,6 +42,7 @@ async function addEmployeeFile(req,res){
             t.rollback(); 
             console.log(error);           
             if(error.name='SequelizeUniqueConstraintError'){
+                console.log(error);
                 res.status(403).json({"data":{"result":false,"message":error.message}});    
             }else{
                 res.status(403).json({"data":{"result":false,"message":"Algo salió mal, intente nuevamente"}});
