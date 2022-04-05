@@ -110,6 +110,7 @@ async function getEmployeeFileByGroups(req,res){
                     include:[
                         {   
                             model:model.employeeFile,
+                            attributes:['id','fisrtName','lastName','documentId'],
                             require:false
                         }
                     ]
