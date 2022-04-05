@@ -54,6 +54,7 @@ async function addEmployeeFile(req,res){
 async function editEmployeeFile(req,res){
     const{id,fisrtName, lastName,documentId,address,email,cargo,birthdate,
         phone,photo,digitalDoc,observation,academic,cursos,experience,contacto,isActive}=req.body;
+        const t = await model.sequelize.transaction();  
         const accountFinded=await model.account.findOne({attributes:['id'],where:{email}}); 
         console.log(accountFinded);        
         let accountId=null;        
@@ -75,7 +76,7 @@ async function editEmployeeFile(req,res){
         }
     
     if(fisrtName==null || lastName==null || documentId==null ||email==null,cargo==null,phone==null,academic==null,experience==null){
-        const t = await model.sequelize.transaction();  
+        
         await model.employeeFile.update({fisrtName, lastName,documentId,address,email,cargo,
         phone,photo,digitalDoc,observation,academic,cursos,experience,contacto,accountId,isActive},{where:{id}},{transaction:t}).then(async function(rsEmployeeFile){
             t.commit();
