@@ -57,13 +57,14 @@ async function editEmployeeFile(req,res){
     
     if(fisrtName==null || lastName==null || documentId==null ||email==null,cargo==null,phone==null,academic==null,experience==null){
         const t = await model.sequelize.transaction();  
-        await model.employeeFile.update({fisrtName, lastName,documentId,address,email,accountId,cargo,
+        await model.employeeFile.update({fisrtName, lastName,documentId,address,email,cargo,
         phone,photo,digitalDoc,observation,academic,cursos,experience,contacto},{where:{id}},{transaction:t}).then(async function(rsEmployeeFile){
             t.commit();
             res.status(200).json({"data":{"result":true,"message":"Procesado Satisfactoriamente","data":rsEmployeeFile}});
         }).catch(async function(error){
-            t.commit();
-            res.status(403).json({"data":{"result":false,"message":"Algo salió mal, intente nuevamente"}});
+            t.rollback();
+            consosel.log(error)
+            res.status(403).json({"data":{"result":false,"message":error.message}});
         })
     }  
 }
