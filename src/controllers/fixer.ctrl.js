@@ -2,11 +2,12 @@ const model=require('../db/models/index');
 const { Op } = require("sequelize");
 
 async function fixerPermissions(req,res){
-    const t = await model.sequelize.transaction();
+   
     let created=0;
     let updated=0;
     await model.role.findAll().then(async function(rsRole){        
-        for (let index = 0; index < rsRole.length; index++) { // recorre todos lo roles            
+        for (let index = 0; index < rsRole.length; index++) { // recorre todos lo roles   
+            let t = await model.sequelize.transaction();         
             if(rsRole[index].id!=5){
                 await model.permission.findAll().then(async function(rsPermission){ //recorre permisos 
                     for (let j = 0; j < rsPermission.length; j++) {                       
@@ -28,8 +29,10 @@ async function fixerPermissions(req,res){
                     }
                 })
             }
+            t.commit();
+            t=null;
         }
-        t.commit();
+        
         res.status(200).json({data:{"result":true,"message":"Reparación exitosa","data":{"creados":created,"Actualizados":updated}}});
     })/*.catch(async function(error){
         t.rollback();
