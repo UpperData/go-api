@@ -54,11 +54,13 @@ async function addEmployeeFile(req,res){
 async function editEmployeeFile(req,res){
     const{id,fisrtName, lastName,documentId,address,email,cargo,
         phone,photo,digitalDoc,observation,academic,cursos,experience,contacto,isActive}=req.body;
-        const accountFinded=await model.account.findOne({attributes:['id'],where:{email}});         
+        const accountFinded=await model.account.findOne({attributes:['id'],where:{email}}); 
+        console.log(accountFinded);        
         let accountId=null;        
         if(accountFinded ){        
-
+            console.log("encontro");
             if(accountFinded.id>0){
+                console.log("Hay id");
                 accountId=accountFinded.id;
                 //Actualiza informacion personal de la cuenta
                 let people= {
