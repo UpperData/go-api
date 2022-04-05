@@ -88,6 +88,11 @@ module.exports = (sequelize, DataTypes) => {
     },
     contacto: {
       type:DataTypes.JSONB
+    },
+    isActive:{
+      type: DataTypes.BOOLEAN,
+      defaultValue:true,
+      allowNull: false
     }
   }, {
     sequelize,
