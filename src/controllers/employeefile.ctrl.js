@@ -52,7 +52,7 @@ async function addEmployeeFile(req,res){
     
 }
 async function editEmployeeFile(req,res){
-    const{id,fisrtName, lastName,documentId,address,email,cargo,
+    const{id,fisrtName, lastName,documentId,address,email,cargo,birthdate,
         phone,photo,digitalDoc,observation,academic,cursos,experience,contacto,isActive}=req.body;
         const accountFinded=await model.account.findOne({attributes:['id'],where:{email}}); 
         console.log(accountFinded);        
