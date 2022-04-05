@@ -134,7 +134,7 @@ async function endPermission(req,res){
         include:[
             {
                 model:model.permission,
-                attributes:[['id','permissionId'],'operationId','subModuleId'],
+                attributes:[['id','permissionId'],'operationId','subModuleId','isActived'],
                 where:{subModuleId},
                 include:[
                     {
