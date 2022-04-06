@@ -14,8 +14,24 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
   article.init({
-    name: DataTypes.STRING,
-    description: DataTypes.STRING
+    name: {
+      type:DataTypes.STRING,
+      allowNull:false,
+      validate:{
+        notNull: {
+          args: [true],
+          msg: 'Por favor ingrese nombre del articulo'
+        },notEmpty: {
+          args: [true],
+          msg: "Nombre del articulo es requerio",
+        }
+         
+      }
+    },
+    description: {
+      type:DataTypes.STRING,
+      defaultValue:"N/A"
+    }
   }, {
     sequelize,
     modelName: 'article',

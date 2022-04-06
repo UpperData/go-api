@@ -21,11 +21,24 @@ module.exports = (sequelize, DataTypes) => {
     },
     minStock: {
       type:DataTypes.INTEGER,
-      allowNull:false
+      allowNull:false,
+      defaultValue:0
     },
     existence: {
       type:DataTypes.INTEGER,
-      allowNull:false
+      allowNull:false,
+      validate:{
+        notNull: {
+          args: [true],
+          msg: 'Por favor ingrese la existencia actual'
+        },notEmpty: {
+          args: [true],
+          msg: "Por favor ingrese la existencia actual",
+        },isNumeric: {
+          args: [false],
+          msg: "Por favor ingrese la existencia actual en números enteros",
+        }
+      }
     },
     price: {
       type:DataTypes.DECIMAL,

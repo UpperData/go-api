@@ -54,7 +54,7 @@ async function assignmentByDoctor(req,res){
         attributes:['id'],
         where:{
             accountId,
-            roleId:[6,8,9]}
+            roleId:[6]}
     }).then(async function(rsAccountRole){
         if(rsAccountRole.count>0){
             await model.assignment.findAll({
@@ -111,4 +111,60 @@ async function assignmentUpdate(req,res){
         res.status(403).json({data:{"result":false,"message":error.message}});
     })    
 }
-module.exports={assignmentNew,assignmentByDoctor,assignmentUpdate};
+
+async function articleNew(req,res){
+    const{name,description,existence}=req.body;
+    const t=await model.sequelize.transaction();
+    await model.article.create({name,description},{transaction:t}).then(async function(rsArticle){
+        await model.inventory.create({articleId:rsArticle.id,existence},{transaction:t}).then(async function(rsArticle){
+            t.commit();
+            res.status(200).json({data:{"result":true,"message":"Nuevo articulo agregado satisfactoriamente"}});            
+        }).catch(async function(error){
+            t.rollback();
+            res.status(403).json({data:{"result":false,"message":error.message}});
+        })
+    }).catch(async function(error){
+        t.rollback();
+        res.status(403).json({data:{"result":false,"message":error.message}});
+    })
+}
+async function articleUpdate(req,res){
+    const{id,name,description}=req.body;
+    const t=await model.sequelize.transaction();
+    await model.article.update({name,description},{where:{id}},{transaction:t}).then(async function(rsArticle){
+        t.commit();
+        res.status(200).json({data:{"result":true,"message":"Articulo actualizado satisfactoriamente"}});
+    }).catch(async function(error){
+        t.rollback();
+        res.status(403).json({data:{"result":false,"message":error.message}});
+    })
+}
+async function articlelist(req,res){ 
+    const {id}=req.params;
+    if(id!='*'){
+        //Busca un estados de Venezuela
+        return await model.article.findAll({
+            attributes:['id','name','description'],
+            where:{id}
+        }).then(async function(rsArticle){
+            if(rsArticle){
+                res.status(200).json({"data":{"result":true,"message":"Busqueda satisfatoria","data":rsArticle}});        
+            }else{
+                res.status(403).json({"data":{"result":false,"message":"No existe registro con este código"}});            
+            }            
+        }).catch(async function(error){  
+            console.log(error)    
+            res.status(403).json({"data":{"result":false,"message":"Algo salió mal buscando registro"}});        
+        })
+    }else{
+        //Busca todos de estados de Venezuela
+        return await model.article.findAll(            
+            { attributes:['id','name','description'],
+           order:['id']}).then(async function(rsArticle){
+            res.status(200).json({"data":{"result":true,"message":"Busqueda satisfatoria","data":rsArticle}});        
+        }).catch(async function(error){            
+            res.status(403).json({"data":{"result":false,"message":"Algo salió mal buscando registro"}});        
+        })
+    }    
+}
+module.exports={assignmentNew,assignmentByDoctor,assignmentUpdate,articleNew,articleUpdate,articlelist};

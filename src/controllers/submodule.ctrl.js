@@ -40,9 +40,19 @@ async function createSubModule(req,res){
     const{name,route,isActived,sorting,moduleId,description}=req.body;
     const t = await model.sequelize.transaction();
     return await model.subModule.create({name,isActived,route,sorting,moduleId,description},{transaction:t}).then(async function(rsSubModule){
-        await model.operation.findAll().then(async function(rsOperations){
+        await model.operation.findAll().then(async function(rsOperations){ 
             for (let index = 0; index < rsOperations.length; index++) {
-                await model.permission.create({subModuleId:rsSubModule.id,operationId:rsOperations[index].id,isActived:false},{transaction:t});
+                //crea permisos
+                await model.permission.create({subModuleId:rsSubModule.id,operationId:rsOperations[index].id,isActived:false},{transaction:t})
+                .then(async function(rsPermission){
+                    // asigna permisos a todos los roles en false
+                    await model.role.findAll({atrributes:['id']}).then(async function(rsRole){ 
+                        for (let j = 0; j < rsRole.length; j++) {
+                            await model.grantRole.create({roleId:rsRole[j].id,permissionId:rsPermission.id,isActived:false},{transaction:t})                            
+                        }
+                    })
+                });
+                
             }   
             t.commit();     
             res.status(200).json({"data":{"result":true,"message":"Registro Satisfactorio","data":rsSubModule}});      

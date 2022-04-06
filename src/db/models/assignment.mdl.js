@@ -61,6 +61,11 @@ module.exports = (sequelize, DataTypes) => {
     responsible:{ 
       type:DataTypes.JSONB,
       allowNull:false
+  },
+  isActived:{
+    type:DataTypes.BOOLEAN,
+    allowNull:false,
+    defaultValue:true
   }
   }, {
     sequelize,
