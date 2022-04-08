@@ -90,17 +90,26 @@ async function assignmentUpdate(req,res){
             roleId:[6,8,9]}
     }).then(async function(rsAccountRole){
         if(rsAccountRole.count>0){
-            await model.assignment.update(
-                {accountId:accountId, articleId, quantity,responsible:{"account":dataToken['account'],"people":dataToken['people']}},
-                {where:{id:assignmentId}},{transaction:t}).then(async function(rsAssignmet){
-            }).then(async function(rsAppointment){
-                t.commit();
-                res.status(200).json({data:{"result":true,"message":"Asignación satisfactoria"}});
-            }).catch(async function(error){
-                console.log(error);
-                t.rollback();
-                res.status(403).json({data:{"result":false,"message":error.message}});
-            })
+            await model.inventory.findOne({
+                attributes:['id','existence'],
+                where:{articleId}
+            }).then(async function(rsExistence){                
+                if(rsExistence ){
+                    if(rsExistence.existence>=quantity){
+                        await model.assignment.update(
+                            {accountId:accountId, articleId, quantity,responsible:{"account":dataToken['account'],"people":dataToken['people']}},
+                            {where:{id:assignmentId}},{transaction:t}).then(async function(rsAssignmet){
+                        }).then(async function(rsAppointment){
+                            t.commit();
+                            res.status(200).json({data:{"result":true,"message":"Asignación satisfactoria"}});
+                        }).catch(async function(error){
+                            console.log(error);
+                            t.rollback();
+                            res.status(403).json({data:{"result":false,"message":error.message}});
+                        })
+                    }else{
+                        res.status(403).json({data:{"result":false,"message":"Cantidad mayor a la existencia"}});
+                    }
         }else{
             t.rollback();
             res.status(403).json({data:{"result":false,"message":"Cuenta no tiene membresía de médico"}});
