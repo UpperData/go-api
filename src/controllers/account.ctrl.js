@@ -303,8 +303,7 @@ async function passwordUpdate(req,res){
                     t.rollback();
                     res.status(403).json({data:{"result":false,"message":"Algo salió mal actualizando password"}});        
                 })
-            }else{
-                console.log(error);
+            }else{                
                 res.status(403).json({data:{"result":false,"message":"Password actual incorrecto"}});  
             }
         }).catch(async function(error){
