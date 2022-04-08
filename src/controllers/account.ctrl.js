@@ -299,7 +299,8 @@ async function passwordUpdate(req,res){
                     }else{
                         res.status(403).json({data:{"result":false,"message":"Algo salió mal procesando su solicitud, intente nuevamente"}});       
                     }                          
-                }).catch(async function(error){                                        
+                }).catch(async function(error){ 
+                    console.log(error);                                       
                     t.rollback();
                     res.status(403).json({data:{"result":false,"message":"Algo salió mal actualizando password"}});        
                 })
@@ -311,6 +312,7 @@ async function passwordUpdate(req,res){
             res.status(403).json({data:{"result":false,"message":"Algo salió mal procesando cambio de password"}});  
         })
     }).catch(async function(error){
+        console.log(error);
         res.status(403).json({data:{"result":false,"message":"Algo salió mal validando cuenta de usuario"}});  
     })
 }
