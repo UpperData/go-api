@@ -278,8 +278,8 @@ async function passwordUpdate(req,res){
     const dataToken=await serviceToken.dataTokenGet(req.header('Authorization').replace('Bearer ', ''));
     const t = await model.sequelize.transaction();    
     const {newPassword,currentPassword}=req.body; 
-    await model.account.findOne({attributes:['pass','email'],where:{id:dataToken['account'].id}}).then(async function(rsAccount){
-        console.log(rsAccount);
+    if(newPassword.length<6 && newPassword>12) res.status(403).json({data:{"result":false,"message":"El password debe 6 a 12 caracteres"}}); 
+    await model.account.findOne({attributes:['pass','email'],where:{id:dataToken['account'].id}}).then(async function(rsAccount){        
         await  bcrypt.compare(currentPassword,rsAccount.pass).then(async function(rsValid){
             if(rsValid){
                 return await model.account.update({pass:newPassword},{where:{id:dataToken.account.id}},{transaction:t}).then(async function(rsNewPassword){ //Actualiza password                    
