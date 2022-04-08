@@ -578,9 +578,10 @@ async function emailUpdate(req,res){
                     }    
                             
                 }).catch(async function(error){
-                    console.log("ocurrio un error:"+error.name)
+                    
                     t.rollback();
                     if(error.name=='SequelizeUniqueConstraintError'){
+                        console.log("Ya existe una cuenta con este email"+error.name)
                         res.status(403).json({data:{"result":false,"message":"Ya existe una cuenta con este email"}});            
                     }else{
                         res.status(403).json({data:{"result":false,"message":"Algo salió mal actualizando email"}});        
