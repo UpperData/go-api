@@ -93,7 +93,7 @@ async function assignmentUpdate(req,res){
             await model.inventory.findOne({
                 attributes:['id','existence'],
                 where:{articleId}
-            }).then(async function(rsExistence){                
+            }).then(async function(rsExistence){               
                 if(rsExistence ){
                     if(rsExistence.existence>=quantity){
                         await model.assignment.update(
@@ -110,11 +110,15 @@ async function assignmentUpdate(req,res){
                     }else{
                         res.status(403).json({data:{"result":false,"message":"Cantidad mayor a la existencia"}});
                     }
+                }else{
+                    t.rollback();
+                    res.status(403).json({data:{"result":false,"message":"Articulo no existe"}});
+                }  
+            })
         }else{
             t.rollback();
             res.status(403).json({data:{"result":false,"message":"Cuenta no tiene membresía de médico"}});
-        }
-        
+        }       
     }).catch(async function(error){                
         t.rollback();
         res.status(403).json({data:{"result":false,"message":error.message}});
