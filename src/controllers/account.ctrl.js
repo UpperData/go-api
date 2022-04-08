@@ -555,7 +555,7 @@ async function emailUpdate(req,res){
     await model.account.findOne({attributes:['pass','email'],where:{id:dataToken['account'].id}}).then(async function(rsAccount){ // valida cuenta
         await  bcrypt.compare(currentPassword,rsAccount.pass).then(async function(rsValid){ // Valida password
             if(rsValid){
-                return await model.account.update({email:newEmail,isConfirmed:false},{where:{id:dataToken['account'].id}},{transaction:t}).then(async function(rsNewEmail){ //Actualiza password
+                return await model.account.update({email:newEmail,isConfirmed:false},{where:{id:dataToken['account'].id}},{transaction:t}).then(async function(rsNewEmail){ //Actualiza email
                     
                     var account={"id":dataToken['account'].id,"email":rsAccount.email};
                     const token = await serviceToken. newToken(account,roles=null,type="updateEmail",dateTime=new Date(),people=null);
@@ -578,7 +578,7 @@ async function emailUpdate(req,res){
                     }    
                             
                 }).catch(async function(error){
-                    console.log(error)
+                    console.log("ocurrio un error:"+error.name)
                     t.rollback();
                     if(error.name=='SequelizeUniqueConstraintError'){
                         res.status(403).json({data:{"result":false,"message":"Ya existe una cuenta con este email"}});            
