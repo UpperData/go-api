@@ -155,7 +155,7 @@ async function loginAccount(req,res){
         include:[
             {
                 model:model.employeeFile,
-                require:false,
+                required:false,
                 attributes:['photo']
             }
         ]        
