@@ -197,7 +197,6 @@ async function loginAccount(req,res){
                                         }								
                                         dataAccount={"id":rsUser.id,"name":rsUser.name,"email":rsUser.email} //Datos de la cuenta	
                                         dataPeople=rsUser.people;	
-                                        console.log(rsUser['employeeFiles']);
                                         dataPeople.photo=rsUser['employeeFiles'][0].photo;
                                         var token =  await serviceToken.newToken(dataAccount,allRole,'login',dateTime,dataPeople) //generar Token 									
                                         await model.account.update({tries:0},{where:{id:rsUser.id}}).then(async function(rsNewPassword){ //Actualiza tries

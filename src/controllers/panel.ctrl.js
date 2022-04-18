@@ -64,7 +64,7 @@ async  function getAllPanel(req,res){
 						where:{roleId:RolE,isActived:true},
 						include:[{
 							model:mdll.permission,
-							where:{subModuleId:rsMenuS[j]['permission']['subModule'].id,isActived:true},
+							where:{subModuleId:rsMenuS[j]['permission']['subModule'].id},
 							attributes:['id'],
 							include:[{
 								model:mdll.operation,
