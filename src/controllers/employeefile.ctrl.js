@@ -31,8 +31,7 @@ async function addEmployeeFile(req,res){
                     "birthdate":birthdate                     
                 }
                 await model.account.update({people},{where:{email}},{transaction:t});
-            }
-            
+            }            
         }
         await model.employeeFile.create({fisrtName, lastName,documentId,address,email,accountId,cargo,
         phone,photo,digitalDoc,observation,academic,cursos,experience,contacto,isActive},{transaction:t}).then(async function(rsEmployeeFile){
@@ -55,8 +54,7 @@ async function editEmployeeFile(req,res){
     const{id,fisrtName, lastName,documentId,address,email,cargo,birthdate,
         phone,photo,digitalDoc,observation,academic,cursos,experience,contacto,isActive}=req.body;
         const t = await model.sequelize.transaction();  
-        const accountFinded=await model.account.findOne({attributes:['id'],where:{email}}); 
-        console.log(accountFinded);        
+        const accountFinded=await model.account.findOne({attributes:['id'],where:{email}});            
         let accountId=null;        
         if(accountFinded ){        
             console.log("encontro");

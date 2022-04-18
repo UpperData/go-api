@@ -151,7 +151,13 @@ async function loginAccount(req,res){
 				name,
 				email,
 			},
-           }
+        },
+        include:[
+            {
+                model:model.employeeFile,
+                attributes:['photo']
+            }
+        ]        
         })
         .then(async function (rsUser){	
             if(rsUser){
@@ -190,7 +196,9 @@ async function loginAccount(req,res){
                                             allRole.push({"id":rsAccRoles[i]['role'].id,"name":rsAccRoles[i]['role'].name});
                                         }								
                                         dataAccount={"id":rsUser.id,"name":rsUser.name,"email":rsUser.email} //Datos de la cuenta	
-                                        dataPeople=rsUser.people;					
+                                        dataPeople=rsUser.people;	
+                                        console.log(rsUser['employeeFiles']);
+                                        dataPeople.photo=rsUser['employeeFiles'][0].photo;
                                         var token =  await serviceToken.newToken(dataAccount,allRole,'login',dateTime,dataPeople) //generar Token 									
                                         await model.account.update({tries:0},{where:{id:rsUser.id}}).then(async function(rsNewPassword){ //Actualiza tries
                                             res.status(200).json({data:{"result":true,"message":"Usted a iniciado sesión " + rsUser.email ,"token":token,tokenRole,"people":dataPeople,"account":dataAccount,"role":allRole}});        
@@ -580,8 +588,7 @@ async function emailUpdate(req,res){
                 }).catch(async function(error){
                     
                     t.rollback();
-                    if(error.name=='SequelizeUniqueConstraintError'){
-                        console.log("Ya existe una cuenta con este email"+error.name)
+                    if(error.name=='SequelizeUniqueConstraintError'){                        
                         res.status(403).json({data:{"result":false,"message":"Ya existe una cuenta con este email"}});            
                     }else{
                         res.status(403).json({data:{"result":false,"message":"Algo salió mal actualizando email"}});        
