@@ -697,7 +697,7 @@ async function getSecretCurrent(req,res){ // obtiene preguntas secretas del sesi
         }).then(async function(rsAccount){
             if(rsAccount){
                 if(rsAccount.isActived){
-                    if(rsAccount.secret.length>1){
+                    if(rsAccount.secret){
                         let question=[];
                         for (let index = 0; index < rsAccount.secret.length; index++) {                        
                             question.push(rsAccount['secret'][index].question);                       
@@ -714,7 +714,7 @@ async function getSecretCurrent(req,res){ // obtiene preguntas secretas del sesi
             }        
         }).catch(async function(error){  
             console.log(error);      
-            res.status(403).json({data:{"result":false,"message":"Algo salió mal opteniendo preguntas secretas"}});        
+            res.status(403).json({data:{"result":false,"message":"Algo salió mal obteniendo preguntas secretas"}});        
         })
     }else{
         res.status(403).json({data:{"result":false,"message":"Sesión expirada"}});    
