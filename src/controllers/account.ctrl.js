@@ -485,6 +485,13 @@ async function loginToken(req,res){
 					res.status(401).json({"data":{"result":false,"messaje":"Sesión expirada"}});
 				}else{	
                     if(rsCurrentAccount.type=='login'){
+                        const photo=await model.employeeFile.findOne({
+                            attributes:['photo'],
+                            where:{accountId:rsCurrentAccount.account.id}
+                        })
+                        console.log(photo);
+                        if(photo)rsCurrentAccount.people.photo=photo.photo;
+                        
                         res.status(200).json({"data":{
                             "result":true,
                             "message":"Usted a iniciado sesión como "+rsCurrentAccount.account.email,
@@ -498,8 +505,9 @@ async function loginToken(req,res){
                     }				
                     						
 				}						
-			}).catch(async function(error){                
-				res.status(403).json({"data":{"result":false,"message":"Su token no es valido"}})
+			}).catch(async function(error){   
+                console.log(error)             
+				res.status(403).json({"data":{"result":false,"message":"algo salió mal autenticando"}})
 			})	
 		}
 		catch(error){					
