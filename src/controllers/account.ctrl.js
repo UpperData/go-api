@@ -367,7 +367,8 @@ async function getSecret(req,res){
         }else{
             res.status(403).json({data:{"result":false,"message":"Cuenta de usuario no registrada"}});        
         }        
-    }).catch(async function(error){        
+    }).catch(async function(error){   
+        console.log(error);     
         res.status(403).json({data:{"result":false,"message":"Algo salió mal opteniendo preguntas secretas"}});        
     })
 }
