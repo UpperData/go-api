@@ -369,7 +369,7 @@ async function getSecret(req,res){
         }        
     }).catch(async function(error){   
         console.log(error);     
-        res.status(403).json({data:{"result":false,"message":"Algo salió mal opteniendo preguntas secretas"}});        
+        res.status(403).json({data:{"result":false,"message":"Algo salió mal obteniendo preguntas secretas"}});        
     })
 }
 async function restoreSecret(req,res){
