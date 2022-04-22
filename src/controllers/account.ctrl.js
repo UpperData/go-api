@@ -704,7 +704,7 @@ async function getSecretCurrent(req,res){ // obtiene preguntas secretas del sesi
                         }                    
                         res.status(200).json({data:{"result":true,"message":"Preguntas secretas retornadas con éxito","data":question}});
                     }else{
-                        res.status(403).json({data:{"result":false,"message":"Usuario no ha configurado sus preguntas secretas, generar o renovar preguntas secretas"}});                
+                        res.status(403).json({data:{"result":false,"message":"Debe preguntas secretas para realizar esta operación"}});                
                     }                
                 }else{
                     res.status(403).json({data:{"result":false,"message":"Cuenta bloqueada comuniquese con el administrador del sistema"}});        
