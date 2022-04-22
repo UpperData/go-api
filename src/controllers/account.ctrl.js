@@ -712,7 +712,8 @@ async function getSecretCurrent(req,res){ // obtiene preguntas secretas del sesi
             }else{
                 res.status(403).json({data:{"result":false,"message":"Cuenta de usuario no registrada"}});        
             }        
-        }).catch(async function(error){        
+        }).catch(async function(error){  
+            console.log(error);      
             res.status(403).json({data:{"result":false,"message":"Algo salió mal opteniendo preguntas secretas"}});        
         })
     }else{
