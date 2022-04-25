@@ -234,47 +234,56 @@ async function loginAccount(req,res){
         })
 }
 async function passwordRestart(req,res){
-    const {token,newPassword,secret,email}=req.body; 
+    const {token,newPassword,email}=req.body; 
     return await model.account.findOne({
         attributes:['id','hashConfirm','secret','email','tries'],
         where:{email}}) // valida si existe cuenta
-    .then(async function(rsAccount){         
-       if(rsAccount.tries<6){//Valida que no pase de 5 intentos
-            if(rsAccount.hashConfirm===token){//valida si el token es correcto
-                //valida respuestas secretas
-                var secretValid=[];
-                var answerValid=false;
-                for (let index = 0; index < rsAccount.secret.length; index++) { 
-                   
-                    if(await bcrypt.compare(secret[index],rsAccount.secret[index].answer) ){
-                        secretValid[index]=true
-                    }                
-                }
-                if(secretValid.filter(st=>true).length==rsAccount.secret.length){
-                    answerValid=true;
-                } else{
-                    answerValid=false;
-                }
-                if(answerValid){//valida respuesta secreta es correcto
-                    await model.account.update({pass:newPassword,hashConfirm:null,tries:0},{where:{id:rsAccount.id}}).then(async function(rsNewPassword){ //Actualiza password
-                        res.status(200).json({data:{"result":true,"message":"Password actualizado satisfactoriamente"}});        
-                    }).catch(async function(error){                        
-                        res.status(403).json({data:{"result":false,"message":"Algo salió mal actualizando password"}});        
-                    })
-                }else{//valida respuesta secreta es invalida
-                    await model.account.update({tries:rsAccount.tries+1},{where:{id:rsAccount.id}}); 
+    .then(async function(rsAccount){  
+      
+       if(rsAccount){//Valida que no pase de 5 intentos
+            if(rsAccount.tries<6){//Valida que no pase de 5 intentos
+                if(rsAccount.hashConfirm===token){//valida si el token es correcto
+                    //valida respuestas secretas
+                    var secretValid=[];
+                    var answerValid=false;
+                    for (let index = 0; index < rsAccount.secret.length; index++) {                                               
+                        if(await bcrypt.compare(req.body.secret[index],rsAccount.secret[index].answer) ){
+                            secretValid[index]=true;
+                        }else{
+                            secretValid[index]=false;
+                        }     
+                    }
+                    function validos(secretValid) {
+                        return secretValid == true;
+                      }                  
+                    if(secretValid.filter(validos).length==rsAccount.secret.length){
+                        answerValid=true;
+                    } else{
+                        answerValid=false;
+                    }
+                    if(answerValid){//valida respuesta secreta es correcto
+                        await model.account.update({pass:newPassword,hashConfirm:null,tries:0},{where:{id:rsAccount.id}}).then(async function(rsNewPassword){ //Actualiza password
+                            res.status(200).json({data:{"result":true,"message":"Password actualizado satisfactoriamente"}});        
+                        }).catch(async function(error){                        
+                            res.status(403).json({data:{"result":false,"message":"Algo salió mal actualizando password"}});        
+                        })
+                    }else{//valida respuesta secreta es invalida
+                        await model.account.update({tries:rsAccount.tries+1},{where:{id:rsAccount.id}}); 
+                        intento=6-(rsAccount.tries+1)   
+                        res.status(403).json({data:{"result":false,"message":"Respuesta secreta invalida, le quedan "+ intento +" intentos"}});                    
+                    }
+                }else{
+                    await model.account.update({tries:rsAccount.tries+1},{where:{id:rsAccount.id}});
                     intento=6-(rsAccount.tries+1)   
-                    res.status(403).json({data:{"result":false,"message":"Respuesta secreta invalida, le quedan "+ intento +" intentos"}});                    
+                    res.status(403).json({data:{"result":false,"message":"Token de restauración no valido, debe comunicarse con el administrador del sistema, le quedan"+ intento + " intentos"}});                
                 }
             }else{
-                await model.account.update({tries:rsAccount.tries+1},{where:{id:rsAccount.id}});
-                intento=6-(rsAccount.tries+1)   
-                res.status(403).json({data:{"result":false,"message":"Token de restauración no valido, debe comunicarse con el administrador del sistema, le quedan"+ intento + " intentos"}});                
+                await model.account.update({isActived:false},{where:{id:rsAccount.id}});
+                res.status(403).json({data:{"result":false,"message":"Cuenta bloqueda por limite de intentos, debe comunicarse con el administrador del sistema"}});   
             }
-       }else{
-        await model.account.update({isActived:false},{where:{id:rsAccount.id}});
-        res.status(403).json({data:{"result":false,"message":"Cuenta bloqueda por limite de intentos, debe comunicarse con el administrador del sistema"}});   
-       }
+       }else{        
+        res.status(403).json({data:{"result":false,"message":"Cuenta invalida"}});   
+    }
         
     }).catch(async function(error){  
         console.log(error);      
@@ -440,7 +449,8 @@ async function resetSecretAnswer(req,res){
 
 async function updateSecret(req,res){
     const dataToken=await serviceToken.dataTokenGet(req.header('Authorization').replace('Bearer ', '')); 
-    const{secret,currentPassword}= req.body;
+    const{currentPassword}= req.body;
+    let {secret}=req.body;
     if(!dataToken){ // Valida expiración       
         res.status(403).json({data:{"result":false,"message":"Sesion expirada"}});  
     }else { 
@@ -452,10 +462,15 @@ async function updateSecret(req,res){
                     if(!rsAccount.isActived){
                         res.status(403).json({data:{"result":false,"message":"La cuenta inactiva"}})
                     }else{	
+                        secretCryp=[]
+                        for (let index = 0; index < secret.length; index++) {
+                            secret[index].answer =  bcrypt.hashSync(secret[index].answer, 10 );                            
+                        }
                         await model.account.update({secret}, {where:{id:dataToken['account'].id}},{transaction:t}).then(async function(rsaccountUd){                        
                             t.commit();
                             res.status(200).json({data:{"result":true,"message":"Respuestas secretas actualizadas satisfactoriamente"}});   
                         }).catch(async function(error){
+                            console.log(error);
                             t.rollback();
                             res.status(403).json({data:{"result":false,"message":"Algo salió mal actualizando sus respuestas secretas, intente nuevamente"}});   
                         })
@@ -464,10 +479,12 @@ async function updateSecret(req,res){
                 }else{
                     res.status(403).json({data:{"result":false,"message":"Password no valido"}});   
                 }
-            }).catch(async function(error){                
+            }).catch(async function(error){    
+                console.log(error);            
                 res.status(403).json({data:{"result":false,"message":"Algo salió mal, intente nuevamente"}});   
             })
-        }).catch(async function(error){            
+        }).catch(async function(error){   
+            console.log(error);         
             res.status(403).json({data:{"result":false,"message":"Algo salió mal actualizando sus respuestas secretas, intente nuevamente"}});   
         })
     }
