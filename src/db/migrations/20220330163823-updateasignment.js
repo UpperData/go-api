@@ -25,8 +25,8 @@ module.exports = {
     return Promise.resolve();
 },
   down: async (queryInterface, Sequelize) => {        
-        await queryInterface.removeColumn('assignments', 'accountId');
-        await queryInterface.removeColumn('assignments', 'isActived');
+        await queryInterface.removeColumn('assignments','accountId');
+        await queryInterface.removeColumn('assignments','isActived');
         await queryInterface.addColumn('assignments', 'accountId');
     }
 };
