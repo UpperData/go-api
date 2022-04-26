@@ -593,7 +593,7 @@ async function emailUpdate(req,res){
                     
                     var account={"id":dataToken['account'].id,"email":rsAccount.email};
                     const token = await serviceToken. newToken(account,roles=null,type="updateEmail",dateTime=new Date(),people=null);
-                    const urlRestore=process.env.HOST_FRONT+"/email/verify/"+token; 
+                    const urlRestore=process.env.HOST_BACK+"/email/verify/"+token; 
                     var sendMail= await utils.sendMail({ // envia email para veridicar cuenta
                         from:"CEMA OnLine <" + process.env.EMAIL_MANAGER +	'>',
                         to:rsAccount.email,
