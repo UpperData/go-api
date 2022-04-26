@@ -589,8 +589,7 @@ async function emailUpdate(req,res){
     await model.account.findOne({attributes:['pass','email'],where:{id:dataToken['account'].id}}).then(async function(rsAccount){ // valida cuenta
         await  bcrypt.compare(currentPassword,rsAccount.pass).then(async function(rsValid){ // Valida password
             if(rsValid){
-                return await model.account.update({email:newEmail,isConfirmed:false},{where:{id:dataToken['account'].id}},{transaction:t}).then(async function(rsNewEmail){ //Actualiza email
-                    
+                return await model.account.update({email:newEmail,isConfirmed:false},{where:{id:dataToken['account'].id}},{transaction:t}).then(async function(rsNewEmail){ //Actualiza email                    
                     var account={"id":dataToken['account'].id,"email":rsAccount.email};
                     const token = await serviceToken. newToken(account,roles=null,type="updateEmail",dateTime=new Date(),people=null);
                     const urlRestore=process.env.HOST_BACK+"/email/verify/"+token; 
