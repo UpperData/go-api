@@ -20,7 +20,6 @@ async function registerAccount(req,res){
     var aleatorio=crypto.randomBytes(8).toString('hex')+now.getTime();    
     name=aleatorio.slice(0,2)+email.slice(0,-12)+aleatorio.slice(aleatorio.length-3,aleatorio.length);       
     const dataToken=await serviceToken.dataTokenGet(req.header('Authorization').replace('Bearer ', '')); 
-    //const dataToken={"people":{"firstName":"Angel","lastName":"Diaz"},"account":{"email":"angel.elcampeon@gmail.com"},}
     const t = await model.sequelize.transaction();  
     let audit=[]
     audit.push({"people":dataToken.people});
@@ -78,7 +77,6 @@ async function registerAccount(req,res){
                         actionLabel:"Iniciar Sesión"
                     });
                     if(sendMail){
-//                        t.commit();
                         res.status(200).json({"data":{"result":true,"message":"Cuenta de usuario registrada satisfactoriamente"}});
                     }else{
                         res.status(403).json({"data":{"result":false,"message":"Algo salió mal creando cuenta de usuario, intente nuevamente"}}); 
@@ -99,8 +97,7 @@ async function registerAccount(req,res){
                             allAdminEmail=adminEmail[index].dataValues.email;
                         }
                     }             
-                    // envia email a administrador
-                    //token=serviceToken.newToken()
+                    // envia email a administrador                   
                     const tokenProfeile=null;
                     const urlProfile=process.env.HOST_FRONT+"/profile/"+tokenProfeile;                  
                    
@@ -199,7 +196,7 @@ async function loginAccount(req,res){
                                         dataAccount={"id":rsUser.id,"name":rsUser.name,"email":rsUser.email} //Datos de la cuenta	
                                         dataPeople=rsUser.people;	                                        
                                         var token =  await serviceToken.newToken(dataAccount,allRole,'login',dateTime,dataPeople) //generar Token 
-                                        dataPeople.photo=rsUser['employeeFiles'][0].photo;									
+                                        if(rsUser['employeeFiles'][0].photo) dataPeople.photo=rsUser['employeeFiles'][0].photo;									
                                         await model.account.update({tries:0},{where:{id:rsUser.id}}).then(async function(rsNewPassword){ //Actualiza tries
                                             res.status(200).json({data:{"result":true,"message":"Usted a iniciado sesión " + rsUser.email ,"token":token,tokenRole,"people":dataPeople,"account":dataAccount,"role":allRole}});        
                                         }).catch(async function(error){                        
