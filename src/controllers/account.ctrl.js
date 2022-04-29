@@ -196,7 +196,9 @@ async function loginAccount(req,res){
                                         dataAccount={"id":rsUser.id,"name":rsUser.name,"email":rsUser.email} //Datos de la cuenta	
                                         dataPeople=rsUser.people;	                                        
                                         var token =  await serviceToken.newToken(dataAccount,allRole,'login',dateTime,dataPeople) //generar Token 
-                                        if(rsUser['employeeFiles']) dataPeople.photo=rsUser['employeeFiles'][0].photo;									
+                                        if(rsUser['employeeFiles']) {
+                                            if(rsUser['employeeFiles'][0].photo) dataPeople.photo=rsUser['employeeFiles'][0].photo
+                                        };									
                                         await model.account.update({tries:0},{where:{id:rsUser.id}}).then(async function(rsNewPassword){ //Actualiza tries
                                             res.status(200).json({data:{"result":true,"message":"Usted a iniciado sesión " + rsUser.email ,"token":token,tokenRole,"people":dataPeople,"account":dataAccount,"role":allRole}});        
                                         }).catch(async function(error){                        
