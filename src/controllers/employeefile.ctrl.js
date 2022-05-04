@@ -56,10 +56,8 @@ async function editEmployeeFile(req,res){
         const t = await model.sequelize.transaction();  
         const accountFinded=await model.account.findOne({attributes:['id'],where:{email}});            
         let accountId=null;        
-        if(accountFinded ){        
-            console.log("encontro");
+        if(accountFinded ){   
             if(accountFinded.id>0){
-                console.log("Hay id");
                 accountId=accountFinded.id;
                 //Actualiza informacion personal de la cuenta
                 let people= {

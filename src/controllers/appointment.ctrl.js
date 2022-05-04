@@ -59,7 +59,7 @@ async function appointmentNew(req,res){
             await model.appointment.create({dateAppointment,hourAppointment,foreignId,siniestroId,address,isOpened,patientId,medialPersonal,appointmentTypeId},{transaction:t})
             .then(async function(rsAppointment){
                 t.commit();
-                res.status(200).json({data:{"result":true,"message":"Cita regsitrada satisfactoriamente"}});
+                res.status(200).json({data:{"result":true,"message":"Cita registrada satisfactoriamente"}});
             }).catch(async function(error){
                 console.log(error);
                 t.rollback()
@@ -217,8 +217,29 @@ async function getAppointmentByDoctor(req,res){
         })        
     }
 }
+async function getAppointmentByDate(req,res){    
+    const dataToken=await serviceToken.dataTokenGet(req.header('Authorization').replace('Bearer ', ''));    
+    const {dateAppointment} = req.params;
+    if(dataToken){
+        await model.appointment.findAndCountAll({ // busca citas en una fecha
+            where:{dateAppointment,isOpened:true},
+            include:[
+                {
+                    model:model.patient
+                }
+            ],
+            order: [['dateAppointment', 'DESC']]
+        }).then(async function(rsAppointment){
+            res.status(200).json({"data":{"result":true,"message":"Busqueda satisfatoria","data":rsAppointment}});
+        }).catch(async function(error){  
+            console.log(error)    
+            res.status(403).json({"data":{"result":false,"message":"Algo salió mal buscando registro"}});        
+        })        
+    }
+}
 module.exports={appointmentNew, //Nueva cita
     updateAppointment, //modifica cita
     getAppointment, //busca cita
-    getAppointmentByDoctor //busca citas de un doctor
+    getAppointmentByDoctor, //busca citas de un doctor
+    getAppointmentByDate
 } 
