@@ -223,7 +223,7 @@ async function getAppointmentByDate(req,res){
     if(dataToken){
         await model.appointment.findAndCountAll({ // busca citas en una fecha
             where:{dateAppointment:{
-                [Op.between]:[dateAppointment+ ' 00:00',dateAppointment+ ' 23:59']
+                [Op.between]:[dateAppointment+ ' 00:00:01.000',dateAppointment+ ' 23:59:00.000']
             },
             isOpened:true},
             include:[
