@@ -222,7 +222,10 @@ async function getAppointmentByDate(req,res){
     const {dateAppointment} = req.params;
     if(dataToken){
         await model.appointment.findAndCountAll({ // busca citas en una fecha
-            where:{dateAppointment,isOpened:true},
+            where:{dateAppointment:{
+                [Op.between]:[dateAppointment+ ' 00:00',dateAppointment+ ' 23:59']
+            },
+            isOpened:true},
             include:[
                 {
                     model:model.patient
