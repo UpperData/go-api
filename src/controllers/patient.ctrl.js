@@ -14,6 +14,10 @@ async function history(req,res){
                     {
                         model:model.medicalReport
                         
+                    },
+                    {
+                        model:model.appointmentType,
+                        attributes:[['id','patientTypeId'],'name','icon']
                     }
                 ]
             }

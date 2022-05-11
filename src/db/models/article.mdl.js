@@ -13,7 +13,8 @@ module.exports = (sequelize, DataTypes) => {
       // define association here
     }
   }
-  article.init({
+  article.init({  
+
     name: {
       type:DataTypes.STRING,
       allowNull:false,

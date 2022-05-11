@@ -9,5 +9,5 @@ router.get('/invENtOrY/aSSGNmEnT/byDoCTOR/:accountId',forceBrute.notBruteSecure,
 router.put('/invENtOrY/asSGNmEnT/UPDATE',forceBrute.notBruteSecure,auth.autorizedRole([5]), inventory.assignmentUpdate); // Actualiza asignación
 router.post('/INVETOry/aricle/new',forceBrute.notBruteSecure,auth.autorizedRole([5]),inventory.articleNew);//Registra producto
 router.put('/InVETOrY/aricLe/EdIT',forceBrute.notBruteSecure,auth.autorizedRole([5]),inventory.articleUpdate);//actualiza un articulo 
-router.post('/InVETorY/aRIcLe/list',forceBrute.notBruteSecure,auth.autorizedRole(['*']),inventory.articlelist);//obtiene uno/todos los articulo 
+router.get('/InVETorY/aRIcLe/list/:id',forceBrute.notBruteSecure,auth.autorizedRole(['*']),inventory.articlelist);//obtiene uno/todos los articulo 
 module.exports=router;
