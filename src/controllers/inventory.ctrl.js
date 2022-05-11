@@ -182,4 +182,4 @@ async function articlelist(req,res){
     }    
 }
 
-module.exports={assignmentNew,assignmentByDoctor,assignmentUpdate,articleNew,articleUpdate,articlelist,inventoryGetAll};
+module.exports={assignmentNew,assignmentByDoctor,assignmentUpdate,articleNew,articleUpdate,articlelist};
