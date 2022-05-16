@@ -181,5 +181,53 @@ async function articlelist(req,res){
         })
     }    
 }
-
-module.exports={assignmentNew,assignmentByDoctor,assignmentUpdate,articleNew,articleUpdate,articlelist};
+async function inventoryTotal(req,res){ // optiene el inventario actual, hoja de inventario
+    await model.inventory.findAll({
+        
+        include:[
+            {
+                model:model.article,
+                attributes:[['id','aricleId'],'name','description']
+            }
+        ]
+    }).then(async function(rsInventory){
+        // Buscar lo que esta en transito por cada articulo
+        console.log('buscar consignaciones');
+       
+        for (let index = 0; index < rsInventory.length; index++) {
+            let asignados=0;
+            asignados= await model.assignment.findOne({
+                attributes:[
+                    [model.sequelize.fn('sum', model.sequelize.col('quantity')), 'total_asignament']],
+                where:{articleId:rsInventory[index].articleId}
+            })
+            rsInventory[index].dataValues.asignados=asignados.dataValues.total_asignament   
+            rsInventory[index].dataValues.almacen=rsInventory[index].existence-asignados.dataValues.total_asignament            
+        }         
+        res.status(200).json(rsInventory);          
+    }).catch(async function(error){
+        console.log(error);
+        res.status(403).json({"data":{"result":false,"message":"Algo salió mal buscando inventario"}});  
+    })
+}
+async function inventoryUpdate(req,res){
+    const {articleId,existence,price,minStock}=req.body
+    await model.inventory.findOne({
+        where:{articleId}
+    }).then(async function(rsInventorysrarch){
+        if(rsInventorysrarch.existence<existence) {
+            res.status(403).json({"data":{"result":false,"message":"Existencia debe ser mayor o igual a". rsInventorysrarch.existence}});
+        }else{
+            await model.inventory.update({existence,price,minStock},{where:{articleId}}).then(async function(rsInventoryUpdate){
+                res.status(200).json(rsInventoryUpdate);  
+            }).catch(async function(error){
+                console.log(error);
+                res.status(403).json({"data":{"result":false,"message":"Algo salió mal actualizando inventario"}});  
+            })
+        }
+    }).catch(async function(error){
+        console.log(error);
+        res.status(403).json({"data":{"result":false,"message":"Algo salió mal buscando articulo"}});  
+    })   
+}
+module.exports={assignmentNew,assignmentByDoctor,assignmentUpdate,articleNew,articleUpdate,articlelist,inventoryTotal,inventoryUpdate};

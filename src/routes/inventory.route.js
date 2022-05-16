@@ -10,4 +10,7 @@ router.put('/invENtOrY/asSGNmEnT/UPDATE',forceBrute.notBruteSecure,auth.autorize
 router.post('/INVETOry/aricle/new',forceBrute.notBruteSecure,auth.autorizedRole([5]),inventory.articleNew);//Registra producto
 router.put('/InVETOrY/aricLe/EdIT',forceBrute.notBruteSecure,auth.autorizedRole([5]),inventory.articleUpdate);//actualiza un articulo 
 router.get('/InVETorY/aRIcLe/list/:id',forceBrute.notBruteSecure,auth.autorizedRole(['*']),inventory.articlelist);//obtiene uno/todos los articulo 
+router.get('/InveTorY/get/ALL',forceBrute.notBruteSecure,auth.autorizedRole([5]),inventory.inventoryTotal);//obtiene inventario actula
+router.put('/InvEToRY/UpdaTE/ARTICLE',forceBrute.notBruteSecure,auth.autorizedRole([5]),inventory.articleUpdate);//actualiza inventario 
+
 module.exports=router;
