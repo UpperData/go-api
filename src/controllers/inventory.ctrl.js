@@ -226,7 +226,7 @@ async function inventoryUpdate(req,res){
         }
     }).catch(async function(error){
         console.log(error);
-        res.status(403).json({"data":{"result":false,"message":"Algo salió mal buscando articulo"}});  
+        res.status(403).json({"data":{"result":false,"message":"Algo salió mal validando inventario"}});  
     })   
 }
 module.exports={assignmentNew,assignmentByDoctor,assignmentUpdate,articleNew,articleUpdate,articlelist,inventoryTotal,inventoryUpdate};
