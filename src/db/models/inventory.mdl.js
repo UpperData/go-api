@@ -18,12 +18,26 @@ module.exports = (sequelize, DataTypes) => {
     articleId: {
       type: DataTypes.INTEGER,
       unique:true,
-      references:{model:{tableName:'articles',schema:'public'},key:'id'}
+      references:{model:{tableName:'articles',schema:'public'},key:'id'},
+      validate:{
+        customValidator(value) {
+          if (value === null && this.age <0) {
+            throw new Error("debe ingresar in articulo valido");
+          }
+        }
+      }
     },
     minStock: {
       type:DataTypes.INTEGER,
       allowNull:false,
-      defaultValue:0
+      defaultValue:0,
+      validate:{
+        customValidator(value) {
+          if (value === null && this.age <0) {
+            throw new Error("el valor del stock minimo debe ser mayor o igual a cero (0) ");
+          }
+        }
+      }
     },
     existence: {
       type:DataTypes.INTEGER,
@@ -44,7 +58,14 @@ module.exports = (sequelize, DataTypes) => {
     price: {
       type:DataTypes.DECIMAL,
       allowNull:false,
-      defaultValue:0
+      defaultValue:0,
+      validate:{
+        customValidator(value) {
+          if (value === null && this.age <0.1) {
+            throw new Error("Debe ingresar precio mayor a cero(0)");
+          }
+        }
+      }
   }
   }, {
     sequelize,

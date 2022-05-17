@@ -212,11 +212,11 @@ async function inventoryTotal(req,res){ // optiene el inventario actual, hoja de
 }
 async function inventoryUpdate(req,res){
     const {articleId,existence,price,minStock}=req.body
-    await model.inventory.findOne({
+    await model.assignment.findOne({
         where:{articleId}
-    }).then(async function(rsInventorysrarch){
-        if(rsInventorysrarch.existence<existence) {
-            res.status(403).json({"data":{"result":false,"message":"Existencia debe ser mayor o igual a". rsInventorysrarch.existence}});
+    }).then(async function(rsAssinament){
+        if(rsAssinament.length<existence) { // La existencia no debe ser menos a lo que esta en asignación
+            res.status(403).json({"data":{"result":false,"message":"Existencia debe ser mayor o igual a". rsAssinament.length}});
         }else{
             await model.inventory.update({existence,price,minStock},{where:{articleId}}).then(async function(rsInventoryUpdate){
                 res.status(200).json(rsInventoryUpdate);  
