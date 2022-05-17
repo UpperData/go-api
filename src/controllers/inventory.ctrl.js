@@ -213,7 +213,7 @@ async function inventoryTotal(req,res){ // optiene el inventario actual, hoja de
 async function inventoryUpdate(req,res){
     const {articleId,existence,price,minStock}=req.body
     await model.assignment.findOne({
-        attributes:[[model.sequelize.fn('sum', model.sequelize.col('amount')), 'total_amount']], // sumatoria de asignaciones para ete articulo
+        attributes:[[model.sequelize.fn('sum', model.sequelize.col('quantity')), 'total_amount']], // sumatoria de asignaciones para ete articulo
         where:{articleId}
     }).then(async function(rsAssinament){
         if(rsAssinament.total_amount<existence) { // La existencia no debe ser menos a lo que esta en asignación
