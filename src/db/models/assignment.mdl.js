@@ -62,7 +62,7 @@ module.exports = (sequelize, DataTypes) => {
       type:DataTypes.JSONB,
       allowNull:false
   },
-  isOpened:{
+  isActived:{
     type:DataTypes.BOOLEAN,
     allowNull:false,
     defaultValue:true
