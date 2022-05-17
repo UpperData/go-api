@@ -21,7 +21,7 @@ module.exports = (sequelize, DataTypes) => {
       references:{model:{tableName:'articles',schema:'public'},key:'id'},
       validate:{
         customValidator(value) {
-          if (value === null && this.age <0) {
+          if (value === null || value <0) {
             throw new Error("debe ingresar in articulo valido");
           }
         }
@@ -33,7 +33,7 @@ module.exports = (sequelize, DataTypes) => {
       defaultValue:0,
       validate:{
         customValidator(value) {
-          if (value === null && this.age <0) {
+          if (value === null || value <0) {
             throw new Error("el valor del stock minimo debe ser mayor o igual a cero (0) ");
           }
         }
@@ -61,7 +61,7 @@ module.exports = (sequelize, DataTypes) => {
       defaultValue:0,
       validate:{
         customValidator(value) {
-          if (value === null && this.age <0.1) {
+          if (value === null || value <0) {
             throw new Error("Debe ingresar precio mayor a cero(0)");
           }
         }
