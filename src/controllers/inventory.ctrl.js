@@ -222,12 +222,12 @@ async function inventoryUpdate(req,res){
             await model.inventory.update({existence,price,minStock},{where:{articleId}}).then(async function(rsInventory){
                 res.status(200).json({"data":{"result":false,"message":"Inventario actualizado","data":rsInventory}});  
             }).catch(async function(error){
-                res.status(403).json({"data":{"result":false,"message":"Algo salió mal actualizando inventario"}});  
+                res.status(403).json({"data":{"result":false,"message":error.message}});  
             })
         }
     }).catch(async function(error){
         console.log(error);
-        res.status(403).json({"data":{"result":false,"message":"Algo salió mal validando inventario"}});  
+        res.status(403).json({"data":{"result":false,"message":error.message}});  
     })   
 }
 module.exports={assignmentNew,assignmentByDoctor,assignmentUpdate,articleNew,articleUpdate,articlelist,inventoryTotal,inventoryUpdate};
