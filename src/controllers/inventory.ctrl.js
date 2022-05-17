@@ -216,7 +216,7 @@ async function inventoryUpdate(req,res){
         where:{articleId}
     }).then(async function(rsAssinament){
         if(rsAssinament.count<existence) { // La existencia no debe ser menos a lo que esta en asignación
-            res.status(403).json({"data":{"result":false,"message":"Existencia debe ser mayor o igual a ". rsAssinament.length}});
+            res.status(403).json({"data":{"result":false,"message":"Existencia debe ser mayor o igual a ". rsAssinament.count}});
         }else{
             await model.inventory.update({existence,price,minStock},{where:{articleId}}).then(async function(rsInventory){
                 res.status(200).json({"data":{"result":false,"message":"Inventario actualizado","data":rsInventory}});  
