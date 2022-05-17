@@ -212,14 +212,14 @@ async function inventoryTotal(req,res){ // optiene el inventario actual, hoja de
 }
 async function inventoryUpdate(req,res){
     const {articleId,existence,price,minStock}=req.body
-    await model.assignment.findOne({
+    await model.assignment.findAndCountAll({
         where:{articleId}
     }).then(async function(rsAssinament){
-        if(rsAssinament.length<existence) { // La existencia no debe ser menos a lo que esta en asignación
+        if(rsAssinament.count<existence) { // La existencia no debe ser menos a lo que esta en asignación
             res.status(403).json({"data":{"result":false,"message":"Existencia debe ser mayor o igual a ". rsAssinament.length}});
         }else{
-            await model.inventory.update({existence,price,minStock},{where:{articleId}}).then(async function(rsAssinament){
-                res.status(200).json({"data":{"result":false,"message":"Inventario actualizado"}});  
+            await model.inventory.update({existence,price,minStock},{where:{articleId}}).then(async function(rsInventory){
+                res.status(200).json({"data":{"result":false,"message":"Inventario actualizado","data":rsInventory}});  
             }).catch(async function(error){
                 res.status(403).json({"data":{"result":false,"message":"Algo salió mal actualizando inventario"}});  
             })
