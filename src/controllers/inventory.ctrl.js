@@ -216,12 +216,11 @@ async function inventoryUpdate(req,res){
         where:{articleId}
     }).then(async function(rsAssinament){
         if(rsAssinament.length<existence) { // La existencia no debe ser menos a lo que esta en asignación
-            res.status(403).json({"data":{"result":false,"message":"Existencia debe ser mayor o igual a". rsAssinament.length}});
+            res.status(403).json({"data":{"result":false,"message":"Existencia debe ser mayor o igual a ". rsAssinament.length}});
         }else{
-            await model.inventory.update({existence,price,minStock},{where:{articleId}}).then(async function(rsInventoryUpdate){
+            await model.inventory.update({existence,price,minStock},{where:{articleId}}).then(async function(rsAssinament){
                 res.status(200).json({"data":{"result":false,"message":"Inventario actualizado"}});  
             }).catch(async function(error){
-                console.log(error);
                 res.status(403).json({"data":{"result":false,"message":"Algo salió mal actualizando inventario"}});  
             })
         }
