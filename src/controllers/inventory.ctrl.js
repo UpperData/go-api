@@ -58,7 +58,7 @@ async function assignmentByDoctor(req,res){
     }).then(async function(rsAccountRole){
         if(rsAccountRole.count>0){
             await model.assignment.findAll({
-                where:{accountId},
+                where:{accountId,isActived:true},
                 include:[                    
                     {
                         model:model.article,
@@ -199,7 +199,7 @@ async function inventoryTotal(req,res){ // optiene el inventario actual, hoja de
             asignados= await model.assignment.findOne({
                 attributes:[
                     [model.sequelize.fn('sum', model.sequelize.col('quantity')), 'total_asignament']],
-                where:{articleId:rsInventory[index].articleId}
+                where:{articleId:rsInventory[index].articleId,isActived:true}
             })
             rsInventory[index].dataValues.asignados=asignados.dataValues.total_asignament   
             rsInventory[index].dataValues.almacen=rsInventory[index].existence-asignados.dataValues.total_asignament            
@@ -214,7 +214,7 @@ async function inventoryUpdate(req,res){
     const {articleId,existence,price,minStock}=req.body
     await model.assignment.findOne({
         attributes:[[model.sequelize.fn('sum', model.sequelize.col('quantity')), 'total_amount']], // sumatoria de asignaciones para ete articulo
-        where:{articleId}
+        where:{articleId,isActived:true}
     }).then(async function(rsAssinament){
         if(rsAssinament.total_amount<existence) { // La existencia no debe ser menos a lo que esta en asignación
             res.status(403).json({"data":{"result":false,"message":"Existencia debe ser mayor o igual a ". rsAssinament.total_amount}});
@@ -225,9 +225,19 @@ async function inventoryUpdate(req,res){
                 res.status(403).json({"data":{"result":false,"message":error.message}});  
             })
         }
-    }).catch(async function(error){
-        console.log(error);
+    }).catch(async function(error){        
         res.status(403).json({"data":{"result":false,"message":error.message}});  
     })   
 }
-module.exports={assignmentNew,assignmentByDoctor,assignmentUpdate,articleNew,articleUpdate,articlelist,inventoryTotal,inventoryUpdate};
+
+async function assignmentRevoke(req,res)  {
+    const {id}=req.params;
+    // restar de la asignación    
+    await model.assignment.update({isActived:false},{where:{id}}).then(async function(rsInventory){         
+        res.status(200).json({"data":{"result":false,"message":"Asignación devuelta con exito"}}); 
+    }).catch(async function(error){
+        res.status(403).json({"data":{"result":false,"message":error.message}});  
+    })
+ 
+}
+module.exports={assignmentNew,assignmentByDoctor,assignmentUpdate,articleNew,articleUpdate,articlelist,inventoryTotal,inventoryUpdate,assignmentRevoke};

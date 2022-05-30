@@ -12,5 +12,6 @@ router.put('/InVETOrY/aricLe/EdIT',forceBrute.notBruteSecure,auth.autorizedRole(
 router.get('/InVETorY/aRIcLe/list/:id',forceBrute.notBruteSecure,auth.autorizedRole(['*']),inventory.articlelist);//obtiene uno/todos los articulo 
 router.get('/InveTorY/get/ALL',forceBrute.notBruteSecure,auth.autorizedRole([5]),inventory.inventoryTotal);//obtiene inventario actula
 router.put('/InvEToRY/UpdaTE/ARTICLE',forceBrute.notBruteSecure,auth.autorizedRole([5]),inventory.inventoryUpdate);//actualiza inventario 
+router.get('/InvEToRY/revoke/assignament/:id',forceBrute.notBruteSecure,auth.autorizedRole([5]),inventory.assignmentRevoke);//revocar asignación
 
 module.exports=router;
