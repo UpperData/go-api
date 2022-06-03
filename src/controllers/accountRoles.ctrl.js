@@ -54,7 +54,6 @@ async function addMembership(req,res){ // agregra membresia
 				}				
 			}).catch(async function (error){
 				t.rollback();
-				console.log(error);
 				res.status(403).json({"data":{"result":false,"message":"Algo salió mal creando membresía"}}); 
 			})
 		}else{
@@ -64,8 +63,7 @@ async function addMembership(req,res){ // agregra membresia
 				t.commit()
 				res.status(200).json({"data":{"result":true,"message":"Membresia asignada","data":rsResult}});   
 			}).catch(async function (error){
-				t.rollback();
-				console.log(error);
+				t.rollback();				
 				res.status(403).json({"data":{"result":false,"message":"Algo salió mal asignando membresía"}}); 
 			})
 		}
@@ -76,4 +74,31 @@ async function addMembership(req,res){ // agregra membresia
 	})
 	
 }
-module.exports={getRoleByAccount,add,addMembership};
+async function getRoleByEmail(req,res){
+	const{email}=req.params;
+	return await models.account.findOne({email})
+	.then(async function(rsAccount){
+		await models.accountRole.findAll({ 
+			attributes:[['id','membershipId']],
+			where:{accountId:rsAccount.id,isActived:true},
+			include:[
+				{
+					model:models.account,
+					attributes:[['id','accountId']]
+				},
+				{
+					model:models.role,
+					attributes:[['id','roleId'],'name']
+				}
+			]
+		})
+		.then(async function(srResult){		
+			res.status(200).json({"data":{"result":true,"message":"resultado de busqueda","data":srResult}}); 
+		}).catch(async function(error){		
+			res.status(403).json({"data":{"result":false,"message":error.message}}); 		
+		})
+	}).catch(async function(error){		
+		res.status(403).json({"data":{"result":false,"message":error.message}}); 		
+	})	
+}
+module.exports={getRoleByAccount,add,addMembership,getRoleByEmail};

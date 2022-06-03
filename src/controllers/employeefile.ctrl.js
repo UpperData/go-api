@@ -84,6 +84,47 @@ async function editEmployeeFile(req,res){
         })
     }  
 }
+async function getEmployeeFileByStatus(req,res){
+    const {status} =req.params;  
+    if(status=='*'){
+        return await model.employeeFile.findAll({
+            attributes:[['id','employeeFileId'],'documentId','fisrtName','lastName','lastName'],
+            include:[
+                {
+                    model:model.fee,                    
+                    attributes:['amount'],
+                    where:{isActived:true},
+                    required:false
+                }
+            ]
+        }).then(async function(rsEmploye){
+            res.status(200).json({"data":{"result":true,"message":"Busqueda satisfactoria","data":rsEmploye}});
+        }).catch(async function(error){
+            console.log(error);
+            res.status(403).json({"data":{"result":false,"message":"Algo salió mal, intente nuevamente"}});
+        })
+    }else{
+        return await model.employeeFile.findAll({
+            attributes:['documentId','fisrtName','lastName','lastName'],
+            where:{
+                isActive:status
+            },
+            include:[
+                {
+                    model:model.fee,                    
+                    attributes:['amount'],
+                    where:{isActived:true}
+                }
+            ]
+        }).then(async function(rsEmploye){
+            res.status(200).json({"data":{"result":true,"message":"Busqueda satisfactoria","data":rsEmploye}});
+        }).catch(async function(error){
+            console.log(error);
+            res.status(403).json({"data":{"result":false,"message":"Algo salió mal, intente nuevamente"}});
+        })
+    }
+    
+}
 async function getEmployeeFileByGroups(req,res){
     const {grp} =req.query;  
     return await model.role.findAll({
@@ -122,4 +163,23 @@ async function getEmployeeFileByGroups(req,res){
         res.status(403).json({"data":{"result":false,"message":"Algo salió mal, intente nuevamente"}});
     })
 }
-module.exports={getEmployeeFile,addEmployeeFile,editEmployeeFile,getEmployeeFileByGroups}
+async function feeEmployeeUpdate(req,res){
+    const {employeeFileId,amount} =req.body;  
+    const t = await model.sequelize.transaction();
+    return await model.fee.update({isActived:false},{where:{employeeFileId}},{transaction:t}).then (async function(rsFee){
+        await model.fee.create({amount,employeeFileId,isActived:true},{transaction:t}).then (async function(rsFeeNew){
+            t.commit();
+            res.status(200).json({"data":{"result":true,"message":"Proceso satisfactorio","data":rsFee}});
+        }).catch(async function(error){          
+            t.rollback();
+            res.status(403).json({"data":{"result":false,"message":error.message}});
+        })
+    }).catch(async function(error){        
+        t.rollback();
+        res.status(403).json({"data":{"result":false,"message":error.message}});
+    })
+
+}
+module.exports={getEmployeeFile,addEmployeeFile,editEmployeeFile,getEmployeeFileByGroups,getEmployeeFileByStatus,
+    feeEmployeeUpdate
+}

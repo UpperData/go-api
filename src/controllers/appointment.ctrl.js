@@ -240,9 +240,30 @@ async function getAppointmentByDate(req,res){
         })        
     }
 }
+async function getAppointmentByPay(req,res){    
+   // const dataToken=await serviceToken.dataTokenGet(req.header('Authorization').replace('Bearer ', ''));    
+    const {employeeFileId} = req.params;
+    await model.appointment.findAndCountAll({ // busca citas cerrada 
+        where:{
+            isOpened:false,
+            medialPersonal:{
+                doctor:{
+                    employeeId:employeeFileId
+                }
+            }
+        }
+    }).then(async function(rsAppointment){
+        // busca todas las citas       
+        res.status(200).json({"data":{"result":true,"message":"Busqueda satisfatoria","data":rsAppointment}});
+    }).catch(async function(error){  
+        console.log(error)    
+        res.status(403).json({"data":{"result":false,"message":"Algo salió mal buscando registro"}});        
+    })  
+}
 module.exports={appointmentNew, //Nueva cita
     updateAppointment, //modifica cita
     getAppointment, //busca cita
     getAppointmentByDoctor, //busca citas de un doctor
-    getAppointmentByDate
+    getAppointmentByDate,//busca citas por fecha
+    getAppointmentByPay//busca citas sin pagar
 } 

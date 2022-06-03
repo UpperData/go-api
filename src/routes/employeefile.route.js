@@ -8,6 +8,8 @@ router.get('/Admin/EMPLoyeeFILE/Get/:id',forceBrute.notBruteSecure,auth.autorize
 router.post('/ADMin/eMPLoyEEFILE/ADd/',forceBrute.notBruteSecure,auth.autorizedRole([5]), employeeFile.addEmployeeFile); // agrega una ficha de empleado
 router.put('/ADmin/emPLoyeeFiLE/EDiT/',forceBrute.notBruteSecure,auth.autorizedRole([5]), employeeFile.editEmployeeFile); // modifica una ficha de empleado
 router.get('/EMplOyeFIle/BYGRoUP/get/',forceBrute.notBruteSecure,auth.autorizedRole([5]), employeeFile.getEmployeeFileByGroups); // retorna empleados por grupo 
+router.get('/EMplOyeFIle/StATUS/gET/:status',forceBrute.notBruteSecure,auth.autorizedRole([5]), employeeFile.getEmployeeFileByStatus); // retorna empleados por estatus
+router.put('/EMplOyefIle/update/fee/',forceBrute.notBruteSecure,auth.autorizedRole([5]), employeeFile.feeEmployeeUpdate); // actualizar honorario
 
 
 module.exports=router;
