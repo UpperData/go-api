@@ -15,7 +15,7 @@ module.exports = (sequelize, DataTypes) => {
   }
   voucher.init({
     employeeFileId: DataTypes.INTEGER,
-    amountId: DataTypes.INTEGER,
+    amount: DataTypes.INTEGER,
     isActived: DataTypes.BOOLEAN,
     details: DataTypes.JSONB
   }, {

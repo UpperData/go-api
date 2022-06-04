@@ -76,16 +76,15 @@ async function addMembership(req,res){ // agregra membresia
 }
 async function getRoleByEmail(req,res){
 	const{email}=req.params;
-	return await models.account.findOne({email})
+	return await models.account.findOne({
+		attributes:['id'],
+		where:{email}
+	})
 	.then(async function(rsAccount){
 		await models.accountRole.findAll({ 
-			attributes:[['id','membershipId']],
+			attributes:[['id','membershipId'],'accountId'],
 			where:{accountId:rsAccount.id,isActived:true},
 			include:[
-				{
-					model:models.account,
-					attributes:[['id','accountId']]
-				},
 				{
 					model:models.role,
 					attributes:[['id','roleId'],'name']

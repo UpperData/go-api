@@ -243,7 +243,7 @@ async function getAppointmentByDate(req,res){
 async function getAppointmentByPay(req,res){    
    // const dataToken=await serviceToken.dataTokenGet(req.header('Authorization').replace('Bearer ', ''));    
     const {employeeFileId} = req.params;
-    await model.appointment.findAndCountAll({ // busca citas cerrada 
+    await model.appointment.findAll({ // busca citas cerrada de un doctor
         where:{
             isOpened:false,
             medialPersonal:{
@@ -252,12 +252,33 @@ async function getAppointmentByPay(req,res){
                 }
             }
         }
-    }).then(async function(rsAppointment){
-        // busca todas las citas       
-        res.status(200).json({"data":{"result":true,"message":"Busqueda satisfatoria","data":rsAppointment}});
-    }).catch(async function(error){  
-        console.log(error)    
-        res.status(403).json({"data":{"result":false,"message":"Algo salió mal buscando registro"}});        
+    }).then(async function(rsAppointment){        
+        console.log(rsAppointment[0].id)
+        // busca todas citas del doctor
+        await model.voucher.findAll({
+            where:{employeeFileId}
+        }).then(async function (rsVoucher){
+            
+            //crea arreglo con citas sin Voucher del doctor
+            let withOutVoucher=[];
+            let isVoucher=0;
+            let isDetails=0;
+            for (let i = 0; i < rsAppointment.length; i++) {
+                for (let j = 0; j < rsVoucher.length; j++) { 
+                      
+                    for (let k=0;k<rsVoucher[j].details.length; k++)  {                      
+                        if (rsAppointment[i].id==rsVoucher[j].details[k].appointmentId) isDetails++                        
+                    }                     
+                }
+                if(isVoucher==0) withOutVoucher.push({"concept":"Consulta medica","appointmentId":rsAppointment[i].id, "description":"Consulta medica "+rsAppointment[i].id})                                   
+                    isVoucher=0;
+            }
+            res.status(200).json({"data":{"result":true,"message":"Busqueda satisfatoria","data":withOutVoucher}});
+        }).catch(async function(error){   
+            res.status(403).json({"data":{"result":false,"message":error.message}});        
+        })        
+    }).catch(async function(error){    
+        res.status(403).json({"data":{"result":false,"message":error.message}});        
     })  
 }
 module.exports={appointmentNew, //Nueva cita
