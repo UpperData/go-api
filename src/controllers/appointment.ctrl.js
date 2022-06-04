@@ -1,3 +1,4 @@
+
 const model=require('../db/models/index');
 const { Op } = require("sequelize");
 const serviceToken=require('./serviceToken.ctrl');
@@ -262,16 +263,18 @@ async function getAppointmentByPay(req,res){
             //crea arreglo con citas sin Voucher del doctor
             let withOutVoucher=[];
             let isVoucher=0;
-            let isDetails=0;
+            let isDetails=false;
             for (let i = 0; i < rsAppointment.length; i++) {
-                for (let j = 0; j < rsVoucher.length; j++) { 
-                      
-                    for (let k=0;k<rsVoucher[j].details.length; k++)  {                      
-                        if (rsAppointment[i].id==rsVoucher[j].details[k].appointmentId) isDetails++                        
+                console.log("cita"+rsAppointment[i].id);
+                for (let j = 0; j < rsVoucher.length; j++) {
+                    console.log("Num. detalles:"+ rsVoucher[j].details);
+                    for (let k=0;k<rsVoucher[j].details.length; k++)  {
+                        console.log("Detalle"+rsVoucher[j].details[k].appointmentId);
+                        if (rsAppointment[i].id==rsVoucher[j].details[k].appointmentId) isDetails=true                        
                     }                     
                 }
-                if(isVoucher==0) withOutVoucher.push({"concept":"Consulta medica","appointmentId":rsAppointment[i].id, "description":"Consulta medica "+rsAppointment[i].id})                                   
-                    isVoucher=0;
+                if(!isDetails) withOutVoucher.push({"concept":"Consulta medica","appointmentId":rsAppointment[i].id, "description":"Consulta medica "+rsAppointment[i].id})                                   
+                isVoucher=false;
             }
             res.status(200).json({"data":{"result":true,"message":"Busqueda satisfatoria","data":withOutVoucher}});
         }).catch(async function(error){   
@@ -282,9 +285,9 @@ async function getAppointmentByPay(req,res){
     })  
 }
 module.exports={appointmentNew, //Nueva cita
-    updateAppointment, //modifica cita
-    getAppointment, //busca cita
-    getAppointmentByDoctor, //busca citas de un doctor
-    getAppointmentByDate,//busca citas por fecha
-    getAppointmentByPay//busca citas sin pagar
-} 
+    updateAppointment, //mod
+    getAppointment,
+    getAppointmentByDoctor,
+    getAppointmentByDate,
+    getAppointmentByPay
+}

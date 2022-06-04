@@ -82,9 +82,13 @@ async function getRoleByEmail(req,res){
 	})
 	.then(async function(rsAccount){
 		await models.accountRole.findAll({ 
-			attributes:[['id','membershipId'],'accountId'],
+			attributes:[['id','membershipId']],
 			where:{accountId:rsAccount.id,isActived:true},
 			include:[
+				{
+					model:models.account,
+					attributes:[['id','accountId'],'name']
+				},
 				{
 					model:models.role,
 					attributes:[['id','roleId'],'name']
