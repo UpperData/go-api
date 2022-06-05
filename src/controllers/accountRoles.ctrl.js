@@ -97,8 +97,9 @@ async function getRoleByEmail(req,res){
 				]
 			})
 			.then(async function(srResult){	
-				srResult.push(rsAccount)	
-				res.status(200).json({"data":{"result":true,"message":"resultado de busqueda","data":srResult}}); 
+				rsMembership={"accountId":rsAccount.dataValues.accountId,"membership":srResult}
+				//srResult.push({"membershi":rsAccount})	
+				res.status(200).json({"data":{"result":true,"message":"resultado de busqueda","data":rsMembership}}); 
 			}).catch(async function(error){	
 				res.status(403).json({"data":{"result":false,"message":error.message}}); 		
 			})
