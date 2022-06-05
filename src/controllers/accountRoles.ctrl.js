@@ -77,29 +77,35 @@ async function addMembership(req,res){ // agregra membresia
 async function getRoleByEmail(req,res){
 	const{email}=req.params;
 	return await models.account.findOne({
-		attributes:['id'],
+		attributes:[['id','accountId']],
 		where:{email}
 	})
 	.then(async function(rsAccount){
-		await models.accountRole.findAll({ 
-			attributes:[['id','membershipId']],
-			where:{accountId:rsAccount.id,isActived:true},
-			include:[
-				{
-					model:models.account,
-					attributes:[['id','accountId'],'name']
-				},
-				{
-					model:models.role,
-					attributes:[['id','roleId'],'name']
-				}
-			]
-		})
-		.then(async function(srResult){		
-			res.status(200).json({"data":{"result":true,"message":"resultado de busqueda","data":srResult}}); 
-		}).catch(async function(error){		
-			res.status(403).json({"data":{"result":false,"message":error.message}}); 		
-		})
+		if(rsAccount){
+			await models.accountRole.findAll({ 
+				attributes:[['id','membershipId'],'accountId'],
+				where:{accountId:rsAccount.dataValues.accountId,isActived:true},
+				include:[
+					{
+						model:models.account,
+						attributes:['name']
+					},
+					{
+						model:models.role,
+						attributes:['name']
+					}
+				]
+			})
+			.then(async function(srResult){	
+				srResult.push(rsAccount)	
+				res.status(200).json({"data":{"result":true,"message":"resultado de busqueda","data":srResult}}); 
+			}).catch(async function(error){	
+				res.status(403).json({"data":{"result":false,"message":error.message}}); 		
+			})
+		}else{
+			res.status(403).json({"data":{"result":false,"message":"No existe email indicado"}}); 
+		}
+		
 	}).catch(async function(error){		
 		res.status(403).json({"data":{"result":false,"message":error.message}}); 		
 	})	

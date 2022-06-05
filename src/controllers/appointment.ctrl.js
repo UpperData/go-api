@@ -270,7 +270,8 @@ async function getAppointmentByPay(req,res){
                     console.log("Num. detalles:"+ rsVoucher[j].details);
                     for (let k=0;k<rsVoucher[j].details.length; k++)  {
                         console.log("Detalle"+rsVoucher[j].details[k].appointmentId);
-                        if (rsAppointment[i].id==rsVoucher[j].details[k].appointmentId) isDetails=true                        
+                        if (rsAppointment[i].id==rsVoucher[j].details[k].appointmentId) isDetails=true   
+                        console.log(isDetails);                     
                     }                     
                 }
                 if(!isDetails) withOutVoucher.push({"concept":"Consulta medica","appointmentId":rsAppointment[i].id, "description":"Consulta medica "+rsAppointment[i].id})                                   
