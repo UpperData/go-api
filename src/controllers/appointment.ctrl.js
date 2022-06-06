@@ -262,20 +262,22 @@ async function getAppointmentByPay(req,res){
             
             //crea arreglo con citas sin Voucher del doctor
             let withOutVoucher=[];
-            let isVoucher=0;
-            let isDetails=false;
-            for (let i = 0; i < rsAppointment.length; i++) {
-                console.log("cita"+rsAppointment[i].id);
-                for (let j = 0; j < rsVoucher.length; j++) {
-                    console.log("Num. detalles:"+ rsVoucher[j].details);
+            let isVoucher=null;
+            //let isDetails=true;
+            for (let i = 0; i < rsAppointment.length; i++) {                
+                for (let j = 0; j < rsVoucher.length; j++) {  
+                                     
                     for (let k=0;k<rsVoucher[j].details.length; k++)  {
-                        console.log("Detalle"+rsVoucher[j].details[k].appointmentId);
-                        if (rsAppointment[i].id==rsVoucher[j].details[k].appointmentId) isDetails=true   
-                        console.log(isDetails);                     
+                        console.log("Cita:  "+ rsAppointment[i].id + " - Recibo:  "+rsVoucher[j].details[k].appointmentId);
+                        if (rsAppointment[i].id==rsVoucher[j].details[k].appointmentId) {
+                            isDetails=false  
+                        }else{
+                            isDetails=true  
+                        }                        
                     }                     
                 }
-                if(!isDetails) withOutVoucher.push({"concept":"Consulta medica","appointmentId":rsAppointment[i].id, "description":"Consulta medica "+rsAppointment[i].id})                                   
-                isVoucher=false;
+                if(isDetails) withOutVoucher.push({"concept":"Consulta medica","appointmentId":rsAppointment[i].id, "description":"Consulta medica "+rsAppointment[i].id})                                   
+                isVoucher=null;
             }
             res.status(200).json({"data":{"result":true,"message":"Busqueda satisfatoria","data":withOutVoucher}});
         }).catch(async function(error){   
