@@ -92,7 +92,7 @@ async function getRoleByEmail(req,res){
 					},
 					{
 						model:models.role,
-						attributes:['name']
+						attributes:[['id','roleId'],'name']
 					}
 				]
 			})
