@@ -253,22 +253,17 @@ async function getAppointmentByPay(req,res){
                 }
             }
         }
-    }).then(async function(rsAppointment){        
-        console.log(rsAppointment[0].id)
+    }).then(async function(rsAppointment){
         // busca todas citas del doctor
         await model.voucher.findAll({
-            where:{employeeFileId}
-        }).then(async function (rsVoucher){
-            
-            //crea arreglo con citas sin Voucher del doctor
-            let withOutVoucher=[];
+            where:{employeeFileId,isActived:true}
+        }).then(async function (rsVoucher){             
+            let withOutVoucher=[]; //crea arreglo con citas sin Voucher del doctor
             let isVoucher=null;
-            //let isDetails=true;
+            let isDetails=null;
             for (let i = 0; i < rsAppointment.length; i++) {                
-                for (let j = 0; j < rsVoucher.length; j++) {  
-                                     
+                for (let j = 0; j < rsVoucher.length; j++) { 
                     for (let k=0;k<rsVoucher[j].details.length; k++)  {
-                        console.log("Cita:  "+ rsAppointment[i].id + " - Recibo:  "+rsVoucher[j].details[k].appointmentId);
                         if (rsAppointment[i].id==rsVoucher[j].details[k].appointmentId) {
                             isDetails=false  
                         }else{
@@ -279,7 +274,7 @@ async function getAppointmentByPay(req,res){
                 if(isDetails) withOutVoucher.push({"concept":"Consulta medica","appointmentId":rsAppointment[i].id, "description":"Consulta medica "+rsAppointment[i].id})                                   
                 isVoucher=null;
             }
-            res.status(200).json({"data":{"result":true,"message":"Busqueda satisfatoria","data":withOutVoucher}});
+            res.status(200).json({"data":{"result":true,"message":"Busqueda satisfatoria","data":withOutVoucher}});                      
         }).catch(async function(error){   
             res.status(403).json({"data":{"result":false,"message":error.message}});        
         })        
