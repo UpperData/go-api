@@ -44,7 +44,7 @@ async function addMembership(req,res){ // agregra membresia
 		
 		if(rsMembership.count>0) {
 			//actualiza
-			await models.accountRole.update({isActived,where:{accountId,roleId},transaction:t})
+			await models.accountRole.update({isActived},{where:{accountId,roleId},transaction:t})
 			.then(function(rsResult){
 				t.commit()
 				if(isActived){
@@ -54,7 +54,8 @@ async function addMembership(req,res){ // agregra membresia
 				}				
 			}).catch(async function (error){
 				t.rollback();
-				res.status(403).json({"data":{"result":false,"message":"Algo salió mal creando membresía"}}); 
+				console.log(error);	
+				res.status(403).json({"data":{"result":false,"message":error.message}}); 
 			})
 		}else{
 			//crea
@@ -63,8 +64,9 @@ async function addMembership(req,res){ // agregra membresia
 				t.commit()
 				res.status(200).json({"data":{"result":true,"message":"Membresia asignada","data":rsResult}});   
 			}).catch(async function (error){
-				t.rollback();				
-				res.status(403).json({"data":{"result":false,"message":"Algo salió mal asignando membresía"}}); 
+				t.rollback();			
+				console.log(error);	
+				res.status(403).json({"data":{"result":false,"message":error.message}}); 
 			})
 		}
 	}).catch(async function (error){
