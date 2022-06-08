@@ -166,20 +166,23 @@ async function getEmployeeFileByGroups(req,res){
 async function feeEmployeeUpdate(req,res){
     const {employeeFileId,amount} =req.body;  
     const t = await model.sequelize.transaction();
-    return await model.fee.update({isActived:false},{where:{employeeFileId}},{transaction:t}).then (async function(rsFee){
-        await model.fee.create({amount,employeeFileId,isActived:true},{transaction:t}).then (async function(rsFeeNew){
+
+    return await model.fee.create({amount,employeeFileId,isActived:true},{transaction:t}).then (async function(rsFeeNew){       
+        await model.fee.update({isActived:false},{where:{employeeFileId}},{transaction:t}).then (async function(rsFee){            
             t.commit();
             res.status(200).json({"data":{"result":true,"message":"Proceso satisfactorio","data":rsFee}});
-        }).catch(async function(error){          
+        }).catch(async function(error){        
             t.rollback();
             res.status(403).json({"data":{"result":false,"message":error.message}});
-        })
-    }).catch(async function(error){        
+        })        
+    }).catch(async function(error){          
         t.rollback();
         res.status(403).json({"data":{"result":false,"message":error.message}});
     })
+     
 
 }
+
 module.exports={getEmployeeFile,addEmployeeFile,editEmployeeFile,getEmployeeFileByGroups,getEmployeeFileByStatus,
     feeEmployeeUpdate
 }
