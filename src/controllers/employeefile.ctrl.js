@@ -113,7 +113,8 @@ async function getEmployeeFileByStatus(req,res){
                 {
                     model:model.fee,                    
                     attributes:['amount'],
-                    where:{isActived:true}
+                    where:{isActived:true},
+                    required:false
                 }
             ]
         }).then(async function(rsEmploye){
