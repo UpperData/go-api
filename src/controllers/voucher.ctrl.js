@@ -29,7 +29,7 @@ async function voucherGetById(req,res){
         }).catch(async function(error){
             res.status(403).json({"data":{"result":false,"message":error.message}}); 
         })
-    }else if(employeeFileId>0 && voucherId==0){ // busca voucher por ID
+    }else if(employeeFileId>0 && voucherId=="null"){ // busca voucher por ID
         return await model.voucher.findAll({
             attributes:[['id','voucherId'],'employeeFileId','amount','details'],
             where:{employeeFileId,isActived:true}
