@@ -18,5 +18,29 @@ async function voucherCreate(req,res){
     }
     
 }
-
-module.exports={voucherCreate};
+async function voucherGetById(req,res){
+    const {voucherId,employeeFileId} =req.params; console.log(req.params)
+    if(voucherId>0){ // busca voucher de un empleado
+        return await model.voucher.findOne({
+            attributes:[['id','voucherId'],'employeeFileId','amount','details'],
+            where:{id:voucherId,isActived:true}
+        }).then(async function (rsVoucher){ 
+            res.status(200).json({"data":{"result":true,"message":"Resultado de busqueda","data":rsVoucher}});  
+        }).catch(async function(error){
+            res.status(403).json({"data":{"result":false,"message":error.message}}); 
+        })
+    }else if(employeeFileId>0 && voucherId==0){ // busca voucher por ID
+        return await model.voucher.findAll({
+            attributes:[['id','voucherId'],'employeeFileId','amount','details'],
+            where:{employeeFileId,isActived:true}
+        }).then(async function (rsVoucher){ 
+            res.status(200).json({"data":{"result":true,"message":"Resultado de busqueda","data":rsVoucher}});  
+        }).catch(async function(error){
+            res.status(403).json({"data":{"result":false,"message":error.message}}); 
+        })
+    }else{
+        res.status(403).json({"data":{"result":false,"message":"Debe ingresar parametros de busqueda empleado y/o numero de voucher"}});
+    }
+    
+}
+module.exports={voucherCreate,voucherGetById};
