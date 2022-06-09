@@ -19,7 +19,7 @@ async function voucherCreate(req,res){
     
 }
 async function voucherGetById(req,res){
-    const {voucherId,employeeFileId} =req.params; console.log(req.params)
+    const {voucherId,employeeFileId} =req.params; 
     if(voucherId>0){ // busca voucher de un empleado
         return await model.voucher.findOne({
             attributes:[['id','voucherId'],'employeeFileId','amount','details'],
@@ -43,4 +43,18 @@ async function voucherGetById(req,res){
     }
     
 }
-module.exports={voucherCreate,voucherGetById};
+async function voucherDisable(req,res){ //Anular recibo
+    const {voucherId} =req.params; 
+    const t= model.sequelize.transaction();
+    return await model.voucher.update(
+        {isActived:false},
+        {where:{id:voucherId}},
+        {transaction:t}
+    ).then(async function (rsVoucher){ 
+        res.status(200).json({"data":{"result":true,"message":"Proceso culminado con exito"}});  
+    }).catch(async function(error){
+        console.log(error);
+        res.status(403).json({"data":{"result":false,"message":error.message}}); 
+    }) 
+}
+module.exports={voucherCreate,voucherGetById,voucherDisable};
