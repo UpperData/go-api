@@ -37,6 +37,9 @@ module.exports = {
       exams: {
         type: Sequelize.JSONB
       },
+      dosage:{
+        type: Sequelize.TEXT
+      },
       otherExams: {
         type: Sequelize.STRING
       },

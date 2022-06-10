@@ -5,9 +5,9 @@ const { Op } = require("sequelize");
 
 //registra onforme medico y cambia de estado a la cita (isOpened:false)
 async function medicalRepostNew(req,res){
-    const{appointmentId,description,withExams, withMedicine, medicines,exams, otherExams}=req.body;
+    const{appointmentId,description,withExams, withMedicine, medicines,exams,dosage,otherExams}=req.body;
     const t= await model.sequelize.transaction();
-    await model.medicalReport.create({appointmentId,description,withExams, withMedicine, medicines,exams, otherExams},{tranasction:t})
+    await model.medicalReport.create({appointmentId,description,withExams, withMedicine, medicines,exams,dosage, otherExams},{tranasction:t})
     .then(async function(rsReport){
         await model.appointment.update({isOpened:false},{where:{id:appointmentId}},{tranasction:t})
         .then(async function(rsAppointment){
@@ -36,7 +36,7 @@ async function medicalReportEdit(req,res){
 
     const{id,appointmentId,description,withExams, withMedicine, medicines,exams, otherExams}=req.body;
     const t= await model.sequelize.transaction();
-    await model.medicalReport.update({appointmentId,description,withExams, withMedicine, medicines,exams, otherExams},{where:{id}},{tranasction:t})
+    await model.medicalReport.update({appointmentId,description,withExams, withMedicine, medicines,exams,dosage, otherExams},{where:{id}},{tranasction:t})
     .then(async function(rsReport){
         res.status(200).json({"data":{"result":true,"message":"Actualización satisfactoria"}});
     }).catch(async function(error){        

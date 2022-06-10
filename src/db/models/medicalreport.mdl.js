@@ -37,6 +37,9 @@ module.exports = (sequelize, DataTypes) => {
     exams: {
       type:DataTypes.JSONB
     },
+    dosage: {
+      type:DataTypes.TEXT
+    },
     otherExams: {
       type:DataTypes.STRING
     }

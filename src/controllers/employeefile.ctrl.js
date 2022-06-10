@@ -105,7 +105,7 @@ async function getEmployeeFileByStatus(req,res){
         })
     }else{
         return await model.employeeFile.findAll({
-            attributes:['documentId','fisrtName','lastName','lastName'],
+            attributes:[['id','employeeFileId'],'documentId','accountId','fisrtName','lastName','lastName'],
             where:{
                 isActive:status
             },
