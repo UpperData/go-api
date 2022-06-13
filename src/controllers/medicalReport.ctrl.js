@@ -51,7 +51,7 @@ async function medicalReportGetByDoctor(req,res){
                 include:[
                     {
                         model:model.appointment,
-                        attributes:[id,medialPersonal],
+                        attributes:['id','medialPersonal'],
                         where:{
                             medialPersonal:{
                                 doctor:{
