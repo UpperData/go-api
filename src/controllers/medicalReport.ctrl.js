@@ -2,6 +2,7 @@
 const model=require('../db/models/index');
 const utils = require('./utils.ctrl');
 const { Op } = require("sequelize");
+const serviceToken=require('./serviceToken.ctrl');
 
 //registra onforme medico y cambia de estado a la cita (isOpened:false)
 async function medicalRepostNew(req,res){
