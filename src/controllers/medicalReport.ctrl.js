@@ -76,7 +76,7 @@ async function medicalReportGetByDoctor(req,res){
 }
 async function medicalReportEdit(req,res){
 
-    const{id,appointmentId,description,withExams, withMedicine, medicines,exams, otherExams}=req.body;
+    const{id,appointmentId,description,withExams, withMedicine, medicines,exams,dosage, otherExams}=req.body;
     const t= await model.sequelize.transaction();
     await model.medicalReport.update({appointmentId,description,withExams, withMedicine, medicines,exams,dosage, otherExams},{where:{id}},{tranasction:t})
     .then(async function(rsReport){
