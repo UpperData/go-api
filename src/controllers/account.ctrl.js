@@ -592,7 +592,9 @@ async function emailUpdate(req,res){
                 return await model.account.update({email:newEmail,isConfirmed:false},{where:{id:dataToken['account'].id}},{transaction:t}).then(async function(rsNewEmail){ //Actualiza email                    
                     var account={"id":dataToken['account'].id,"email":rsAccount.email};
                     const token = await serviceToken. newToken(account,roles=null,type="updateEmail",dateTime=new Date(),people=null);
-                    const urlRestore=process.env.HOST_BACK+"/email/verify/"+token; 
+                    const urlRestore=process.env.HOST_BACK+"/email/verify/"+token;
+                    t.commit(); 
+                    
                     var sendMail= await utils.sendMail({ // envia email para veridicar cuenta
                         from:"CEMA OnLine <" + process.env.EMAIL_MANAGER +	'>',
                         to:rsAccount.email,
@@ -603,12 +605,13 @@ async function emailUpdate(req,res){
                         action:urlRestore,
                         actionLabel:"Certificar Email"
                     });
+                    
                     if(sendMail){
                         t.commit(); // actializa email
                         res.status(200).json({data:{"result":true,"message":"Operación procesada satisfactoriamente, recibirá  un Email para certificar el cambio"}});    
                     }else{
                         res.status(403).json({data:{"result":false,"message":"Algo salió mal procesando su solicitud, intente nuevamente"}});       
-                    }    
+                    }   
                             
                 }).catch(async function(error){
                     console.log(error)
