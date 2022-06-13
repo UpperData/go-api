@@ -7,7 +7,7 @@ const { Op } = require("sequelize");
 async function medicalRepostNew(req,res){
     const{appointmentId,description,withExams, withMedicine, medicines,exams,dosage,otherExams}=req.body;
     const t= await model.sequelize.transaction();
-    await model.medicalReport.create({appointmentId,description,withExams, withMedicine, medicines,exams,dosage, otherExams},{tranasction:t})
+    await model.medicalReport.create({appointmentId,description,withExams, withMedicine, medicines,exams,dosage,otherExams},{tranasction:t})
     .then(async function(rsReport){
         await model.appointment.update({isOpened:false},{where:{id:appointmentId}},{tranasction:t})
         .then(async function(rsAppointment){
@@ -15,9 +15,11 @@ async function medicalRepostNew(req,res){
             res.status(200).json({"data":{"result":true,"message":"Informe registrado satisfactoriamente"}});
         }).catch(async function(error){
             t.rollback();
+            console.log(error)
             res.status(403).json({data:{"result":false,"message":error.message}});
         })
     }).catch(async function(error){
+        console.log(error)
         t.rollback();
         res.status(403).json({data:{"result":false,"message":error.message}});
     })    
