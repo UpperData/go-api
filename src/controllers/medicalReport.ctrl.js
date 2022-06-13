@@ -16,12 +16,17 @@ async function medicalRepostNew(req,res){
         }).catch(async function(error){
             t.rollback();
             console.log(error)
+            
             res.status(403).json({data:{"result":false,"message":error.message}});
         })
     }).catch(async function(error){
         console.log(error)
         t.rollback();
-        res.status(403).json({data:{"result":false,"message":error.message}});
+        if(error.type== 'unique violation'){
+            res.status(403).json({data:{"result":false,"message":"Cita ya posee informe asociado"}});    
+        }else{
+            res.status(403).json({data:{"result":false,"message":error.message}});
+        }        
     })    
 }
 async function medicalReportGet(req,res){
