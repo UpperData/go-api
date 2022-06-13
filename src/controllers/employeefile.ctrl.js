@@ -2,8 +2,13 @@ const model=require('../db/models/index');
 const { Op } = require("sequelize");
 async function getEmployeeFile(req,res){
     const {id}=req.params;
+    //{"gender": "M", "number": "17450236", "birthday": "1985-05-01T07:21:14.000Z", "civilStatus": {"id": 1, "name": "Casado"}, "nationality": "V"}
     await model.employeeFile.findOne({        
-        where:{id}
+        where:{
+            documentId:{
+                number:id
+            }
+        }
     }).then(async function(rsEmployeeFile){
         res.status(200).json({"data":{"result":true,"message":"Busqueda Satisfactorio","data":rsEmployeeFile}});
     }).catch(async function(error){           
