@@ -205,8 +205,7 @@ async function getAppointmentByDoctor(req,res){
                         }
                     ]
                 }
-            ).then(async function(rsPatient){
-                console.log(rsPatient);
+            ).then(async function(rsPatient){                
                 res.status(200).json({"data":{"result":true,"message":"Busqueda satisfatoria","data":rsPatient}});  
             }).catch(async function(error){  
                 console.log(error)    
