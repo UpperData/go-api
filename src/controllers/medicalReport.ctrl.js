@@ -52,8 +52,10 @@ async function medicalReportGetByDoctor(req,res){
                     {
                         model:model.appointment,
                         where:{
-                            doctor:{
-                                employeeId:employee.id
+                            medialPersonal:{
+                                doctor:{
+                                    employeeId:id
+                                }
                             }
                         }
                     }
