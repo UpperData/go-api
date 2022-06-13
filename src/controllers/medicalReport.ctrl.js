@@ -22,7 +22,7 @@ async function medicalRepostNew(req,res){
     }).catch(async function(error){
         console.log(error)
         t.rollback();
-        if(error.type== 'unique violation'){
+        if(error.name=='SequelizeUniqueConstraintError'){
             res.status(403).json({data:{"result":false,"message":"Cita ya posee informe asociado"}});    
         }else{
             res.status(403).json({data:{"result":false,"message":error.message}});
