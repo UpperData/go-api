@@ -54,7 +54,7 @@ async function medicalReportGetByDoctor(req,res){
                         where:{
                             medialPersonal:{
                                 doctor:{
-                                    employeeId:id
+                                    employeeId:employee.id
                                 }
                             }
                         }
