@@ -80,8 +80,10 @@ async function medicalReportEdit(req,res){
     const t= await model.sequelize.transaction();
     await model.medicalReport.update({appointmentId,description,withExams, withMedicine, medicines,exams,dosage, otherExams},{where:{id}},{tranasction:t})
     .then(async function(rsReport){
+        t.commit();
         res.status(200).json({"data":{"result":true,"message":"Actualización satisfactoria"}});
     }).catch(async function(error){        
+        t.rollback();
         res.status(403).json({data:{"result":false,"message":error.message}});
     })
 }
