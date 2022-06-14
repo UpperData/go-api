@@ -262,7 +262,7 @@ async function getAppointmentByPay(req,res){
             let isDetails=null;
             for (let i = 0; i < rsAppointment.length; i++) {                
                 for (let j = 0; j < rsVoucher.length; j++) { 
-                    if(rsVoucher[j].details){
+                    if(rsVoucher[j]){
                         for (let k=0;k<rsVoucher[j].details.length; k++)  {
                             if (rsAppointment[i].id==rsVoucher[j].details[k].appointmentId) {
                                 isDetails=false; 
