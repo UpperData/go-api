@@ -270,7 +270,7 @@ async function getAppointmentByPay(req,res){
                         }                        
                     }                     
                 }
-                if(isDetails) withOutVoucher.push({"concept":"Consulta medica","appointmentId":rsAppointment[i].id, "description":"Consulta medica "+rsAppointment[i].id})                                   
+                if(isDetails==true) withOutVoucher.push({"concept":"Consulta medica","appointmentId":rsAppointment[i].id, "description":"Consulta medica "+rsAppointment[i].id})                                   
                 isVoucher=null;
             }
             res.status(200).json({"data":{"result":true,"message":"Busqueda satisfatoria","data":withOutVoucher}});                      
