@@ -260,24 +260,27 @@ async function getAppointmentByPay(req,res){
             let withOutVoucher=[]; //crea arreglo con citas sin Voucher del doctor
             let isVoucher=null;
             let isDetails=null;
-            for (let i = 0; i < rsAppointment.length; i++) {                
-                for (let j = 0; j < rsVoucher.length; j++) { 
-                    if(rsVoucher[j]){
-                        for (let k=0;k<rsVoucher[j].details.length; k++)  {
-                            if (rsAppointment[i].id==rsVoucher[j].details[k].appointmentId) {
-                                isDetails=false; 
-                                console.log("iguales") ;
-                            }else{
-                                isDetails=true ;
-                                console.log("Diferentes") ;
-                            }            
-                            console.log(isDetails);
-                        } 
-                    }else{
-                        isDetails=true ;
+            for (let i = 0; i < rsAppointment.length; i++) {                 
+                if(rsVoucher){
+                    console.log("recorriendo recibos")
+                    for (let j = 0; j < rsVoucher.length; j++) { 
+                        if(rsVoucher[j]){
+                            for (let k=0;k<rsVoucher[j].details.length; k++)  {
+                                if (rsAppointment[i].id==rsVoucher[j].details[k].appointmentId) {
+                                    isDetails=false; 
+                                    console.log("iguales") ;
+                                }else{
+                                    isDetails=true ;
+                                    console.log("Diferentes") ;
+                                }            
+                                console.log(isDetails);
+                            } 
+                        }else{
+                            isDetails=true ;
+                        }                                            
                     }
-                                        
-                }
+                }               
+                
                 if(isDetails==true) withOutVoucher.push({"concept":"Consulta medica","appointmentId":rsAppointment[i].id, "description":"Consulta medica "+rsAppointment[i].id})                                   
                 isVoucher=null;
             }
