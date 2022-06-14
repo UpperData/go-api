@@ -266,7 +266,6 @@ async function getAppointmentByPay(req,res){
                 for (let j = 0; j < rsVoucher.length; j++) { 
                     console.log("recorriendo recibos")
                     if(rsVoucher[j]){
-
                         for (let k=0;k<rsVoucher[j].details.length; k++)  {
                             if (rsAppointment[i].id==rsVoucher[j].details[k].appointmentId) {
                                 isDetails=false; 
