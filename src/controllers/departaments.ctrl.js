@@ -48,4 +48,50 @@ async function editDepartament(req,res){
         res.status(403).json({"data":{"result":false,"message":"Algo salió mal actualizando registro"}});  
     })
 }
-module.exports={getDepartament,createDepartament,editDepartament}
+async function createSubDepartament(req,res){ 
+    const{departamentId,name}=req.body;
+    const t = await model.sequelize.transaction();
+    return await model.subDepartament.create({departamentId,name},{transaction:t}).then(async function(rsDepartament){
+        t.commit()
+        res.status(200).json({"data":{"result":true,"message":"Registro Satisfactorio","data":rsDepartament}});      
+    }).catch(async function(error){  
+        t.rollback()  
+        console.log(error);        
+        res.status(403).json({"data":{"result":false,"message":"Algo salió mal creando registro"}});  
+    })
+}
+async function editSubDepartament(req,res){
+    const t = await model.sequelize.transaction();
+    const{id,name}=req.body;
+    return await model.subDepartament.update({name},{where:{id}},{transaction:t}).then(async function(rsDepartament){
+        t.commit()
+        res.status(200).json({"data":{"result":true,"message":"Actualización Satisfactoria","data":rsDepartament}});      
+    }).catch(async function(error){
+        t.rollback();
+        res.status(403).json({"data":{"result":false,"message":"Algo salió mal actualizando registro"}});  
+    })
+}
+async function createCargo(req,res){ 
+    const{departamentId,name}=req.body;
+    const t = await model.sequelize.transaction();
+    return await model.cargo.create({departamentId,name},{transaction:t}).then(async function(rsDepartament){
+        t.commit()
+        res.status(200).json({"data":{"result":true,"message":"Registro Satisfactorio","data":rsDepartament}});      
+    }).catch(async function(error){  
+        t.rollback()  
+        console.log(error);        
+        res.status(403).json({"data":{"result":false,"message":"Algo salió mal creando registro"}});  
+    })
+}
+async function editCargo(req,res){
+    const t = await model.sequelize.transaction();
+    const{id,name}=req.body;
+    return await model.cargo.update({name},{where:{id}},{transaction:t}).then(async function(rsDepartament){
+        t.commit()
+        res.status(200).json({"data":{"result":true,"message":"Actualización Satisfactoria","data":rsDepartament}});      
+    }).catch(async function(error){
+        t.rollback();
+        res.status(403).json({"data":{"result":false,"message":"Algo salió mal actualizando registro"}});  
+    })
+}
+module.exports={getDepartament,createDepartament,editDepartament,createSubDepartament,editCargo,createCargo,editSubDepartament}
