@@ -74,10 +74,11 @@ async function editSubDepartament(req,res){
 async function createCargo(req,res){ 
     const{departamentId,name}=req.body;
     const t = await model.sequelize.transaction();
-    const id=await model.cargo.findOne({
+    const id=await model.cargo.findAll({
         attributes:[
             [model.sequelize.fn('max', model.sequelize.col('id')), 'max_id']]
     });
+    console.log(id);
     return await model.cargo.create({id:id.max_id+1,departamentId,name},{transaction:t}).then(async function(rsDepartament){
         t.commit()
         res.status(200).json({"data":{"result":true,"message":"Registro Satisfactorio","data":rsDepartament}});      
