@@ -26,7 +26,8 @@ async function getChangeType(req,res){
 }
 async function getCurrentChangeType(req,res){
     return await model.changeType.findOne({
-        attributes:[ [model.sequelize.fn('max', model.sequelize.col('id')), 'id'],'value']
+        attributes:[ [model.sequelize.fn('max', model.sequelize.col('id')), 'id'],'value'],
+        group:['value']
     }).then(async function(rsChangeType){
         if(rsChangeType){
             res.status(200).json({"data":{"result":true,"message":"Busqueda satisfatoria","data":rsChangeType}});        
