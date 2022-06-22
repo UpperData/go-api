@@ -17,7 +17,7 @@ async function getChangeType(req,res){
         })
     }else{
         //Busca todos los roles
-        return await model.changeType.findAll({order:['updatedAt']}).then(async function(rsChangeType){
+        return await model.changeType.findAll({order:['updatedAt','DESC']}).then(async function(rsChangeType){
             res.status(200).json({"data":{"result":true,"message":"Busqueda satisfatoria","data":rsChangeType}});        
         }).catch(async function(errror){
             res.status(403).json({"data":{"result":false,"message":"Algo salió mal buscando registro"}});        
