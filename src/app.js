@@ -44,6 +44,7 @@ app.use(require('./routes/inventory.route'));
 app.use(require('./routes/fixer.route'));
 app.use(require('./routes/patient.route'));
 app.use(require('./routes/voucher.route'));
+app.use(require('./routes/changeType.route'));
 
 app.listen(app.get('port'),function(){
     console.log('cema is working in port:', app.get('port'));
