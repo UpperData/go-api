@@ -78,9 +78,6 @@ async function createCargo(req,res){
         attributes:[
             [model.sequelize.fn('max', model.sequelize.col('id')), 'max_id']]
     });
-    console.log(id.dataValues.max_id);
-    console.log(id.max_id);
-    console.log(id.max_id+1);
     return await model.cargo.create({id:id.dataValues.max_id+1,departamentId,name},{transaction:t}).then(async function(rsDepartament){
         t.commit()
         res.status(200).json({"data":{"result":true,"message":"Registro Satisfactorio","data":rsDepartament}});      
