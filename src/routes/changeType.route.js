@@ -1,6 +1,6 @@
 const express =require ('express');
 const router= express.Router();
-const changeType=require('../controllers/cha');
+const changeType=require('../controllers/changeType.ctrl');
 const forceBrute=require('../controllers/middleware/noBrute.ctrl');
 const auth=require('../controllers/middleware/auth.ctrl');
 
