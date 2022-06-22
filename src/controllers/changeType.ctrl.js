@@ -25,7 +25,7 @@ async function getChangeType(req,res){
     }
 }
 async function getCurrentChangeType(req,res){
-    return await model.changeType.findOne({
+    return await model.changeType.findAll({
         attributes:[ [model.sequelize.fn('max', model.sequelize.col('id')), 'id'],'value'],
         group:['value']
     }).then(async function(rsChangeType){
