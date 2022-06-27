@@ -43,12 +43,12 @@ async function createSubModule(req,res){
         await model.operation.findAll().then(async function(rsOperations){ 
             for (let index = 0; index < rsOperations.length; index++) {
                 //crea permisos
-                await model.permission.create({subModuleId:rsSubModule.id,operationId:rsOperations[index].id,isActived:false},{transaction:t})
+                await model.permission.create({subModuleId:rsSubModule.id,operationId:rsOperations[index].id,isActived:true},{transaction:t})
                 .then(async function(rsPermission){
                     // asigna permisos a todos los roles en false
                     await model.role.findAll({atrributes:['id']}).then(async function(rsRole){ 
                         for (let j = 0; j < rsRole.length; j++) {
-                            await model.grantRole.create({roleId:rsRole[j].id,permissionId:rsPermission.id,isActived:false},{transaction:t})                            
+                            await model.grantRole.create({roleId:rsRole[j].id,permissionId:rsPermission.id,isActived:true},{transaction:t})                            
                         }
                     })
                 });
