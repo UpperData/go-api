@@ -26,11 +26,21 @@ async function getChangeType(req,res){
 }
 async function getCurrentChangeType(req,res){
     return await model.changeType.findOne({
-        attributes:[ [model.sequelize.fn('max', model.sequelize.col('id')), 'id'],'value'],
-        group:['value']
+        attributes:[ [model.sequelize.fn('max', model.sequelize.col('id')), 'id']]
     }).then(async function(rsChangeType){
         if(rsChangeType){
-            res.status(200).json({"data":{"result":true,"message":"Busqueda satisfatoria","data":rsChangeType}});        
+            await model.changeType.findOne({
+                where:{id:rsChangeType.id}
+            }).then(async function(rsChangeTypeCurrent){
+                if(rsChangeTypeCurrent){
+                    res.status(200).json({"data":{"result":true,"message":"Busqueda satisfatoria","data":rsChangeTypeCurrent}});        
+                }else{
+                    res.status(403).json({"data":{"result":false,"message":"No existe registro con este código"}});            
+                }
+                
+            }).catch(async function(errror){
+                res.status(403).json({"data":{"result":false,"message":"Algo salió mal buscando registro"}});        
+            })                   
         }else{
             res.status(403).json({"data":{"result":false,"message":"No existe registro con de tipo de cambio"}});            
         }
