@@ -1,6 +1,7 @@
 const model=require('../db/models/index');
 const { Op } = require("sequelize");
 const serviceToken=require('./serviceToken.ctrl');
+const generals=require('./generals.ctrl');
 
 
 async function assignmentNew(req,res){
@@ -191,19 +192,27 @@ async function inventoryTotal(req,res){ // optiene el inventario actual, hoja de
             }
         ]
     }).then(async function(rsInventory){
-        // Buscar lo que esta en transito por cada articulo
-        console.log('buscar consignaciones');
-       
+        //optiene precio del dolar
+         const dolar= await generals.generalCurrenteChange();
+        // variable precio total
+        let totalPriceInventory=0;
+        // Buscar lo que esta en transito por cada articulo               
         for (let index = 0; index < rsInventory.length; index++) {
             let asignados=0;
             asignados= await model.assignment.findOne({
                 attributes:[
                     [model.sequelize.fn('sum', model.sequelize.col('quantity')), 'total_asignament']],
                 where:{articleId:rsInventory[index].articleId,isActived:true}
-            })
+            }) 
             rsInventory[index].dataValues.asignados=asignados.dataValues.total_asignament   
-            rsInventory[index].dataValues.almacen=rsInventory[index].existence-asignados.dataValues.total_asignament            
-        }         
+            rsInventory[index].dataValues.almacen=rsInventory[index].existence-asignados.dataValues.total_asignament   
+            rsInventory[index].dataValues.dolarValue=Number(rsInventory[index].price/dolar).toFixed(2); //agrega precio en dolares segun el valor actual
+            totalPriceInventory=totalPriceInventory+( Number(rsInventory[index].price) * Number(rsInventory[index].existence));
+            console.log("Precio: "+rsInventory[index].price+" - Existencia: "+Number(rsInventory[index].existence)+"- Acumulado: "+totalPriceInventory);
+            
+        }    
+        rsInventory.push({bolivaresTotalInventory:totalPriceInventory.toFixed(2)});
+        rsInventory.push({dolarTotalInventory:Number(totalPriceInventory/dolar).toFixed(2)});     
         res.status(200).json(rsInventory);          
     }).catch(async function(error){
         console.log(error);

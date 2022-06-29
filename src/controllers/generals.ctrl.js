@@ -393,5 +393,30 @@ async function getExams(req,res){
         })
     }    
 }
+async function generalCurrenteChange(){
+    console.log("Obteniendo precio actual del dolar")
+     return await model.changeType.findOne({
+        attributes:[ [model.sequelize.fn('max', model.sequelize.col('id')), 'id']]
+    }).then(async function(rsChangeType){
+        if(rsChangeType){
+            return await model.changeType.findOne({
+                where:{id:rsChangeType.id}
+            }).then(async function(rsChangeTypeCurrent){
+                return rsChangeTypeCurrent.value; 
+                if(rsChangeTypeCurrent){                    
+                    return rsChangeTypeCurrent.value;                    
+                }else{
+                    return null;
+                }
+            }).catch(async function(errror){
+                return null;        
+            })                   
+        }else{
+            return null;            
+        }
+    }).catch(async function(errror){
+        return null;
+    })
+}
 module.exports={getCivil,currentAccount,getPhoneType,getDepartament,getSubDepartament,getCargo,getPatienType,getState,getCitiesByState,
-    getProvincesByState,getParroquiaByProvince,getAppointmentTpye,getExams}
+    getProvincesByState,getParroquiaByProvince,getAppointmentTpye,getExams,generalCurrenteChange}
