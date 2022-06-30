@@ -208,12 +208,10 @@ async function inventoryTotal(req,res){ // optiene el inventario actual, hoja de
             rsInventory[index].dataValues.almacen=rsInventory[index].existence-asignados.dataValues.total_asignament   
             rsInventory[index].dataValues.dolarValue=Number(rsInventory[index].price/dolar).toFixed(2); //agrega precio en dolares segun el valor actual
             totalPriceInventory=totalPriceInventory+( Number(rsInventory[index].price) * Number(rsInventory[index].existence));
-            console.log("Precio: "+rsInventory[index].price+" - Existencia: "+Number(rsInventory[index].existence)+"- Acumulado: "+totalPriceInventory);
-            
         }    
-        rsInventory.push({bolivaresTotalInventory:totalPriceInventory.toFixed(2)});
-        rsInventory.push({dolarTotalInventory:Number(totalPriceInventory/dolar).toFixed(2)});     
-        res.status(200).json(rsInventory);          
+        //rsInventory.push({bolivaresTotalInventory:totalPriceInventory.toFixed(2)});
+        //rsInventory.push({dolarTotalInventory:Number(totalPriceInventory/dolar).toFixed(2)});     
+        res.status(200).json({"items":rsInventory,bolivaresTotalInventory:totalPriceInventory.toFixed(2),dolarTotalInventory:Number(totalPriceInventory/dolar).toFixed(2)});          
     }).catch(async function(error){
         console.log(error);
         res.status(403).json({"data":{"result":false,"message":"Algo salió mal buscando inventario"}});  
@@ -247,6 +245,5 @@ async function assignmentRevoke(req,res)  {
     }).catch(async function(error){
         res.status(403).json({"data":{"result":false,"message":error.message}});  
     })
- 
 }
 module.exports={assignmentNew,assignmentByDoctor,assignmentUpdate,articleNew,articleUpdate,articlelist,inventoryTotal,inventoryUpdate,assignmentRevoke};
