@@ -178,7 +178,7 @@ async function appointmenAPS(req,res){
         res.status(403).json(error.message);
     });
 }
-//citas tipo APS
+//citas tipo domicilairio
 async function appointmenDocicilio(req,res){
     const {startDate,endDate}=req.params
     return await model.appointment.findAndCountAll({
@@ -209,4 +209,144 @@ async function appointmenDocicilio(req,res){
         res.status(403).json(error.message);
     });
 }
-module.exports={employeeFileActived,employeeFileNoActived,employeeFileFemale,employeeFileMale,appointmenClosed,appointmenOpened,appointmenAPS,appointmenDocicilio}
+//articulos en stock minimo
+async function inventoryLowStock(req,res){
+    return await model.inventory.findAndCountAll({
+        attributes:['id','articleId','minStock','existence','price'],
+        where:{
+            minStock: {
+                [Op.gte]: model.sequelize.col('existence')
+            }
+        },
+        include:[
+            {
+                model:model.article,
+                attributes:['id','name']
+            }
+        ]
+    }).then(async function(rslowStock){
+        res.status(200).json(rslowStock)
+    }).catch(async function(error){
+        console.log(error);
+        res.status(403).json(error.message);
+    });
+}
+//articulos agotados
+async function inventorySoldOut(req,res){
+    return await model.inventory.findAndCountAll({
+        attributes:['id','articleId','minStock','existence','price'],
+        where:{
+            existence: {
+                [Op.qte]: 0
+            }
+        },
+        include:[
+            {
+                model:model.article,
+                attributes:['id','name']
+            }
+            
+        ]
+    }).then(async function(rslowStock){
+        res.status(200).json(rslowStock)
+    }).catch(async function(error){
+        console.log(error);
+        res.status(403).json(error.message);
+    });
+}
+//-	Obtener Artículos sin existencia en almacén (si en tránsito)
+async function inventoryOutWharehouse(req,res){
+    return await model.inventory.findAndCountAll({
+        attributes:['id','articleId','minStock','existence','price'],
+        where:{
+            existence: {
+                [Op.gte]: 1 
+            }
+        },
+        include:[
+            {
+                model:model.article,
+                attributes:['id','name'],
+                required:false,
+                include:[
+                    {
+                        model:model.assignment,
+                        attributes:['id','quantity'],
+                        required:true,
+                        where:{
+                            isActived:true
+                        },
+                    }
+                ]
+            }
+        ]
+    }).then(async function(rsInventory){
+        let totalAsignament=0;
+        let outWharehouse=[];
+        for (let index = 0; index < rsInventory.count; index++) {
+           
+            if( rsInventory['rows'][index].dataValues['article']){ //recorre el inventario
+                //suma las asignaciones
+                for (let j = 0; j < rsInventory['rows'][index].dataValues['article'].dataValues['assignments'].length; j++) {
+                    totalAsignament+=rsInventory['rows'][index].dataValues['article'].dataValues['assignments'][j].quantity                
+                }
+                if(rsInventory['rows'][index].existence<=totalAsignament){ //compara existencia con total asignado
+                    outWharehouse.push(rsInventory['rows'][index])
+                }
+            }            
+        }
+        res.status(200).json(outWharehouse);
+    }).catch(async function(error){
+        console.log(error);
+        res.status(403).json(error.message);
+    });
+}
+
+//-	btener Artículos en tránsito
+async function inventoryInAsignment(req,res){
+    return await model.inventory.findAndCountAll({
+        attributes:['id','articleId','minStock','existence','price'],
+        where:{
+            existence: {
+                [Op.gte]: 1 
+            }
+        },
+        include:[
+            {
+                model:model.article,
+                attributes:['id','name'],
+                required:false,
+                include:[
+                    {
+                        model:model.assignment,
+                        attributes:['id','quantity'],
+                        required:true,
+                        where:{
+                            isActived:true
+                        },
+                    }
+                ]
+            }
+        ]
+    }).then(async function(rsInventory){
+        let totalAsignament=0;
+        let inAsignment=[];
+        for (let index = 0; index < rsInventory.count; index++) {
+           
+            if( rsInventory['rows'][index].dataValues['article']){ //recorre el inventario
+                //suma las asignaciones
+                for (let j = 0; j < rsInventory['rows'][index].dataValues['article'].dataValues['assignments'].length; j++) {
+                    totalAsignament+=rsInventory['rows'][index].dataValues['article'].dataValues['assignments'][j].quantity                
+                }
+                inAsignment.push(rsInventory['rows'][index]);                
+            }            
+        }
+        res.status(200).json(inAsignment);
+    }).catch(async function(error){
+        console.log(error);
+        res.status(403).json(error.message);
+    });
+}
+module.exports={employeeFileActived,employeeFileNoActived,employeeFileFemale,employeeFileMale,appointmenClosed,appointmenOpened,appointmenAPS,appointmenDocicilio,inventoryLowStock,
+    inventorySoldOut,inventoryOutWharehouse,inventoryInAsignment
+}

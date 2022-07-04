@@ -14,4 +14,12 @@ router.get('/reporTs/appointment/CLOSED/:startDate/:endDate',auth.autorizedRole(
 router.get('/reporTs/appoiNtment/OpeNEd/:startDate/:endDate',auth.autorizedRole([5]),reportSystem.appointmenOpened); // Citas abiertas
 router.get('/rePOrTs/appoiNtmenT/ApS/:startDate/:endDate',auth.autorizedRole([5]),reportSystem.appointmenAPS); // Citas Tipo APS
 router.get('/rePOrTs/aPpoiNtmenT/DOMIciLIO/:startDate/:endDate',auth.autorizedRole([5]),reportSystem.appointmenDocicilio); // Citas Tipo APS
+
+//Inventario
+router.get('/rePorTs/iNVEntory/low/stock',auth.autorizedRole([5]),reportSystem.inventoryLowStock); // inventario con bajo stock
+router.get('/rePorTs/iNvEntory/sold/out',auth.autorizedRole([5]),reportSystem.inventorySoldOut); // inventario agotado
+router.get('/rePorTs/iNvEntory/out/wharehouse',auth.autorizedRole([5]),reportSystem.inventoryOutWharehouse); // inventario sin almacén
+router.get('/rePorTs/iNvEntory/in/aSIGnmenT',auth.autorizedRole([5]),reportSystem.inventoryInAsignment); // inventario en transito
+
+
 module.exports=router;

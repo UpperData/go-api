@@ -9,7 +9,14 @@ module.exports = {
         type: Sequelize.INTEGER
       },
       articleId: {
-        type: Sequelize.INTEGER
+        type: Sequelize.INTEGER,
+        references:{
+          model:{
+            tableName:'articles',
+            schema:'public'
+          },
+          key:'id'
+        }
       },
       minStock: {
         type: Sequelize.INTEGER
