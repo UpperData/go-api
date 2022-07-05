@@ -332,7 +332,7 @@ async function inventoryInAsignment(req,res){
         let totalAsignament=0;
         let inAsignment=[];
         for (let index = 0; index < rsInventory.count; index++) {
-            if(rsInventory['rows']>0){
+            if(rsInventory.count>0){
                 if( rsInventory['rows'][index].dataValues['article']){ //recorre el inventario
                     //suma las asignaciones
                     for (let j = 0; j < rsInventory['rows'][index].dataValues['article'].dataValues['assignments'].length; j++) {
