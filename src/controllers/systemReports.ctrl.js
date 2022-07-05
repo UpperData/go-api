@@ -332,14 +332,16 @@ async function inventoryInAsignment(req,res){
         let totalAsignament=0;
         let inAsignment=[];
         for (let index = 0; index < rsInventory.count; index++) {
-           
-            if( rsInventory['rows'][index].dataValues['article']){ //recorre el inventario
-                //suma las asignaciones
-                for (let j = 0; j < rsInventory['rows'][index].dataValues['article'].dataValues['assignments'].length; j++) {
-                    totalAsignament+=rsInventory['rows'][index].dataValues['article'].dataValues['assignments'][j].quantity                
+            if(rsInventory['rows']){
+                if( rsInventory['rows'][index].dataValues['article']){ //recorre el inventario
+                    //suma las asignaciones
+                    for (let j = 0; j < rsInventory['rows'][index].dataValues['article'].dataValues['assignments'].length; j++) {
+                        totalAsignament+=rsInventory['rows'][index].dataValues['article'].dataValues['assignments'][j].quantity                
+                    }
+                    inAsignment.push(rsInventory['rows'][index]);                
                 }
-                inAsignment.push(rsInventory['rows'][index]);                
-            }            
+            }
+                        
         }
         res.status(200).json(inAsignment);
     }).catch(async function(error){
