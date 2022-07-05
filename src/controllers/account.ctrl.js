@@ -361,7 +361,7 @@ async function getSecret(req,res){
     }).then(async function(rsAccount){
         if(rsAccount){
             if(rsAccount.isActived){
-                if(rsAccount.secret.length>1){
+                if(rsAccount.secret){                    
                     let question=[];
                     for (let index = 0; index < rsAccount.secret.length; index++) {                        
                         question.push(rsAccount['secret'][index].question);                       

@@ -283,12 +283,12 @@ async function inventoryOutWharehouse(req,res){
     }).then(async function(rsInventory){
         let totalAsignament=0;
         let outWharehouse=[];
-        for (let index = 0; index < rsInventory.count; index++) {
+        for (let index = 0; index < rsInventory['rows'].length; index++) {
            
-            if( rsInventory['rows'][index].dataValues['article']){ //recorre el inventario
+            if( rsInventory['rows'][index]['article']){ //recorre el inventario
                 //suma las asignaciones
-                for (let j = 0; j < rsInventory['rows'][index].dataValues['article'].dataValues['assignments'].length; j++) {
-                    totalAsignament+=rsInventory['rows'][index].dataValues['article'].dataValues['assignments'][j].quantity                
+                for (let j = 0; j < rsInventory['rows'][index]['article']['assignments'].length; j++) {
+                    totalAsignament+=rsInventory['rows'][index]['article']['assignments'][j].quantity                
                 }
                 if(rsInventory['rows'][index].existence<=totalAsignament){ //compara existencia con total asignado
                     outWharehouse.push(rsInventory['rows'][index])
