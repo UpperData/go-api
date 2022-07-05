@@ -330,18 +330,13 @@ async function inventoryInAsignment(req,res){
         ]
     }).then(async function(rsInventory){
         let totalAsignament=0;
-        let inAsignment=[];
-        for (let index = 0; index < rsInventory.count; index++) {
-            if(rsInventory['rows'][index]){
-                if( rsInventory['rows'][index].dataValues['article']){ //recorre el inventario
-                    //suma las asignaciones
-                    for (let j = 0; j < rsInventory['rows'][index].dataValues['article'].dataValues['assignments'].length; j++) {
-                        totalAsignament+=rsInventory['rows'][index].dataValues['article'].dataValues['assignments'][j].quantity                
-                    }
-                    inAsignment.push(rsInventory['rows'][index]);                
-                }
-            }
-                        
+        let inAsignment=[];   //console.log(rsInventory['rows'][0]['article'].assignments);
+        for (let i = 0; i < rsInventory['rows'].length; i++) {         
+            totalAsignament=0;
+            for (let j = 0; j <rsInventory['rows'][i]['article']['assignments'].length; j++) {
+                totalAsignament+=rsInventory['rows'][i]['article'].assignments[j].quantity                
+            }            
+            inAsignment.push({item:rsInventory['rows'][i]['article'],totalAsignament});            
         }
         res.status(200).json(inAsignment);
     }).catch(async function(error){
