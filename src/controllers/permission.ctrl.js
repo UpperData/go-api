@@ -81,7 +81,8 @@ async function addPermision(req,res){ //regsitra un nuevo permiso
                     for (let index = 0; index < allRoles.length; index++) {
                         await model.permission.grantRole({roleId:allRoles[index].id,permissionId:rsPermissionAdd.id,isActived:false},{transaction:t})                            
                     }                    
-                }).catch(async function(error){        
+                }).catch(async function(error){    
+                    console.log(error);     
                     res.status(403).json({"data":{"result":false,"message":"Algo salió registrando permiso"}}); 
                 })
                 //agregar este permiso en todos los modulos en false

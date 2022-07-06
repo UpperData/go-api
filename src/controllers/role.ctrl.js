@@ -39,7 +39,8 @@ async function createRole(req,res){
         }                    
         t.commit();
         res.status(200).json({"data":{"result":true,"message":"Registro Satisfactorio","data":rsRole}});      
-    }).catch(async function(error){        
+    }).catch(async function(error){
+        console.log(error);        
         t.rollback();
         res.status(403).json({"data":{"result":false,"message":"Algo salió mal registrando grupo"}});  
     })
