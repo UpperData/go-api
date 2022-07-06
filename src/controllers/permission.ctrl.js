@@ -74,7 +74,17 @@ async function addPermision(req,res){ //regsitra un nuevo permiso
                 {transaction:t}
             );// valida que no exista el permiso 
             if(countPermitions.count==0){ // si no existe
-                await model.permission.create({subModuleId,operationId:operations[index].id,isActived:operations[index].isActived},{transaction:t});
+                await model.permission.create({subModuleId,operationId:operations[index].id,isActived:operations[index].isActived},{transaction:t})
+                .then(async function(rsPermissionAdd){
+                    // Asigno permiso a todos lo roles en false
+                    const allRoles=await model.roles.findAll({attributes:['id','name']});
+                    for (let index = 0; index < allRoles.length; index++) {
+                        await model.permission.grantRole({roleId:allRoles[index].id,permissionId:rsPermissionAdd.id,isActived:false},{transaction:t})                            
+                    }                    
+                }).catch(async function(error){        
+                    res.status(403).json({"data":{"result":false,"message":"Algo salió registrando permiso"}}); 
+                })
+                //agregar este permiso en todos los modulos en false
             }                
         }   
         res.status(200).json({"data":{"result":true,"message":"Proceso Satisfactorio"}}); 

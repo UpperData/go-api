@@ -33,6 +33,10 @@ async function createRole(req,res){
     const{name,isActived,icon}=req.body;
     const t = await model.sequelize.transaction();
     return await model.role.create({name,isActived:true,icon},{transaction:t}).then(async function(rsRole){
+        const allPermission= await model.permission.findAll({attributes:['id','name']});
+        for (let index = 0; index < allPermission.length; index++) {
+            await model.permission.grantRole({roleId:rsRole.id,permissionId:allPermission[index].id,isActived:false},{transaction:t})                            
+        }                    
         t.commit();
         res.status(200).json({"data":{"result":true,"message":"Registro Satisfactorio","data":rsRole}});      
     }).catch(async function(error){        
