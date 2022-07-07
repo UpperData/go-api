@@ -32,7 +32,11 @@ async function getRole(req,res){
 async function createRole(req,res){ 
     const{name,isActived,icon}=req.body;
     const t = await model.sequelize.transaction();
-    return await model.role.create({name,isActived:true,icon},{transaction:t}).then(async function(rsRole){
+    const idRole=await model.role.findOne({
+        attributes:[
+            [model.sequelize.fn('max', model.sequelize.col('id')), 'max_id']]
+    });
+    return await model.role.create({id:idRole.dataValues.+1,name,isActived:true,icon},{transaction:t}).then(async function(rsRole){
         const allPermission= await model.permission.findAll({attributes:['id']});
         for (let index = 0; index < allPermission.length; index++) {
             await model.grantRole.findAndCountAll({where:{roleId:rsRole.id,permissionId:allPermission[index].id}}).
