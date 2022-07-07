@@ -33,9 +33,19 @@ async function createRole(req,res){
     const{name,isActived,icon}=req.body;
     const t = await model.sequelize.transaction();
     return await model.role.create({name,isActived:true,icon},{transaction:t}).then(async function(rsRole){
-        const allPermission= await model.permission.findAll({attributes:['id','name']});
+        const allPermission= await model.permission.findAll({attributes:['id']});
         for (let index = 0; index < allPermission.length; index++) {
-            await model.permission.grantRole({roleId:rsRole.id,permissionId:allPermission[index].id,isActived:false},{transaction:t})                            
+            await model.grantRole.findAndCountAll({where:{roleId:rsRole.id,permissionId:allPermission[index].id}}).
+            then(async function(rsFindGrant){
+                if(rsFindGrant.count<=0){
+                    await model.grantRole.create({roleId:rsRole.id,permissionId:allPermission[index].id,isActived:false},{transaction:t})
+                }
+            }).catch(async function(error){
+                console.log(error);        
+                t.rollback();
+                res.status(403).json({"data":{"result":false,"message":"Algo salió mal registrando grupo"}});  
+            })
+            
         }                    
         t.commit();
         res.status(200).json({"data":{"result":true,"message":"Registro Satisfactorio","data":rsRole}});      

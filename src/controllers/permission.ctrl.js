@@ -79,7 +79,14 @@ async function addPermision(req,res){ //regsitra un nuevo permiso
                     // Asigno permiso a todos lo roles en false
                     const allRoles=await model.roles.findAll({attributes:['id','name']});
                     for (let index = 0; index < allRoles.length; index++) {
-                        await model.permission.grantRole({roleId:allRoles[index].id,permissionId:rsPermissionAdd.id,isActived:false},{transaction:t})                            
+                        await model.permission.findAndCountAll({where:{roleId:allRoles[index].id,permissionId:rsPermissionAdd.id}})
+                        .then(async function(rsFindPermission){
+                            if(rsFindPermission.count==0){ // si no existe le permiso lo crea
+                                await model.permission.grantRole({roleId:allRoles[index].id,permissionId:rsPermissionAdd.id,isActived:false},{transaction:t})                            
+                            }
+                            
+                        })
+                        
                     }                    
                 }).catch(async function(error){    
                     console.log(error);     
