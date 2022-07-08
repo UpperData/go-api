@@ -334,8 +334,8 @@ async function inventoryInAsignment(req,res){
             for (let j = 0; j <rsInventory['rows'][i]['article']['assignments'].length; j++) {
                 totalAsignament+=rsInventory['rows'][i]['article'].assignments[j].quantity                
             }    
-            rsInventory['rows'][i].totalAsignament=totalAsignament;        
-            inAsignment.push({item:rsInventory['rows'][i],totalAsignament});            
+            rsInventory['rows'][i].dataValues.totalAsignament=totalAsignament;        
+            inAsignment.push({item:rsInventory['rows'][i]});            
         }
         res.status(200).json(inAsignment);
     }).catch(async function(error){
