@@ -236,9 +236,7 @@ async function inventorySoldOut(req,res){
     return await model.inventory.findAndCountAll({
         attributes:['id','articleId','minStock','existence','price'],
         where:{
-            existence: {
-                [Op.qte]: 0
-            }
+            existence:0
         },
         include:[
             {
@@ -302,7 +300,7 @@ async function inventoryOutWharehouse(req,res){
     });
 }
 
-//-	btener Artículos en tránsito
+//-	obtener Artículos en tránsito
 async function inventoryInAsignment(req,res){
     return await model.inventory.findAndCountAll({
         attributes:['id','articleId','minStock','existence','price'],
