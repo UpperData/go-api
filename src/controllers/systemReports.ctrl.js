@@ -335,7 +335,7 @@ async function inventoryInAsignment(req,res){
                 totalAsignament+=rsInventory['rows'][i]['article'].assignments[j].quantity                
             }    
             rsInventory['rows'][i].dataValues.totalAsignament=totalAsignament;        
-            inAsignment.push({item:rsInventory['rows'][i]});            
+            inAsignment.push(rsInventory['rows'][i]);            
         }
         res.status(200).json(inAsignment);
     }).catch(async function(error){
