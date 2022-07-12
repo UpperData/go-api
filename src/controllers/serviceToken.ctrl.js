@@ -34,15 +34,12 @@ require('dotenv').config();
 	iat:moment().unix(),
 	exp
     };
-
-    var token= await jwt.encode(payload,process.env.JWT_SECRET);
-      
+    var token= await jwt.encode(payload,process.env.JWT_SECRET);      
     return token;
 }
 async function dataTokenGet(token){ // obtiene informacion del token con la estructura --> newToken(account,roles,type,dateTime,people)
 	try{
-		var  payload= await jwt.decode(token,process.env.JWT_SECRET);
-		
+		var  payload= await jwt.decode(token,process.env.JWT_SECRET);		
 		if (Date.now() >= payload.exp * 1000) {
 			return false;
 		}else{
@@ -67,13 +64,10 @@ async function genRestoreSecret(rsAccount){ //genera toke sin estructura especif
 	}catch(error){
 		return false;
 	}
-	
-	
 }
 async function getTokenAll(token){ // obtiene token sin estructura especifica --> payload
 	try{
-		var  payload= await jwt.decode(token,process.env.JWT_SECRET);
-		
+		var  payload= await jwt.decode(token,process.env.JWT_SECRET);		
 		if (Date.now() >= payload.exp * 1000) {
 			return false;
 		}else{			

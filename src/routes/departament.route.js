@@ -10,5 +10,5 @@ router.put('/DEpT/UPdate/',forceBrute.notBruteSecure,auth.autorizedRole([5]),dep
 router.post('/DePT/sub/NEW/',forceBrute.notBruteSecure,auth.autorizedRole([5]),dept.createSubDepartament); //Crear subDepartamentos
 router.put('/DEpT/sub/UPdate/',forceBrute.notBruteSecure,auth.autorizedRole([5]),dept.editSubDepartament); //Modificar SubDepartamentos
 router.post('/DePT/sub/Cargo/NEW/',forceBrute.notBruteSecure,auth.autorizedRole([5]),dept.createCargo); //Crear cargo
-router.put('/DEpT/sub/Cargo/UPdate/',forceBrute.notBruteSecure,auth.autorizedRole([5]),dept.editSubDepartament); //Modificar Cargo
+router.put('/DEpT/sub/Cargo/UPdate/',forceBrute.notBruteSecure,auth.autorizedRole([5]),dept.editCargo); //Modificar Cargo
 module.exports=router;

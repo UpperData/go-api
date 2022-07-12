@@ -57,37 +57,34 @@ async function addEmployeeFile(req,res){
 }
 async function editEmployeeFile(req,res){
     const{id,fisrtName, lastName,documentId,address,email,cargo,birthdate,
-        phone,photo,digitalDoc,observation,academic,cursos,experience,contacto,isActive}=req.body;
-        const t = await model.sequelize.transaction();  
-        const accountFinded=await model.account.findOne({attributes:['id'],where:{email}});            
-        let accountId=null;        
-        if(accountFinded ){   
-            if(accountFinded.id>0){
-                accountId=accountFinded.id;
-                //Actualiza informacion personal de la cuenta
-                let people= {
-                    "document":documentId,
-                    "firstName":fisrtName,
-                    "lastName":lastName,
-                    "birthdate":birthdate                     
-                }
-                await model.account.update({people},{where:{email}},{transaction:t});
+    phone,photo,digitalDoc,observation,academic,cursos,experience,contacto,isActive}=req.body;
+    const t = await model.sequelize.transaction();  
+    const accountFinded=await model.account.findOne({attributes:['id'],where:{email}});            
+    let accountId=null;        
+    if(accountFinded ){   
+        if(accountFinded.id>0){
+            accountId=accountFinded.id;
+            //Actualiza informacion personal de la cuenta
+            let people= {
+                "document":documentId,
+                "firstName":fisrtName,
+                "lastName":lastName,
+                "birthdate":birthdate                     
             }
-            
+            await model.account.update({people},{where:{email}},{transaction:t});
         }
-    
-    if(fisrtName==null || lastName==null || documentId==null ||email==null,cargo==null,phone==null,academic==null,experience==null){
         
-        await model.employeeFile.update({fisrtName, lastName,documentId,address,email,cargo,
-        phone,photo,digitalDoc,observation,academic,cursos,experience,contacto,accountId,isActive},{where:{id}},{transaction:t}).then(async function(rsEmployeeFile){
-            t.commit();
-            res.status(200).json({"data":{"result":true,"message":"Procesado Satisfactoriamente","data":rsEmployeeFile}});
-        }).catch(async function(error){
-            t.rollback();
-            consosel.log(error)
-            res.status(403).json({"data":{"result":false,"message":error.message}});
-        })
-    }  
+    }        
+    await model.employeeFile.update({fisrtName, lastName,documentId,address,email,cargo,
+    phone,photo,digitalDoc,observation,academic,cursos,experience,contacto,accountId,isActive},{where:{id}},{transaction:t}).then(async function(rsEmployeeFile){
+        t.commit();
+        res.status(200).json({"data":{"result":true,"message":"Procesado Satisfactoriamente","data":rsEmployeeFile}});
+    }).catch(async function(error){
+        t.rollback();
+        console.log(error)
+        res.status(403).json({"data":{"result":false,"message":error.message}});
+    })
+    
 }
 async function getEmployeeFileByStatus(req,res){
     const {status} =req.params;  
