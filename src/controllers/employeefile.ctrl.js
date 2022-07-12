@@ -72,8 +72,7 @@ async function editEmployeeFile(req,res){
                 "birthdate":birthdate                     
             }
             await model.account.update({people},{where:{email}},{transaction:t});
-        }
-        
+        }        
     }        
     await model.employeeFile.update({fisrtName, lastName,documentId,address,email,cargo,
     phone,photo,digitalDoc,observation,academic,cursos,experience,contacto,accountId,isActive},{where:{id}},{transaction:t}).then(async function(rsEmployeeFile){
