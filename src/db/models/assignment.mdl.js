@@ -12,6 +12,7 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       // define association here     
       assignment.belongsTo(models.account);  
+      assignment.belongsTo(models.article);
     }
   }
   assignment.init({
