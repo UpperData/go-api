@@ -11,6 +11,7 @@ module.exports = {
      *   isBetaMember: false
      * }], {});
     */
+    
     await queryInterface.bulkInsert('roles', [
       {id:4,name: 'Upper',isActived:true,createdAt: new Date(),updatedAt: new Date()},
       {id:5,name: 'Admin',isActived:true,createdAt: new Date(),updatedAt: new Date()},
@@ -30,6 +31,7 @@ module.exports = {
       {id:19,name: 'Bioanalista',isActived:true,createdAt: new Date(),updatedAt: new Date()},
       {id:20,name: 'Supervisor Cuenta',isActived:true,createdAt: new Date(),updatedAt: new Date()}
     ], {});
+    //Model.sequelize.query(`SELECT setval('public.roles_id_seq',21, true)`);// actualiza secuencia
   },
 
   async down (queryInterface, Sequelize) {

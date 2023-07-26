@@ -362,7 +362,7 @@ async function getSecret(req,res){
         if(rsAccount){
             if(rsAccount.isActived){
                 //const resume = {language: null};
-                const secreto = !!rsAccount.secret?.length; // valida arreglo vacio
+                const secreto = !!rsAccount.secret.length; // valida arreglo vacio
                 if(secreto){                    
                     let question=[];
                     for (let index = 0; index < rsAccount.secret.length; index++) {                        

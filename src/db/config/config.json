@@ -2,7 +2,7 @@
   "development": {
     "username": "upperdata",
     "password": "(1Juan-1:9*",
-    "database": "cema11022022-dev",
+    "database": "go-dev-07262026",
     "host": "127.0.0.1",
     "dialect": "postgresql"
   },
