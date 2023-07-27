@@ -2,7 +2,7 @@
   "development": {
     "username": "upperdata",
     "password": "g8*M#+49?F",
-    "database": "go-dev-07262026",
+    "database": "go-dev-07262023",
     "host": "localhost",
     "dialect": "postgresql"
   },
