@@ -479,7 +479,12 @@ async function updateSecret(req,res){
     const dataToken=await serviceToken.dataTokenGet(req.header('Authorization').replace('Bearer ', '')); 
     const{currentPassword}= req.body;
     let {secret}=req.body;
-    if(!dataToken){ // Valida expiración       
+    await model.account.update({secret}, {where:{id:dataToken['account'].id}},{transaction:t})
+    .then(async function(rsaccountUd){                        
+        t.commit();
+        res.status(200).json({data:{"result":true,"message":"Respuestas secretas actualizadas satisfactoriamente"}});  
+     })
+    /* if(!dataToken){ // Valida expiración       
         res.status(403).json({data:{"result":false,"message":"Sesion expirada"}});  
     }else { 
         const t = await model.sequelize.transaction();    
@@ -516,7 +521,7 @@ async function updateSecret(req,res){
             res.status(403).json({data:{"result":false,"message":"Algo salió mal actualizando sus respuestas secretas, intente nuevamente"}});   
         })
     }
-
+ */
 }
 async function loginToken(req,res){	
 	const {token}= req.params		
