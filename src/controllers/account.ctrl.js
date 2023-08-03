@@ -480,6 +480,10 @@ async function updateSecret(req,res){
     const{currentPassword}= req.body;
     let {secret}=req.body;
     const t = await model.sequelize.transaction();  
+    secretCryp=[]
+    for (let index = 0; index < secret.length; index++) {
+        secret[index].answer =  bcrypt.hashSync(secret[index].answer, 10 );                            
+    }
     await model.account.update({secret}, {where:{id:dataToken['account'].id}},{transaction:t})
     .then(async function(rsaccountUd){                        
         t.commit();
