@@ -261,7 +261,7 @@ async function loginAccount(req,res){
 }
 async function passwordRestart(req,res){
     const {token,newPassword,email,secret}=req.body; 
-    console.log(secret);
+    
     return await model.account.findOne({
         attributes:['id','hashConfirm','secret','email','tries'],
         where:{email}}) // valida si existe cuenta
@@ -273,7 +273,8 @@ async function passwordRestart(req,res){
                     //valida respuestas secretas
                     var secretValid=[];
                     var answerValid=false;
-                    for (let index = 0; index < rsAccount.secret.length; index++) {                                               
+                    for (let index = 0; index < rsAccount.secret.length; index++) {  
+                        console.log(secret[index]);                                             
                         if(await bcrypt.compare(secret[index],rsAccount.secret[index].answer) ){
                             secretValid[index]=true;
                         }else{
