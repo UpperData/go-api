@@ -274,7 +274,7 @@ async function passwordRestart(req,res){
                     var secretValid=[];
                     var answerValid=false;
                     for (let index = 0; index < rsAccount.secret.length; index++) {  
-                        console.log(secret[index]);                                             
+                        console.log(rsAccount.secret[index].answer);                                             
                         if(await bcrypt.compare(secret[index],rsAccount.secret[index].answer) ){
                             secretValid[index]=true;
                         }else{
