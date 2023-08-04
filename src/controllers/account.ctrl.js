@@ -481,7 +481,7 @@ async function updateSecret(req,res){
     const dataToken=await serviceToken.dataTokenGet(req.header('Authorization').replace('Bearer ', '')); 
     const{currentPassword}= req.body;
     //let {secret}=req.body;
-    "secret"=  [
+    let secret=  [
         {
            "answer": "mama",
            "question": "ita"
