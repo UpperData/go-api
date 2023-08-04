@@ -480,7 +480,17 @@ async function resetSecretAnswer(req,res){
 async function updateSecret(req,res){
     const dataToken=await serviceToken.dataTokenGet(req.header('Authorization').replace('Bearer ', '')); 
     const{currentPassword}= req.body;
-    let {secret}=req.body;
+    //let {secret}=req.body;
+    "secret"=  [
+        {
+           "answer": "mama",
+           "question": "ita"
+        },{
+           "answer": "papa",
+           "question": "david"
+        }
+    ];
+    
     const t = await model.sequelize.transaction();  
     secretCryp=[]
     for (let index = 0; index < secret.length; index++) {
