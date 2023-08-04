@@ -158,96 +158,71 @@ async function loginAccount(req,res){
         ]        
         })
         .then(async function (rsUser){	
-            if(rsUser){
-                return  await roleAccount.getRoleByAccount({accountId:rsUser.id})  
-                    .then(async function (rsAccRoles){
-                        if(rsAccRoles.length>0){
-                            var tokenRole
-                            var allRole  = [];
-                            for (let i=0; i<rsAccRoles.length; i++){
-                                allRole.push({"id":rsAccRoles[i]['role'].id,"name":rsAccRoles[i]['role'].name});
-                            }								
-                            dataAccount={"id":rsUser.id,"name":rsUser.name,"email":rsUser.email} //Datos de la cuenta	
-                            dataPeople=rsUser.people;	                                        
-                            var token =  await serviceToken.newToken(dataAccount,allRole,'login',dateTime,dataPeople) //generar Token 
-                            
-                            if(rsUser['employeeFiles'].length>0) {
-                                if(rsUser['employeeFiles'][0].photo) dataPeople.photo=rsUser['employeeFiles'][0].photo
-                            };									
-                            await model.account.update({tries:0},{where:{id:rsUser.id}}).then(async function(rsNewPassword){ //Actualiza tries
-                                res.status(200).json({data:{"result":true,"message":"Usted a iniciado sesión " + rsUser.email ,"token":token,tokenRole,"people":dataPeople,"account":dataAccount,"role":allRole}});        
-                            }).catch(async function(error){                        
-                                res.status(200).json({data:{"result":true,"message":"Usted a iniciado sesión " + rsUser.email ,"token":token,tokenRole,"people":dataPeople,"account":dataAccount,"role":allRole,"advertencia":"ocurrio un error intentando actualizar número de intentos"}});        
+            if(rsUser){              
+                                
+                if(!rsUser.isActived){
+                    res.status(403).json({"data":{"result":false,"message":"Usuario Bloqueado, comuniquese con el administrador del sistema"}})        
+                }else{
+                    if(rsUser.tries>5){                        
+                        await model.account.update({isActived:false,hashConfirm:null},{where:{id:rsUser.id}}).then(async function(rsStatus){ //Actualiza status                               
+                            role= await roleAccount.getRoleByAccount({accountId:rsUser.id});  
+                            await model.notification.create({ 
+                                from:process.env.COMPANY,                                
+                                body:{
+                                    subject:"Cuenta "+process.env.COMPANY+" Bloqueada",
+                                    text:"La cuenta"+ rsUser.email+"("+rsUser.id+")" +" ha sido bloqueada por exceso de intentos ",
+                                    title:"Cuenta Bloqueada",
+                                    subtitle:rsUser.name+"("+rsUser.id+")",
+                                    link:"http://go/account/details/"+rsUser.id
+                                    },
+                                read:false,
+                                accountRolesId:role[0]
                             }) 
-                        }
-                        else{				
-                            res.status(403).json({data:{"result":false,"message":"Usuario no esta activo en un grupo"}});
-                        }
-                    })
-                                
-                // if(!rsUser.isActived){
-                //     res.status(403).json({"data":{"result":false,"message":"Usuario Bloqueado, comuniquese con el administrador del sistema"}})        
-                // }else{
-                //     if(rsUser.tries>5){                        
-                //         await model.account.update({isActived:false,hashConfirm:null},{where:{id:rsUser.id}}).then(async function(rsStatus){ //Actualiza status                               
-                //             role= await roleAccount.getRoleByAccount({accountId:rsUser.id});  
-                //             await model.notification.create({ 
-                //                 from:"Administrador CEMA",                                
-                //                 body:{
-                //                     subject:"Cuenta CEMA Bloqueada",
-                //                     text:"La cuenta"+ rsUser.email+"("+rsUser.id+")" +" ha sido bloqueada por exceso de intentos ",
-                //                     title:"Cuenta Bloqueada",
-                //                     subtitle:rsUser.name+"("+rsUser.id+")",
-                //                     link:"http://cema/account/details/"+rsUser.id
-                //                     },
-                //                 read:false,
-                //                 accountRolesId:role[0]
-                //             }) 
-                //             res.status(403).json({"data":{"result":false,"message":"su cuenta a sido bloqueda por exceder limite de intentos"}}) 
-                //         }).catch(async function(error){
-                //             res.status(403).json({data:{"result":false,"message":"Algo salió mal actualizando cuenta de usuario"}});        
-                //         })                        
-                //     }else{
-                //         return await  bcrypt.compare(pass,rsUser.pass)
-                //         .then(async  function (rsPass){
-                //             if(rsPass){												
-                //                 return  await roleAccount.getRoleByAccount({accountId:rsUser.id})  
-                //                 .then(async function (rsAccRoles){
-                //                     if(rsAccRoles.length>0){
-                //                         var tokenRole
-                //                         var allRole  = [];
-                //                         for (let i=0; i<rsAccRoles.length; i++){
-                //                             allRole.push({"id":rsAccRoles[i]['role'].id,"name":rsAccRoles[i]['role'].name});
-                //                         }								
-                //                         dataAccount={"id":rsUser.id,"name":rsUser.name,"email":rsUser.email} //Datos de la cuenta	
-                //                         dataPeople=rsUser.people;	                                        
-                //                         var token =  await serviceToken.newToken(dataAccount,allRole,'login',dateTime,dataPeople) //generar Token 
+                            res.status(403).json({"data":{"result":false,"message":"su cuenta a sido bloqueda por exceder limite de intentos"}}) 
+                        }).catch(async function(error){
+                            res.status(403).json({data:{"result":false,"message":"Algo salió mal actualizando cuenta de usuario"}});        
+                        })                        
+                    }else{
+                        return await  bcrypt.compare(pass,rsUser.pass)
+                        .then(async  function (rsPass){
+                            if(rsPass){												
+                                return  await roleAccount.getRoleByAccount({accountId:rsUser.id})  
+                                .then(async function (rsAccRoles){
+                                    if(rsAccRoles.length>0){
+                                        var tokenRole
+                                        var allRole  = [];
+                                        for (let i=0; i<rsAccRoles.length; i++){
+                                            allRole.push({"id":rsAccRoles[i]['role'].id,"name":rsAccRoles[i]['role'].name});
+                                        }								
+                                        dataAccount={"id":rsUser.id,"name":rsUser.name,"email":rsUser.email} //Datos de la cuenta	
+                                        dataPeople=rsUser.people;	                                        
+                                        var token =  await serviceToken.newToken(dataAccount,allRole,'login',dateTime,dataPeople) //generar Token 
                                        
-                //                         if(rsUser['employeeFiles'].length>0) {
-                //                             if(rsUser['employeeFiles'][0].photo) dataPeople.photo=rsUser['employeeFiles'][0].photo
-                //                         };									
-                //                         await model.account.update({tries:0},{where:{id:rsUser.id}}).then(async function(rsNewPassword){ //Actualiza tries
-                //                             res.status(200).json({data:{"result":true,"message":"Usted a iniciado sesión " + rsUser.email ,"token":token,tokenRole,"people":dataPeople,"account":dataAccount,"role":allRole}});        
-                //                         }).catch(async function(error){                        
-                //                             res.status(200).json({data:{"result":true,"message":"Usted a iniciado sesión " + rsUser.email ,"token":token,tokenRole,"people":dataPeople,"account":dataAccount,"role":allRole,"advertencia":"ocurrio un error intentando actualizar número de intentos"}});        
-                //                         }) 
-                //                     }
-                //                     else{				
-                //                         res.status(403).json({data:{"result":false,"message":"Usuario no esta activo en un grupo"}});
-                //                     }
-                //                 })	
-                //             }else {
-                //                 await model.account.update({tries:rsUser.tries+1},{where:{id:rsUser.id}}).then(async function(rsNewPassword){ //Actualiza tries
-                //                     intento=6-(rsUser.tries+1)
-                //                     res.status(403).json({"data":{"result":false,"message":"Contraseña inválida, le restan " + intento +" intentos"}})        
-                //                 }).catch(async function(error){                        
-                //                     res.status(403).json({data:{"result":false,"message":"Contraseña inválida, Algo salió mal actualizando cuenta de usuario"}});        
-                //                 })				
+                                        if(rsUser['employeeFiles'].length>0) {
+                                            if(rsUser['employeeFiles'][0].photo) dataPeople.photo=rsUser['employeeFiles'][0].photo
+                                        };									
+                                        await model.account.update({tries:0},{where:{id:rsUser.id}}).then(async function(rsNewPassword){ //Actualiza tries
+                                            res.status(200).json({data:{"result":true,"message":"Usted a iniciado sesión " + rsUser.email ,"token":token,tokenRole,"people":dataPeople,"account":dataAccount,"role":allRole}});        
+                                        }).catch(async function(error){                        
+                                            res.status(200).json({data:{"result":true,"message":"Usted a iniciado sesión " + rsUser.email ,"token":token,tokenRole,"people":dataPeople,"account":dataAccount,"role":allRole,"advertencia":"ocurrio un error intentando actualizar número de intentos"}});        
+                                        }) 
+                                    }
+                                    else{				
+                                        res.status(403).json({data:{"result":false,"message":"Usuario no esta activo en un grupo"}});
+                                    }
+                                })	
+                            }else {
+                                await model.account.update({tries:rsUser.tries+1},{where:{id:rsUser.id}}).then(async function(rsNewPassword){ //Actualiza tries
+                                    intento=6-(rsUser.tries+1)
+                                    res.status(403).json({"data":{"result":false,"message":"Contraseña inválida, le restan " + intento +" intentos"}})        
+                                }).catch(async function(error){                        
+                                    res.status(403).json({data:{"result":false,"message":"Contraseña inválida, Algo salió mal actualizando cuenta de usuario"}});        
+                                })				
                                 
-                //             }
-                //         })
-                //     }
-                // }
+                            }
+                        })
+                    }
+                }
                 
 				
 			}
