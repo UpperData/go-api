@@ -59,7 +59,7 @@ module.exports = {
       },
       photo: {
         type: Sequelize.BLOB,
-        allowNull:false
+        allowNull:true
       },
       updatedAt: {
         allowNull: false,

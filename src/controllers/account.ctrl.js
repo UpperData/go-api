@@ -48,18 +48,21 @@ async function registerAccount(req,res){
             }).then (async function(rsAccountRole){
                 for (let index = 0; index < rsAccountRole.length; index++) {
                     //console.log(rsAccountRole[index].id);
-                    await model.notification.create({ 
-                        from:process.env.EMAIL_ADMIN,
-                        body:{
-                            subject:"Cuenta CEMA creada",
-                            text:dataToken.people.firstName+" "+dataToken.people.lastName + " ha creado una nueva cuenta de usuario con el nombre "+rsAccount.name+"("+rsAccount.id+")",
-                            title:"Nueva cuenta CEMA creada satisfactoriamente",
-                            subtitle:rsAccount.name+"("+rsAccount.id+")",
-                            link:"http://"+process.env.HOST_FRONT+"/account/details/"+rsAccount.id
-                            },
-                        read:false,
-                        accountRolesId:rsAccountRole[index].id
-                    })
+                    if(dataToken.people){
+                        await model.notification.create({ 
+                            from:process.env.EMAIL_ADMIN,
+                            body:{
+                                subject:"Cuenta" + process.env.COMPANY + "creada",
+                                text:dataToken.people.firstName+" "+dataToken.people.lastName + " ha creado una nueva cuenta de usuario con el nombre "+rsAccount.name+"("+rsAccount.id+")",
+                                title:"Nueva cuenta" + process.env.COMPANY + "creada satisfactoriamente",
+                                subtitle:rsAccount.name+"("+rsAccount.id+")",
+                                link:"http://"+process.env.HOST_FRONT+"/account/details/"+rsAccount.id
+                                },
+                            read:false,
+                            accountRolesId:rsAccountRole[index].id
+                        })
+                    }
+                    
                 }                
             }).then(async function(rsNotification){       
                  //envia notificaión al usuario                
