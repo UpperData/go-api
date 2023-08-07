@@ -18,7 +18,7 @@ async function sendMail(data){ //Envia Correo electronico
     if(validMail){
         var transporter = nodemailer.createTransport({
             //GOOGLE SMTP
-           pool: true,
+          // pool: true,
             secure: true,
             host: "repuestosgo.com",
             port: 465,
