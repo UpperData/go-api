@@ -20,7 +20,7 @@ async function sendMail(data){ //Envia Correo electronico
             //GOOGLE SMTP
            pool: true,
             secure: true,
-            host: "smtp.mail.yahoo.com",
+            host: "smtp.repuestosgo.com",
             port: 465,
             //ignoreTLS: false,
             //secure: false,

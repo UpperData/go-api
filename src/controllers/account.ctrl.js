@@ -70,11 +70,11 @@ async function registerAccount(req,res){
                t.commit();
                     const urlLogin=process.env.HOST_FRONT+"/login";                    
                     var sendMail= await utils.sendMail({ // Notifica al nuevo usuario
-                        from:"CEMA OnLine <" + process.env.EMAIL_MANAGER +	'>',
+                        from:process.env.COMPANY+"<" + process.env.EMAIL_MANAGER +	'>',
                         to:rsAccount.email,
                         subject:"Cuenta Creada",
-                        text:"para iniciar su sesión en CEMA On Line haga click en el enlace, su password es: "+ pass,
-                        title:"Ya eres usuario de CEMA Online",
+                        text:"para iniciar su sesión en "+process.env.COMPANY+" haga click en el enlace, su password es: "+ pass,
+                        title:"Ya eres usuario de "+process.env.COMPANY,
                         subtitle:null,                
                         action:urlLogin,
                         actionLabel:"Iniciar Sesión"
@@ -105,11 +105,11 @@ async function registerAccount(req,res){
                     const urlProfile=process.env.HOST_FRONT+"/profile/"+tokenProfeile;                  
                    
                     await utils.sendMail({
-                        from:"CEMA OnLine <" + process.env.EMAIL_MANAGER +	'>',
+                        from:process.env.COMPANY+"<" + process.env.EMAIL_MANAGER +	'>',
                         to:allAdminEmail,
                         subject:"Nuevo usuario creado",
                         text:dataToken.people.firstName+" "+dataToken.people.lastName + " ha creado una nueva cuenta de usuario con el nombre "+rsAccount.email+"("+rsAccount.id+")",
-                        title:"Nueva cuenta CEMA OnLine creada satisfactoriamente",
+                        title:"Nueva cuenta "+process.env.COMPANY+" creada satisfactoriamente",
                         subtitle:rsAccount.name+"("+rsAccount.id+")",
                         action:urlProfile,                                       
                         actionLabel:'Ver Detalles'
