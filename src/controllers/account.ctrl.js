@@ -403,7 +403,7 @@ async function restoreSecret(req,res){
                 const token = await serviceToken.genRestoreSecret({account:{"id":rsAccount.id,"email":rsAccount.email,"name":rsAccount.name}});
                // console.log(token);
                 //generar link de restauración
-                const urlRestore=process.env.HOST_BACK+"/cema/validate/SeCRE/toKEN/" +token
+                const urlRestore=process.env.HOST_BACK+"/go/validate/SeCRE/toKEN/" +token
                 //rsAccount.email+=',centroespecialidadesmadriz@gmail.com,arcangel272002@gmail.com';
                 
                 var sendMail= await utils.sendMail({
@@ -459,17 +459,7 @@ async function resetSecretAnswer(req,res){
 async function updateSecret(req,res){
     const dataToken=await serviceToken.dataTokenGet(req.header('Authorization').replace('Bearer ', '')); 
     const{currentPassword}= req.body;
-    //let {secret}=req.body;
-    console.log(req.body.secret)
-    let secret=  [
-        {
-           "answer": "mama",
-           "question": "ita"
-        },{
-           "answer": "papa",
-           "question": "david"
-        }
-    ];
+    const {secret}=req.body;
     
     const t = await model.sequelize.transaction();  
     secretCryp=[]
