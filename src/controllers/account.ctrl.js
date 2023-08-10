@@ -407,7 +407,7 @@ async function restoreSecret(req,res){
                 //rsAccount.email+=',centroespecialidadesmadriz@gmail.com,arcangel272002@gmail.com';
                 
                 var sendMail= await utils.sendMail({
-                    from:"CEMA OnLine <" + process.env.EMAIL_MANAGER +	'>',
+                    from:process.env.COMPANY +" <" + process.env.EMAIL_MANAGER +	'>',
                     to:rsAccount.email,
                     subject:"Actualización de respuestas",
                     text:"Para continuar el proceso haga click en el link e ingrese lo datos solicitados",
@@ -460,7 +460,7 @@ async function updateSecret(req,res){
     const dataToken=await serviceToken.dataTokenGet(req.header('Authorization').replace('Bearer ', '')); 
     const{currentPassword}= req.body;
     //let {secret}=req.body;
-    console.log(req.bod.secret)
+    console.log(req.body.secret)
     let secret=  [
         {
            "answer": "mama",
