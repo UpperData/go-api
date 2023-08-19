@@ -6,7 +6,6 @@ const roleAccount=require('./accountRoles.ctrl');
 const bcrypt=require("bcryptjs"); // encripta caracteres
 var crypto = require("crypto"); // valor aleatorio
 const { Op } = require("sequelize");
-//const { token } = require('morgan');
 require ('dotenv').config();
 
 async function registerAccount(req,res){
