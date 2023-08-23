@@ -1,7 +1,5 @@
-
 const model=require('../db/models/index');
 const { Op } = require("sequelize");
-const serviceToken=require('./serviceToken.ctrl');
 
 async function getMainCategories(req,res){
     await model.mainCategory.findAll({attributes:{exclude:['isActived','createdAt','updatedAt']},where:{isActived:true}})
@@ -25,8 +23,38 @@ async function addMainCategories(req,res){
         res.status(403).json({data:{"result":false,"message":error.message}})
     })
 }
+async function getSubCategories(req,res){
+    const{mainCategoryId} =req.params
+    await model.subCategory.findAll({attributes:{exclude:['isActived','createdAt','updatedAt']},
+    where:{isActived:true,mainCategoryId},
+    include:[
+        {
+        model:model.mainCategory,
+        attributes:['id','name']
+        }
+    ]
+    })
+    .then(async function(rsResult){
+        res.status(200).json({data:{"result":true,"message":"Consulta satisfactoria","data":rsResult}});
+    }).catch(async function(error){
+        res.status(403).json({data:{"result":false,"message":error.message}})
+    })
+}
+async function addSubCategories(req,res){
+    const {name,icon,url,isActived,order,mainCategoryId} = req.body;
+    const t = await model.sequelize.transaction();
+    await model.subCategory.create({name,icon,url,isActived,order,mainCategoryId},{transaction:t})
+    .then(async function(rsResult){
+        t.commit();
+        res.status(200).json({data:{"result":true,"message":"Registro agregado con exito","data":rsResult}});
+    }).catch(async function(error){
+        t.rollback();
+        res.status(403).json({data:{"result":false,"message":error.message}})
+    })
+}
 module.exports={
     getMainCategories, // obtienes categorias activas
-    addMainCategories // agrega una nueva categoria
-
+    addMainCategories, // agrega una nueva categoria
+    getSubCategories, //obtiene subcategoria de una categoria principal
+    addSubCategories //
 }

@@ -1,9 +1,10 @@
 'use strict';
+const { INTEGER } = require('sequelize');
 const {
   Model
 } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
-  class contract extends Model {
+  class subCategory extends Model {
     /**
      * Helper method for defining associations.
      * This method is not a part of Sequelize lifecycle.
@@ -11,18 +12,19 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
+      subCategory.belongsTo(models.mainCategory);
     }
   }
-  contract.init({
-    startDate: DataTypes.DATE,
-    endDate: DataTypes.DATE,
-    comission: DataTypes.DECIMAL,
-    storeId: DataTypes.INTEGER,
+  subCategory.init({
+    name: DataTypes.STRING,
+    icon: DataTypes.STRING,
+    url: DataTypes.STRING,
     isActived: DataTypes.BOOLEAN,
-    fileContract: DataTypes.STRING
+    order: DataTypes.INTEGER,
+    mainCategoryId:DataTypes.INTEGER
   }, {
     sequelize,
-    modelName: 'contract',
+    modelName: 'subCategory',
   });
-  return contract;
+  return subCategory;
 };

@@ -37,7 +37,7 @@ module.exports = {
       storeTypeId: {
         type: Sequelize.INTEGER,
         references:{model:{tableName:'storeTypes',schema:'public'},key:'id'}
-      },
+      }, 
       isActived: {
         type: Sequelize.BOOLEAN
       },
