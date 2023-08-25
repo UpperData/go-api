@@ -20,6 +20,7 @@ async function createStore(req,res){
             t.commit();
             res.status(200).json({"data":{"result":true,"message":"Tienda registrada satisfactoriamente"}});
         }).catch(async function(error){
+            console.log(error)
             t.rollback();
             res.status(403).json({"data":{"result":false,"message":"Algo salió mal creando tienda, intente nuevamente"}});
         });
