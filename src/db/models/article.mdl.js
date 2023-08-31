@@ -11,11 +11,15 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      article.hasMany(models.assignment)
+      article.hasMany(models.assignment);
+      article.belongsTo(models.store);
     }
   }
   article.init({  
-
+    storeId:{
+      type:DataTypes.INTEGER,
+      allowNull:false
+    },
     name: {
       type:DataTypes.STRING,
       allowNull:false,

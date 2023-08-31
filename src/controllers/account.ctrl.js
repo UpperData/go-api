@@ -9,7 +9,7 @@ const { Op } = require("sequelize");
 require ('dotenv').config();
 
 async function registerAccount(req,res){
-    const {email,people,memberships}=req.body  
+    const {email,people,memberships,photo}=req.body  
       //general password 8 dogotpd
     var now=new Date();                  
     let pass= crypto.randomBytes(4).toString('hex')+now.getTime();
@@ -25,7 +25,7 @@ async function registerAccount(req,res){
     audit.push({"account":dataToken.account});
             
     // OPtiene todos los administradores del sistema (email) 
-    await model.account.create( {email,name,pass,people,creater:audit,secret:null, token:"null",isConfimr:true,isActived:true},{transaction:t})
+    await model.account.create( {email,photo,name,pass,people,creater:audit,secret:null, token:"null",isConfimr:true,isActived:true},{transaction:t})
     .then(async function(rsAccount){   
         
         // asocia a perosna si existe con el mismo correo
@@ -198,11 +198,12 @@ async function loginAccount(req,res){
                                             allRole.push({"id":rsAccRoles[i]['role'].id,"name":rsAccRoles[i]['role'].name});
                                         }								
                                         dataAccount={"id":rsUser.id,"name":rsUser.name,"email":rsUser.email} //Datos de la cuenta	
-                                        dataPeople=rsUser.people;	                                        
-                                        var token =  await serviceToken.newToken(dataAccount,allRole,'login',dateTime,dataPeople) //generar Token 
+                                        dataPeople=rsUser.people;                                        
+                                        let dataStore =await model.store.findOne({where:{accountId:rsUser.id}});
+                                        //console.log(dataStore);
+                                        var token =  await serviceToken.newToken(dataAccount,allRole,'login',dateTime,dataPeople,dataStore) //generar Token 
                                        
                                         if(rsUser['employeeFiles'].length>0) {
-                                            console.log(rsUser['employeeFiles'])
                                             if(rsUser['employeeFiles'].photo) dataPeople.photo=rsUser['employeeFiles'].photo
                                         };									
                                         await model.account.update({tries:0},{where:{id:rsUser.id}}).then(async function(rsNewPassword){ //Actualiza tries

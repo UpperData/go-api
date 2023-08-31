@@ -128,9 +128,16 @@ async function assignmentUpdate(req,res){
 
 async function articleNew(req,res){
     const{name,description,existence}=req.body;
+    //console.log(req.header('Authorization'));
+    const dataToken=await generals.currentAccount(req.header('Authorization').replace('Bearer ', ''));
+    console.log(dataToken['data']['shop']);
+    if(!dataToken['data']['shop']){
+        res.status(403).json({data:{"result":false,"message":"No posee tienda asociada a su cuenta"}});
+        res.end();
+    }
     const t=await model.sequelize.transaction();
     var maxArticle=await model.sequelize.query("SELECT max(id) + 1 as proximo from articles");    
-    await model.article.create({id:maxArticle[0][0].proximo,name,description},{transaction:t}).then(async function(rsArticle){
+    await model.article.create({id:maxArticle[0][0].proximo,name,description,storeId:dataToken['data']['shop'].id},{transaction:t}).then(async function(rsArticle){
         await model.inventory.create({articleId:rsArticle.id,existence},{transaction:t}).then(async function(rsArticle){
             t.commit();
             res.status(200).json({data:{"result":true,"message":"Nuevo articulo agregado satisfactoriamente"}});            

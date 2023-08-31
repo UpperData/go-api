@@ -4,7 +4,8 @@ var moment=require('moment');
 const model=require('../db/models/index');
 require('dotenv').config();
 
- async function newToken(account,roles,type,dateTime,people){ //Genera un token con una estructura especifica -->newToken(account,roles,type,dateTime,people)
+ async function newToken(account,roles,type,dateTime,people,shop){ //Genera un token con una estructura especifica -->newToken(account,roles,type,dateTime,people)
+	
 	var exp;
 	 if(type=="passwordReset"){
 		exp=moment().add(2,"hours").unix();
@@ -13,7 +14,7 @@ require('dotenv').config();
 	}else if(type=="newAccount"){
 		exp=moment().add(3,"days").unix();
 	}else if(type=="login"){
-		exp=moment().add(4,"hours").unix();
+		exp=moment().add(6,"hours").unix();
 	}else if(type=="updateEmail"){
 		exp=moment().add(1,"days").unix();
 	}else if(type=="test"){
@@ -26,24 +27,26 @@ require('dotenv').config();
 	 
     var payload={
 	type,
-	account:{"id":account.id,"email":account.email,"name":account.name},
+	account:{"id":account.id,"email":account.email,"name":account.name},	
 	role:roles,	
 	people:people,
 	dateTimeLogin:dateTime,	
 	rem:"lo-veremos-cara-a-cara",
 	iat:moment().unix(),
-	exp
+	exp,
+	shop:shop.dataValues
     };
-    var token= await jwt.encode(payload,process.env.JWT_SECRET);      
+    var token= await jwt.encode(payload,process.env.JWT_SECRET);     
     return token;
 }
-async function dataTokenGet(token){ // obtiene informacion del token con la estructura --> newToken(account,roles,type,dateTime,people)
+async function dataTokenGet(token){ // obtiene informacion del token con la estructura --> newToken(account,roles,type,dateTime,people,shop)
 	try{
-		var  payload= await jwt.decode(token,process.env.JWT_SECRET);		
+		var  payload= await jwt.decode(token,process.env.JWT_SECRET);
+		//console.log(payload);		
 		if (Date.now() >= payload.exp * 1000) {
 			return false;
 		}else{
-			const dataToken={"account":payload.account,"role":payload.role, "people":payload.people,"dateStart":payload.dateTimeLogin,"type":payload.type}
+			const dataToken={"account":payload.account,"role":payload.role, "people":payload.people,"dateStart":payload.dateTimeLogin,"type":payload.type,"shop":payload.shop}
 			return dataToken;  
 		}
 	}catch(erro){

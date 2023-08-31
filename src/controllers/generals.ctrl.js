@@ -1,9 +1,11 @@
 const model=require('../db/models/index');
 const { Op } = require("sequelize");
+require ('dotenv').config();
+var jwt=require('jwt-simple');
 async function currentAccount(token){
 	try{
+        //console.log(token);
 		var  payload= await jwt.decode(token,process.env.JWT_SECRET);
-		
 		if (Date.now() >= payload.exp * 1000) {
 			return false;
 		}else{
@@ -11,7 +13,8 @@ async function currentAccount(token){
 			"type":payload.type,"dateStart":payload.dateTimeLogin,"bid":payload.bidId}}
 			return dataToken;  
 		}
-	}catch(erro){
+	}catch(error){
+        console.log(error)
 		return false;
 	}
 }

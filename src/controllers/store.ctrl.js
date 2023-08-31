@@ -12,10 +12,10 @@ require ('dotenv').config();
 async function createStore(req,res){
     //valida campos requeridos
     const  {name,logo,description,isItHaveBuild,phone,address,parroquiaId,
-            storeTypeId,isActived,fiscalInfo,deliveryInfo}=req.body;
+            storeTypeId,isActived,fiscalInfo,deliveryInfo, accountId}=req.body;
     const t = await model.sequelize.transaction();
     await model.store.create({name,logo,description,isItHaveBuild,phone,address,
-        parroquiaId,storeTypeId,isActived,fiscalInfo,deliveryInfo},{transaction:t})
+        parroquiaId,storeTypeId,isActived,fiscalInfo,deliveryInfo,accountId},{transaction:t})
         .then(async function(rsStoreCreate){
             t.commit();
             res.status(200).json({"data":{"result":true,"message":"Tienda registrada satisfactoriamente"}});

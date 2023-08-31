@@ -8,6 +8,12 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER
       },
+      storeId:{
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        autoIncrement: true,
+        references:{model:{tableName:'stores',schema:'public'},key:'id'}        
+      },
       name: {
         type: Sequelize.STRING
       },
