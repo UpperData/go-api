@@ -34,8 +34,9 @@ require('dotenv').config();
 	rem:"lo-veremos-cara-a-cara",
 	iat:moment().unix(),
 	exp,
-	shop:shop.dataValues
+	shop:shop
     };
+	console.log(payload)
     var token= await jwt.encode(payload,process.env.JWT_SECRET);     
     return token;
 }
