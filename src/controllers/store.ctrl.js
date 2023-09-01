@@ -98,6 +98,18 @@ async function revokeContract(req,res){
             res.status(403).json({"data":{"result":false,"message":"Algo salió mal actualizando contrato, intente nuevamente"}});
         });
 }
+async function contractFile(req,res){
+    const  {id,fileContract}=req.body;
+    const t = await model.sequelize.transaction();
+    await model.contract.update({fileContract},{where:{id}},{transaction:t})
+        .then(async function(rsContract){
+            t.commit();
+            res.status(200).json({"data":{"result":true,"message":"Contrato actualizado satisfactoriamente"}});
+        }).catch(async function(error){
+            t.rollback();
+            res.status(403).json({"data":{"result":false,"message":"Algo salió mal actualizando contrato, intente nuevamente"}});
+        });
+}
 async function findContract(req,res){
     const {id}=req.params;
     if(id!='*'){
@@ -142,5 +154,6 @@ module.exports={
     createContract, // Crea un contrato
     revokeContract, // Editar contrato
     findContract,  // contrato x id / all
-    findContractByStore // contratos por tienda
+    findContractByStore, // contratos por tienda
+    contractFile
 }
