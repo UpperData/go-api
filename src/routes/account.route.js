@@ -20,7 +20,7 @@ router.get('/email/verify/:token',forceBrute.notBruteSecure,account.emailVerify)
 router.get('/EMAIl/STaTus/veriFy',forceBrute.notBruteSecure,account.isCertificated); // Verifica si un email esta certificado
 router.get('/EmAIL/TOKEn/verifysEnd',forceBrute.notBruteSecure,account.emailCertificationToken); //Genera y envia  token para certificacion de email
 router.get('/secREt/CURRENT/GET',forceBrute.notBruteSecure,account.getSecretCurrent); // Retorna preguntas secretas del usuario actual
-
+router.get('/account/actives/get',forceBrute.notBruteSecure,account.getActiveAccount); // Optener cuenta de usuario activas
 
 
 module.exports=router;

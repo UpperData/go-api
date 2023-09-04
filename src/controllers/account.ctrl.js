@@ -761,8 +761,7 @@ async function getSecretCurrent(req,res){ // obtiene preguntas secretas del sesi
             }else{
                 res.status(403).json({data:{"result":false,"message":"Cuenta de usuario no registrada"}});        
             }        
-        }).catch(async function(error){  
-            console.log(error);      
+        }).catch(async function(error){     
             res.status(403).json({data:{"result":false,"message":"Algo salió mal obteniendo preguntas secretas"}});        
         })
     }else{
@@ -770,7 +769,15 @@ async function getSecretCurrent(req,res){ // obtiene preguntas secretas del sesi
     }
     
 }
-
+async function getActiveAccount (req,res){
+    return await model.account.findAll({attributes:['id','email'], where:{isActived:true}})
+        .then(async function(rsAccount){
+            res.status(200).json({data:{"result":true,"message":"Busqueda satisfactoria","data":rsAccount}});
+        }).catch(async function(error){
+            console.log(error);
+            res.status(403).json({data:{"result":false,"message":"Algo salió mal, intente nuevamente"}});    
+        })
+}
 module.exports={
     registerAccount,
     loginAccount,
@@ -789,6 +796,6 @@ module.exports={
     emailVerify, //Certifica email
     isCertificated, // Verifica si un email esta certificado
     getSecretCurrent,// obtiene preguntas secretas del usuario actual
-
+    getActiveAccount  // retorna cuentas activas
 
 }

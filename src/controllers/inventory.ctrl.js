@@ -130,7 +130,7 @@ async function articleNew(req,res){
     const{name,description,existence}=req.body;
     //console.log(req.header('Authorization'));
     const dataToken=await generals.currentAccount(req.header('Authorization').replace('Bearer ', ''));
-    console.log(dataToken['data']['shop']);
+    
     if(!dataToken['data']['shop']){
         res.status(403).json({data:{"result":false,"message":"No posee tienda asociada a su cuenta"}});
         res.end();
@@ -152,9 +152,10 @@ async function articleNew(req,res){
     })
 }
 async function articleUpdate(req,res){
+    const dataToken=await generals.currentAccount(req.header('Authorization').replace('Bearer ', ''));
     const{id,name,description}=req.body;
     const t=await model.sequelize.transaction();
-    await model.article.update({name,description},{where:{id}},{transaction:t}).then(async function(rsArticle){
+    await model.article.update({name,description},{where:{id,storeId:dataToken['data']['shop'].id}},{transaction:t}).then(async function(rsArticle){
         t.commit();
         res.status(200).json({data:{"result":true,"message":"Articulo actualizado satisfactoriamente"}});
     }).catch(async function(error){
@@ -163,11 +164,12 @@ async function articleUpdate(req,res){
     })
 }
 async function articlelist(req,res){ 
+    const dataToken=await generals.currentAccount(req.header('Authorization').replace('Bearer ', ''));
     const {id}=req.params;
     if(id!='*'){        
         return await model.article.findAll({
             attributes:['id','name','description'],
-            where:{id}
+            where:{id,storeId:dataToken['data']['shop'].id}
         }).then(async function(rsArticle){
             if(rsArticle){
                 res.status(200).json({"data":{"result":true,"message":"Busqueda satisfatoria","data":rsArticle}});        
@@ -181,7 +183,7 @@ async function articlelist(req,res){
     }else{
         //Busca todos de estados de Venezuela
         return await model.article.findAll(            
-            { attributes:['id','name','description'],
+            { attributes:['id','name','description'],where:{storeId:dataToken['data']['shop'].id},
            order:['id']}).then(async function(rsArticle){
             res.status(200).json({"data":{"result":true,"message":"Busqueda satisfatoria","data":rsArticle}});        
         }).catch(async function(error){            
@@ -190,12 +192,14 @@ async function articlelist(req,res){
     }    
 }
 async function inventoryTotal(req,res){ // optiene el inventario actual, hoja de inventario
+    const dataToken=await generals.currentAccount(req.header('Authorization').replace('Bearer ', ''));
     await model.inventory.findAll({
         
         include:[
             {
                 model:model.article,
-                attributes:[['id','aricleId'],'name','description']
+                attributes:[['id','aricleId'],'name','description'],
+                where:{storeId:dataToken['data']['shop'].id}
             }
         ]
     }).then(async function(rsInventory){
