@@ -52,9 +52,21 @@ async function addSubCategories(req,res){
         res.status(403).json({data:{"result":false,"message":error.message}})
     })
 }
+async function getSubCategoriesN1(req,res){
+    const{subCategoryId} =req.params
+    await model.subCategoryN1.findAll({attributes:{exclude:['isActived','createdAt','updatedAt']},
+    where:{isActived:true,subCategoryId}})
+    .then(async function(rsResult){
+        res.status(200).json({data:{"result":true,"message":"Consulta satisfactoria","data":rsResult}});
+    }).catch(async function(error){
+        console.log(error);
+        res.status(403).json({data:{"result":false,"message":error.message}})
+    })
+}
 module.exports={
     getMainCategories, // obtienes categorias activas
     addMainCategories, // agrega una nueva categoria
     getSubCategories, //obtiene subcategoria de una categoria principal
-    addSubCategories //
+    addSubCategories, //
+    getSubCategoriesN1
 }

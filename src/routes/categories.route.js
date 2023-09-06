@@ -9,4 +9,5 @@ router.get('/front/categoriES/GET',forceBrute.notBruteSecure,category.getMainCat
 router.post('/frONT/CAtegorRIES/CREATE',forceBrute.notBruteSecure,category.addMainCategories); //add Main caterory
 router.get('/Front/SubCATEGORY/GET/:mainCategoryId',forceBrute.notBruteSecure,category.getSubCategories);
 router.post('/FRont/sUBCAterory/CREATE',forceBrute.notBruteSecure,category.addSubCategories) //Crea subcategoria
+router.get('/Front/SubCATEGORYn1/GET/:subCategoryId',forceBrute.notBruteSecure,category.getSubCategoriesN1);
 module.exports=router;
