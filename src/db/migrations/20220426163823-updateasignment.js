@@ -1,5 +1,5 @@
 'use strict';
-
+// ==========>>>>>>>> esta migración esta deprecada, se puede eliminar <<<<<<<=========
 module.exports = {
   up: async (queryInterface, Sequelize) => {
     const tableDefinition =  await queryInterface.describeTable('assignments');
@@ -24,9 +24,10 @@ module.exports = {
     }      
     return Promise.resolve();
 },
-  down: async (queryInterface, Sequelize) => {        
-        await queryInterface.removeColumn('assignments','accountId');
-        await queryInterface.removeColumn('assignments','isActived');
-        await queryInterface.addColumn('assignments', 'accountId');
+  down: async (queryInterface, Sequelize) => {   
+        const tableDefinition =  await queryInterface.describeTable('assignments');     
+       //if (!tableDefinition.accountId) {  await queryInterface.removeColumn('assignments','accountId'); }
+       //if (!tableDefinition.isActived) { await queryInterface.removeColumn('assignments','isActived'); }
+       //if (!tableDefinition.doctorId) { await queryInterface.addColumn('assignments', 'doctorId');}
     }
 };

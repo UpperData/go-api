@@ -11,8 +11,17 @@ module.exports = {
       storeId:{
         type: Sequelize.INTEGER,
         allowNull: false,
-        autoIncrement: true,
-        references:{model:{tableName:'stores',schema:'public'},key:'id'}        
+        autoIncrement: true //,
+        //references:{model:{tableName:'stores',schema:'public'},key:'id'}        
+      },
+      isActived:{
+        type: Sequelize.BOOLEAN,
+        allowNull: false
+      },
+      doctorId:{
+        type: Sequelize.INTEGER,
+        allowNull: true
+               
       },
       name: {
         type: Sequelize.STRING

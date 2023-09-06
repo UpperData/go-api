@@ -165,6 +165,7 @@ async function articleUpdate(req,res){
 }
 async function articlelist(req,res){ 
     const dataToken=await generals.currentAccount(req.header('Authorization').replace('Bearer ', ''));
+    console.log(dataToken);
     const {id}=req.params;
     if(id!='*'){        
         return await model.article.findAll({

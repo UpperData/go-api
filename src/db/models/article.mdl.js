@@ -34,6 +34,15 @@ module.exports = (sequelize, DataTypes) => {
          
       }
     },
+    isActived:{
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue:true
+    },
+    doctorId:{
+      type: DataTypes.INTEGER,
+      allowNull: true      
+    },
     description: {
       type:DataTypes.STRING,
       defaultValue:"N/A"

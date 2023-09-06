@@ -36,7 +36,7 @@ require('dotenv').config();
 	exp,
 	shop:shop
     };
-	console.log(payload)
+	//console.log(payload)
     var token= await jwt.encode(payload,process.env.JWT_SECRET);     
     return token;
 }
