@@ -30,7 +30,23 @@ async function findStore(req,res){
     if(id!='*'){
         //Busca una tienda
         return await model.store.findOne({
-            where:{id}
+            where:{id},
+            include:[
+                {
+                    model:model.parroquia,
+                    attributes:['id','name'],
+                    include:[{
+                        model:model.province,
+                        attributes:['id','name'],
+                        include:[{
+                            model:model.state,
+                            attributes:['id','name'],
+                        }]
+                    }]
+                    
+                }
+                
+            ]
         }).then(async function(rsStore){
             if(rsStore){
                 res.status(200).json({"data":{"result":true,"message":"Busqueda satisfatoria","data":rsStore}});        
@@ -39,13 +55,33 @@ async function findStore(req,res){
             }
             
         }).catch(async function(errror){
+            console.log(errror)
             res.status(403).json({"data":{"result":false,"message":"Algo salió mal buscando registro"}});        
         })
     }else{
         //Busca todas las tiendas
-        return await model.store.findAll({order:['name']}).then(async function(rsStore){
+        return await model.store.findAll(
+        {
+            order:['name'],
+            include:[
+                {
+                    model:model.parroquia,
+                    attributes:['id','name'],
+                    include:[{
+                        model:model.province,
+                        attributes:['id','name'],
+                        include:[{
+                            model:model.state,
+                            attributes:['id','name'],
+                        }]
+                    }]
+                    
+                }
+            ]
+        }).then(async function(rsStore){
             res.status(200).json({"data":{"result":true,"message":"Busqueda satisfatoria","data":rsStore}});        
         }).catch(async function(errror){
+            console.log(errror)
             res.status(403).json({"data":{"result":false,"message":"Algo salió mal buscando registro"}});        
         })
     }

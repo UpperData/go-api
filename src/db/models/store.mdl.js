@@ -11,6 +11,7 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
+      store.belongsTo(models.parroquia,{ foreignKey: 'parroquiaId'} )
     }
   }
   store.init({
@@ -23,7 +24,7 @@ module.exports = (sequelize, DataTypes) => {
       allowNull:false
     },
     logo: {
-      type:DataTypes.STRING
+      type:DataTypes.TEXT
     },
     description: {
       type:DataTypes.STRING
