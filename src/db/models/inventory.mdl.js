@@ -67,6 +67,55 @@ module.exports = (sequelize, DataTypes) => {
           }
         }
       }
+  },category:{
+    type:DataTypes.JSONB,
+    allowNull:false,
+    validate:{
+      customValidator(value) {
+        if (value === null || value <0) {
+          throw new Error("De indicar la categoría del artículo");
+        }
+      }
+    }
+  },sku:{
+      type:DataTypes.STRING,
+      allowNull:true,
+  },autoType:{
+    type:DataTypes.STRING,
+    allowNull:false,
+    validate:{
+      customValidator(value) {
+        if (value === null || value <0) {
+          throw new Error("De indicar el tipo de vehiculo");
+        }
+      }
+    }
+  },filter:{
+    type:DataTypes.JSONB,
+    allowNull:false,
+    validate:{
+      customValidator(value) {
+        if (value === null || value <0) {
+          throw new Error("De indicar descripción del vehiculo");
+        }
+      }
+    }
+  },description:{
+      type:DataTypes.STRING,
+      allowNull:false
+  },tags:{
+    type:DataTypes.STRING,
+    allowNull:true
+  },photo:{
+    type:DataTypes.JSONB,
+    allowNull:false,
+    validate:{
+      customValidator(value) {
+        if (value === null || value <0) {
+          throw new Error("De indicar agregar fotos de artículo");
+        }
+      }
+    }
   }
   }, {
     sequelize,

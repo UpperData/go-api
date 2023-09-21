@@ -128,7 +128,6 @@ async function assignmentUpdate(req,res){
 
 async function articleNew(req,res){
     const{name,description,existence}=req.body;
-    //console.log(req.header('Authorization'));
     const dataToken=await generals.currentAccount(req.header('Authorization').replace('Bearer ', ''));
     
     if(!dataToken['data']['shop']){
@@ -137,13 +136,14 @@ async function articleNew(req,res){
     }
     const t=await model.sequelize.transaction();
     var maxArticle=await model.sequelize.query("SELECT max(id) + 1 as proximo from articles");    
-    await model.article.create({id:maxArticle[0][0].proximo,name,description,storeId:dataToken['data']['shop'].id},{transaction:t}).then(async function(rsArticle){
-        await model.inventory.create({articleId:rsArticle.id,existence},{transaction:t}).then(async function(rsArticle){
-            t.commit();
-            res.status(200).json({data:{"result":true,"message":"Nuevo articulo agregado satisfactoriamente"}});            
-        }).catch(async function(error){
-            t.rollback();
-            res.status(403).json({data:{"result":false,"message":error.message}});
+    await model.article.create({id:maxArticle[0][0].proximo,name,description,storeId:dataToken['data']['shop'].id},{transaction:t},{returning: true}).
+        then(async function(rsArticle){
+            await model.inventory.create({articleId:rsArticle.id,existence},{transaction:t}).then(async function(rsArticle){
+                t.commit();
+                res.status(200).json({data:{"result":true,"message":"Nuevo articulo agregado satisfactoriamente"}});            
+            }).catch(async function(error){
+                t.rollback();
+                res.status(403).json({data:{"result":false,"message":error.message}});
         })
     }).catch(async function(error){
         t.rollback();
@@ -178,7 +178,6 @@ async function articlelist(req,res){
                 res.status(403).json({"data":{"result":false,"message":"No existe registro con este código"}});            
             }            
         }).catch(async function(error){  
-            console.log(error)    
             res.status(403).json({"data":{"result":false,"message":"Algo salió mal buscando registro"}});        
         })
     }else{
@@ -191,6 +190,22 @@ async function articlelist(req,res){
             res.status(403).json({"data":{"result":false,"message":"Algo salió mal buscando registro"}});        
         })
     }    
+}
+async function inventoryAdd(req,res){
+    const {articleId,existence,minSctock,price,category,sku,autoType,filter, description,tags, MainPhoto, secondPhoto,thirdPhoto}=req.body
+    await model.inventory.findAndCountAll({articleId,isActived:true})
+    .then(async function(rsFind){
+
+        if(rsFind.count>0){ // inventory update
+
+        }else{
+            await model.inventory.create({articleId,existence,minSctock,price,category,sku,autoType,filter, description,tags, MainPhoto, secondPhoto,thirdPhoto})
+            .then(async function(rsInventoryCreate){
+
+            })
+        }
+        
+    })    
 }
 async function inventoryTotal(req,res){ // optiene el inventario actual, hoja de inventario
     const dataToken=await generals.currentAccount(req.header('Authorization').replace('Bearer ', ''));
@@ -230,7 +245,9 @@ async function inventoryTotal(req,res){ // optiene el inventario actual, hoja de
     })
 }
 async function inventoryUpdate(req,res){
-    const {articleId,existence,price,minStock}=req.body
+    const {articleId,existence,price,minStock,category,sku,autoType,filter, description,tags, photo}=req.body
+  
+    const dataToken=await generals.currentAccount(req.header('Authorization').replace('Bearer ', ''));
     await model.assignment.findOne({
         attributes:[[model.sequelize.fn('sum', model.sequelize.col('quantity')), 'total_amount']], // sumatoria de asignaciones para ete articulo
         where:{articleId,isActived:true}
