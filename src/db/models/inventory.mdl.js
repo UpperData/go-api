@@ -112,7 +112,7 @@ module.exports = (sequelize, DataTypes) => {
     validate:{
       customValidator(value) {
         if (value === null || value <0) {
-          throw new Error("De indicar agregar fotos de artículo");
+          throw new Error("De indicar agregar fotos del artículo");
         }
       }
     }
