@@ -27,6 +27,24 @@ module.exports = {
       price: {
         type: Sequelize.DECIMAL
       },
+      category: {
+        type: Sequelize.JSONB
+      },
+      sku: {
+        type: Sequelize.JSONB
+      },
+      filter: {
+        type: Sequelize.JSONB
+      },
+      description: {
+        type: Sequelize.JSONB
+      },
+      tags: {
+        type: Sequelize.JSONB
+      },
+      photo: {
+        type: Sequelize.JSONB
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE

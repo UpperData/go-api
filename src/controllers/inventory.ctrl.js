@@ -192,14 +192,14 @@ async function articlelist(req,res){
     }    
 }
 async function inventoryAdd(req,res){
-    const {articleId,existence,minSctock,price,category,sku,autoType,filter, description,tags, MainPhoto, secondPhoto,thirdPhoto}=req.body
+    const {articleId,existence,minSctock,price,category,sku,autoType,filter, description,tags, photo}=req.body
     await model.inventory.findAndCountAll({articleId,isActived:true})
     .then(async function(rsFind){
 
         if(rsFind.count>0){ // inventory update
 
         }else{
-            await model.inventory.create({articleId,existence,minSctock,price,category,sku,autoType,filter, description,tags, MainPhoto, secondPhoto,thirdPhoto})
+            await model.inventory.create({articleId,existence,minSctock,price,category,sku,filter, description,tags, photo})
             .then(async function(rsInventoryCreate){
 
             })
@@ -245,7 +245,7 @@ async function inventoryTotal(req,res){ // optiene el inventario actual, hoja de
     })
 }
 async function inventoryUpdate(req,res){
-    const {articleId,existence,price,minStock,category,sku,autoType,filter, description,tags, photo}=req.body
+    const {articleId,existence,minSctock,price,category,sku,filter, description,tags, photo}=req.body
   
     const dataToken=await generals.currentAccount(req.header('Authorization').replace('Bearer ', ''));
     await model.assignment.findOne({
@@ -255,13 +255,15 @@ async function inventoryUpdate(req,res){
         if(rsAssinament.total_amount<existence) { // La existencia no debe ser menos a lo que esta en asignación
             res.status(403).json({"data":{"result":false,"message":"Existencia debe ser mayor o igual a ". rsAssinament.total_amount}});
         }else{
-            await model.inventory.update({existence,price,minStock},{where:{articleId}}).then(async function(rsInventory){
+            await model.inventory.update({articleId,existence,minSctock,price,category,sku,filter, description,tags, photo},{where:{articleId}}).then(async function(rsInventory){
                 res.status(200).json({"data":{"result":false,"message":"Inventario actualizado","data":rsInventory}});  
             }).catch(async function(error){
+                console.log(error);
                 res.status(403).json({"data":{"result":false,"message":error.message}});  
             })
         }
-    }).catch(async function(error){        
+    }).catch(async function(error){    
+         console.log(error);    
         res.status(403).json({"data":{"result":false,"message":error.message}});  
     })   
 }
