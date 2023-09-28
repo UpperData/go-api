@@ -116,6 +116,10 @@ module.exports = (sequelize, DataTypes) => {
         }
       }
     }
+  },isPublished:{
+    type:DataTypes.BOOLEAN,
+    allowNull:false,
+    defaultValue:false
   }
   }, {
     sequelize,

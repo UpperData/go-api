@@ -45,9 +45,10 @@ app.use(require('./routes/fixer.route'));
 app.use(require('./routes/patient.route'));
 app.use(require('./routes/voucher.route'));
 app.use(require('./routes/changeType.route'));
-app.use(require('./routes/reports.routes'));
+app.use(require('./routes/reports.route'));
 app.use(require('./routes/store.route'));
-app.use(require('./routes/categories.route'))
+app.use(require('./routes/categories.route'));
+app.use(require('./routes/publishing.route'));
 
 app.listen(app.get('port'),function(){
     console.log('repuestosGO is working in port:', app.get('port'));
