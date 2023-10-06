@@ -5,44 +5,41 @@ const generals=require('./generals.ctrl');
 
 async function getPublishing(req,res){    
     const {articleId}=req.params;
-    const dataToken=await serviceToken.dataTokenGet(req.header('Authorization').replace('Bearer ', ''));     
-    if(id!='*'){
+    //const dataToken=await serviceToken.dataTokenGet(req.header('Authorization').replace('Bearer ', ''));     
+    if(articleId!='*'){
         //Busca inventario de un articulo
         return await model.inventory.findOne({            
-            where:{articleId}
-        }).then(async function(rsPhotype){
-            if(rsPhotype){
-                res.status(200).json({"data":{"result":true,"message":"Busqueda satisfatoria","data":rsPhotype}});        
+            where:{articleId},
+            limit:500
+        }).then(async function(rsPublishing){
+            if(rsPublishing){
+                res.status(200).json({"data":{"result":true,"message":"Busqueda satisfatoria","data":rsPublishing}});        
             }else{
                 res.status(403).json({"data":{"result":false,"message":"No existe registro con este código"}});            
             }            
-        }).catch(async function(errror){            
+        }).catch(async function(error){ 
+            console.log(error);           
             res.status(403).json({"data":{"result":false,"message":"Algo salió mal buscando registro"}});        
         })
     }else{
         //Busca todos el inventario de una tienda
-        return await model.inventory.findAll(            
-            {                 
-                where:{storeId:dataToken['data']['shop'].id},
-                order:['updatedAt']}).then(async function(rsPhotype)
-            {
-            res.status(200).json({"data":{"result":true,"message":"Busqueda satisfatoria","data":rsPhotype}});
-        }).catch(async function(errror){            
+        return await model.inventory.findAll({where:{articleId},order:['updatedAt']})
+        .then(async function(rsPublishing)
+        {
+            res.status(200).json({"data":{"result":true,"message":"Busqueda satisfatoria","data":rsPublishing}});
+        }).catch(async function(error){            
             res.status(403).json({"data":{"result":false,"message":"Algo salió mal buscando registro"}});        
         })
-    }    
-
-
+    } 
 }
 async function setPublishing(req,res){
     const {articleId,isPublished}=req.body
-    const dataToken=await generals.currentAccount(req.header('Authorization').replace('Bearer ', ''));    
-   
+    const dataToken=await generals.currentAccount(req.header('Authorization').replace('Bearer ', ''));
     return await model.inventory.update({isPublished},{where:{articleId}})
-    .then(async function(rsPublising){
-        if(rsPublising){
-            res.status(200).json({"data":{"result":true,"message":"Publicación satisfatoria","data":rsPublising}});        
-        }          
+    .then(async function(rsPublishing){
+        if(rsPublishing){
+            res.status(200).json({"data":{"result":true,"message":"Publicación satisfatoria","data":rsPublishing}});        
+        }           
     }).catch(async function(error){            
         console.log(error)
         res.status(403).json({"data":{"result":false,"message":"Algo salió mal, intente nuevamente"}});        
@@ -50,4 +47,61 @@ async function setPublishing(req,res){
    
 }
 
-module.exports={getPublishing,setPublishing};
+async function getPublishingCategory(req,res){    
+    const {categoryId}=req.params;        
+    if(categoryId!='*'){
+        //Busca inventario de un articulo
+        return await model.inventory.findAndCountAll({            
+            where:{category:{
+                categoryId
+            }},
+            limit:500
+        }).then(async function(rsPublishing){
+            if(rsPublishing){
+                res.status(200).json({"data":{"result":true,"message":"Busqueda satisfatoria","data":rsPublishing}});        
+            }else{
+                res.status(403).json({"data":{"result":false,"message":"No existe registro con este código"}});            
+            }            
+        }).catch(async function(error){ 
+            console.log(error);           
+            res.status(403).json({"data":{"result":false,"message":"Algo salió mal buscando registro"}});        
+        })
+    }
+}
+async function getPublishingClass(req,res){    
+    const {autoTypeId}=req.params;  
+    //Busca inventario de un articulo
+    return await model.inventory.findAndCountAll({            
+        where:{autoTypeId},
+        limit:2000
+    }).then(async function(rsPublishing){
+        if(rsPublishing){
+            res.status(200).json({"data":{"result":true,"message":"Busqueda satisfatoria","data":rsPublishing}});        
+        }else{
+            res.status(403).json({"data":{"result":false,"message":"No existe registro con este código"}});            
+        }            
+    }).catch(async function(error){ 
+        console.log(error);           
+        res.status(403).json({"data":{"result":false,"message":"Algo salió mal buscando registro"}});        
+    })   
+}
+async function getPublishingSubCategory(req,res){    
+    const {subCategoryId}=req.params;  
+    //Busca inventario de un articulo
+    return await model.inventory.findAndCountAll({            
+        where:{category:{
+            subCategory:subCategoryId
+        }},
+        limit:2000
+    }).then(async function(rsPublishing){
+        if(rsPublishing){
+            res.status(200).json({"data":{"result":true,"message":"Busqueda satisfatoria","data":rsPublishing}});        
+        }else{
+            res.status(403).json({"data":{"result":false,"message":"No existe registro con este código"}});            
+        }            
+    }).catch(async function(error){ 
+        console.log(error);           
+        res.status(403).json({"data":{"result":false,"message":"Algo salió mal buscando registro"}});        
+    })   
+}
+module.exports={getPublishing,setPublishing,getPublishingCategory,getPublishingClass,getPublishingSubCategory};

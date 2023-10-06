@@ -12,6 +12,7 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       // define association here
       inventory.belongsTo(models.article);
+      inventory.belongsTo(models.autoType)
       
     }
   }
@@ -80,8 +81,8 @@ module.exports = (sequelize, DataTypes) => {
   },sku:{
       type:DataTypes.STRING,
       allowNull:true,
-  },autoType:{
-    type:DataTypes.STRING,
+  },autoTypeId:{
+    type:DataTypes.INTEGER,
     allowNull:false,
     validate:{
       customValidator(value) {
