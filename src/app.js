@@ -17,9 +17,11 @@ const app =express(); //incializa el framework
 //app.use(apiLimiter); // Limita conexiones
 app.set('port',process.env.PORT || 4094 ); // comunication port
 app.use(helmet()); //ayuda a proteger la aplicación de algunas vulnerabilidades web conocidas mediante el establecimiento correcto de cabeceras HTTP.
-
+const whiteList=['http:localhost:4094','http:localhost:3000', 'https://carapi.app', 'https://repuestosgo.com', 'http://repuestosgo.com', 'https://bk.repuestosgo.com']
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin:whiteList
+}));
 app.use(morgan('dev')); // transaction views in  'dev'  format
 app.use(express.urlencoded({extended:false,limit: '100mb'})); // Esto es para pode recibir datos enviados -2000kb
 app.use(express.json({limit: '100mb'})); // for read .JSON format
