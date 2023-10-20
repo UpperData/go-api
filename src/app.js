@@ -20,7 +20,7 @@ app.use(helmet()); //ayuda a proteger la aplicación de algunas vulnerabilidades
 const whiteList=['http:localhost:4094','http:localhost:3000', 'https://carapi.app', 'https://repuestosgo.com', 'http://repuestosgo.com', 'https://bk.repuestosgo.com']
 // Middleware
 app.use(cors({
-  origin:whiteList
+  origin:whiteList,optionsSuccessStatus: 200
 }));
 app.use(morgan('dev')); // transaction views in  'dev'  format
 app.use(express.urlencoded({extended:false,limit: '100mb'})); // Esto es para pode recibir datos enviados -2000kb
