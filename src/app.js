@@ -19,9 +19,7 @@ app.set('port',process.env.PORT || 4094 ); // comunication port
 app.use(helmet()); //ayuda a proteger la aplicación de algunas vulnerabilidades web conocidas mediante el establecimiento correcto de cabeceras HTTP.
 const whiteList=['http:localhost:4094','http:localhost:3000','http:localhost:4000','http:localhost:4001', 'https://carapi.app','http://carapi.app', 'https://repuestosgo.com', 'http://repuestosgo.com', 'https://bk.repuestosgo.com']
 // Middleware
-app.use(cors({
-  origin:whiteList,optionsSuccessStatus: 200
-}));
+app.use(cors());
 app.use(morgan('dev')); // transaction views in  'dev'  format
 app.use(express.urlencoded({extended:false,limit: '100mb'})); // Esto es para pode recibir datos enviados -2000kb
 app.use(express.json({limit: '100mb'})); // for read .JSON format
