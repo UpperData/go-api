@@ -256,7 +256,7 @@ async function inventoryUpdate(req,res){
             res.status(403).json({"data":{"result":false,"message":"Existencia debe ser mayor o igual a ". rsAssinament.total_amount}});
         }else{
             await model.inventory.update({articleId,existence,minSctock,price,category,sku,filter, description,tags, photo},{where:{articleId}}).then(async function(rsInventory){
-                res.status(200).json({"data":{"result":false,"message":"Inventario actualizado","data":rsInventory}});  
+                res.status(200).json({"data":{"result":true,"message":"Inventario actualizado","data":rsInventory}});  
             }).catch(async function(error){
                 console.log(error);
                 res.status(403).json({"data":{"result":false,"message":error.message}});  
