@@ -38,7 +38,12 @@ async function setPublishing(req,res){
     return await model.inventory.update({isPublished},{where:{articleId}})
     .then(async function(rsPublishing){
         if(rsPublishing){
-            res.status(200).json({"data":{"result":true,"message":"Publicación satisfatoria","data":rsPublishing}});        
+            if(isPublished){
+                res.status(200).json({"data":{"result":true,"message":"Publicación generada de satisfatoriament","data":rsPublishing}});        
+            }else{
+                res.status(200).json({"data":{"result":true,"message":"Publicación ocultada satisfactoriamente","data":rsPublishing}});        
+            }
+            
         }           
     }).catch(async function(error){            
         console.log(error)
