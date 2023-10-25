@@ -218,7 +218,7 @@ async function inventoryTotal(req,res){ // optiene el inventario actual, hoja de
                 where:{storeId:dataToken['data']['shop'].id}
             }
         ],
-        order:['aricleId']
+        order:['articleId']
     }).then(async function(rsInventory){
         //optiene precio del dolar
          const dolar= await generals.generalCurrenteChange();
