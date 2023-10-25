@@ -245,7 +245,7 @@ async function inventoryTotal(req,res){ // optiene el inventario actual, hoja de
     })
 }
 async function inventoryUpdate(req,res){
-    const {articleId,existence,minSctock,price,category,sku,filter, description,tags, photo}=req.body
+    const {articleId,existence,minSctock,price,category,sku,filter, description,tags, photo,autoTypeId}=req.body
   
     const dataToken=await generals.currentAccount(req.header('Authorization').replace('Bearer ', ''));
     await model.assignment.findOne({
@@ -255,7 +255,7 @@ async function inventoryUpdate(req,res){
         if(rsAssinament.total_amount<existence) { // La existencia no debe ser menos a lo que esta en asignación
             res.status(403).json({"data":{"result":false,"message":"Existencia debe ser mayor o igual a ". rsAssinament.total_amount}});
         }else{
-            await model.inventory.update({articleId,existence,minSctock,price,category,sku,filter, description,tags, photo},{where:{articleId}}).then(async function(rsInventory){
+            await model.inventory.update({articleId,existence,minSctock,price,category,sku,filter, description,tags, photo,autoTypeId},{where:{articleId}}).then(async function(rsInventory){
                 res.status(200).json({"data":{"result":true,"message":"Inventario actualizado","data":rsInventory}});  
             }).catch(async function(error){
                 console.log(error);
