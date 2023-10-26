@@ -2,6 +2,7 @@ const model=require('../db/models/index');
 const { Op } = require("sequelize");
 require ('dotenv').config();
 var jwt=require('jwt-simple');
+const request = require("request");
 async function currentAccount(token){
 	try{
         //console.log(token);
@@ -421,5 +422,29 @@ async function generalCurrenteChange(){
         return null;
     })
 }
+async function getCarYear(req,res){
+    request("https://carapi.app/api/years",(err,response,body)=>{
+        if (!err){
+            const years = JSON.parse(body);
+            res.status(200).json({"data":{"result":true,"message":"Busqueda satisfatoria","data":years}});
+        }
+    })
+}
+async function getCarMakes(req,res){
+    request("https://carapi.app/api/makes",(err,response,body)=>{
+        if (!err){
+            const makes = JSON.parse(body);
+            res.status(200).json({"data":{"result":true,"message":"Busqueda satisfatoria","data":makes.data}});
+        }
+    })
+}
+async function getCarModels(req,res){
+    request("https://carapi.app/api/models",(err,response,body)=>{
+        if (!err){
+            const models = JSON.parse(body);
+            res.status(200).json({"data":{"result":true,"message":"Busqueda satisfatoria","data":models.data}});
+        }
+    })
+}
 module.exports={getCivil,currentAccount,getPhoneType,getDepartament,getSubDepartament,getCargo,getPatienType,getState,getCitiesByState,
-    getProvincesByState,getParroquiaByProvince,getAppointmentTpye,getExams,generalCurrenteChange}
+    getProvincesByState,getParroquiaByProvince,getAppointmentTpye,getExams,generalCurrenteChange,getCarYear,getCarMakes,getCarModels}

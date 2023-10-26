@@ -36,6 +36,7 @@
     "nodemon": "^2.0.15",
     "pg": "^8.3.0",
     "pg-hstore": "^2.3.4",
+    "request": "^2.88.2",
     "revalidator": "^0.3.1",
     "sequelize": "^6.15.0"
   },
