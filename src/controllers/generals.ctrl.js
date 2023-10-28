@@ -471,8 +471,11 @@ async function getCarModelsByMakeId(req,res){
     if(makeId!= null ){
         request("https://carapi.app/api/models?make_id="+makeId,(err,response,body)=>{
             if (!err){
-                const models = JSON.parse(body);                
-                res.status(200).json({"data":{"result":true,"message":"Busqueda satisfatoria","data":models.data}});
+                const models = JSON.parse(body);        
+                console.log(models);        
+                res.status(200).json({"data":{"result":true,"message":"Busqueda satisfatoria","data":models}});
+            }else{
+                res.status(403).json({"data":{"result":false,"message":"Algo salio mal, obteniendo modelos"}});
             }
         })
     }else{
