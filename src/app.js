@@ -49,6 +49,7 @@ app.use(require('./routes/reports.route'));
 app.use(require('./routes/store.route'));
 app.use(require('./routes/categories.route'));
 app.use(require('./routes/publishing.route'));
+app.use(require('./routes/shoppingCar.route'))
 
 app.listen(app.get('port'),function(){
     console.log('repuestosGO is working in port:', app.get('port'));
