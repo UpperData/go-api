@@ -4,10 +4,10 @@ const general=require('../controllers/generals.ctrl');
 const auth=require('../controllers/middleware/auth.ctrl');
 const forceBrute=require('../controllers/middleware/noBrute.ctrl');
 
-router.get('/CarS/YEARS',forceBrute.notBruteSecure,auth.autorizedRole(['*']), general.getCarYear) // Retorna años
-router.get('/CaRS/MAkeS',forceBrute.notBruteSecure,auth.autorizedRole(['*']), general.getCarMakes) // Retorna marcas
-router.get('/CaRS/MODels/:make',forceBrute.notBruteSecure,auth.autorizedRole(['*']), general.getCarModels) // modelo de marcas
-router.get('/CaRS/MoDelS/id/:makeId',forceBrute.notBruteSecure,auth.autorizedRole(['*']), general.getCarModelsByMakeId) // Modelo de marca por Id
+router.get('/CarS/YEARS',forceBrute.notBruteSecure, general.getCarYear) // Retorna años
+router.get('/CaRS/MAkeS',forceBrute.notBruteSecure, general.getCarMakes) // Retorna marcas
+router.get('/CaRS/MODels/:make',forceBrute.notBruteSecure, general.getCarModels) // modelo de marcas
+router.get('/CaRS/MoDelS/id/:makeId',forceBrute.notBruteSecure, general.getCarModelsByMakeId) // Modelo de marca por Id
 router.get('/civil/get/:id',forceBrute.notBruteSecure,auth.autorizedRole(['*']), general.getCivil); // retorna estado civil
 router.get('/phone/get/type/:id',forceBrute.notBruteSecure,auth.autorizedRole(['*']), general.getPhoneType); // retorna phone types
 router.get('/departament/get/:id',forceBrute.notBruteSecure,auth.autorizedRole(['*']), general.getDepartament); // retorna departemento de la empresa
