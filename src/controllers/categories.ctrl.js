@@ -63,10 +63,33 @@ async function getSubCategoriesN1(req,res){
         res.status(403).json({data:{"result":false,"message":error.message}})
     })
 }
+async function getAllCategories(req,res){        
+    await model.mainCategory.findAll({attributes:{exclude:['isActived','createdAt','updatedAt']},
+    where:{isActived:true},
+    include:[
+        {
+            model:model.subCategory,
+            attributes:{exclude:['isActived','createdAt','updatedAt']},
+            where:{isActived:true},
+            include:[{
+                model:model.subCategoryN1,
+                attributes:{exclude:['isActived','createdAt','updatedAt']},
+                where:{isActived:true}
+            }]            
+        }
+    ]}).then(async function(rsResult){
+        res.status(200).json({data:{"result":true,"message":"Consulta satisfactoria","data":rsResult}});
+    }).catch(async function(error){
+        console.log(error);
+        res.status(403).json({data:{"result":false,"message":error.message}})
+    })
+}
+
 module.exports={
     getMainCategories, // obtienes categorias activas
     addMainCategories, // agrega una nueva categoria
     getSubCategories, //obtiene subcategoria de una categoria principal
     addSubCategories, //
-    getSubCategoriesN1
+    getSubCategoriesN1,
+    getAllCategories// obtienes arbol de categorias
 }

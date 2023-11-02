@@ -10,4 +10,5 @@ router.post('/frONT/CAtegorRIES/CREATE',forceBrute.notBruteSecure,category.addMa
 router.get('/Front/SubCATEGORY/GET/:mainCategoryId',forceBrute.notBruteSecure,category.getSubCategories);
 router.post('/FRont/sUBCAterory/CREATE',forceBrute.notBruteSecure,category.addSubCategories) //Crea subcategoria
 router.get('/Front/SubCATEGORYn1/GET/:subCategoryId',forceBrute.notBruteSecure,category.getSubCategoriesN1);
+router.get('/fornt/ALLCateories',forceBrute.notBruteSecure,category.getAllCategories)// obtienes arbol de categorias
 module.exports=router;

@@ -13,6 +13,7 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       // define association here
       subCategory.belongsTo(models.mainCategory);
+      subCategory.hasMany(models.subCategoryN1);
     }
   }
   subCategory.init({
