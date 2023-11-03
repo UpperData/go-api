@@ -16,7 +16,7 @@ module.exports = (sequelize, DataTypes) => {
   }
   mainCategory.init({
     name: DataTypes.STRING,
-    icon: DataTypes.STRING,
+    icon: DataTypes.TEXT,
     url: DataTypes.STRING,
     isActived: DataTypes.STRING,
     order:DataTypes.INTEGER

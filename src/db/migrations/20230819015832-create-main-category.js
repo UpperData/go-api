@@ -13,7 +13,7 @@ module.exports = {
         unique:true
       },
       icon: {
-        type: Sequelize.STRING,
+        type: Sequelize.TEXT,
         unique:true
       },
       url: {
