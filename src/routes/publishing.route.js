@@ -9,6 +9,7 @@ router.get('/invetory/puBLIshING/gET/:articleId',forceBrute.notBruteSecure,publi
 router.get('/invetory/puBLIshING/cat/GET/:categoryId',forceBrute.notBruteSecure,publishing.getPublishingCategory); // obtiene una publicación x Categoria
 router.get('/invetory/pubLIshING/CLAss/GET/:autoTypeId',forceBrute.notBruteSecure,publishing.getPublishingClass); // obtiene una publicación x clase de auto
 router.get('/invetory/pubLIshING/SUBcat/GET/:subCategoryId',forceBrute.notBruteSecure,publishing.getPublishingSubCategory); // obtiene una publicación x clase de auto
+router.get('/invetory/pubLIshING/FULL/GET/:limit/:page',forceBrute.notBruteSecure,publishing.getPublishingFull); // Todas la publicaiones por pagians
 
 
 module.exports=router;
