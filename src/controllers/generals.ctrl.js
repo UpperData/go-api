@@ -483,7 +483,20 @@ async function getCarModelsByMakeId(req,res){
         
     }    
 }
+async function getBarMenu(req,res){
+
+    return await model.subCategory.findOne({
+        where:{
+            [Op.or]: [{ id: 2 }, { id: 6 },{id:10}], 
+        }
+    }).then(async function(rsSubCategory){
+        res.status(200).json({"data":{"result":true,"message":"Busqueda satisfatoria","data":rsSubCategory}});
+    }).catch(async function(error){  
+        res.status(403).json({"data":{"result":false,"message":"Algo salió mal buscando barra de menú"}});        
+    })
+
+}
 
 module.exports={getCivil,currentAccount,getPhoneType,getDepartament,getSubDepartament,getCargo,getPatienType,getState,getCitiesByState,
     getProvincesByState,getParroquiaByProvince,getAppointmentTpye,getExams,generalCurrenteChange,getCarYear,getCarMakes,getCarModels,
-    getCarModelsByMakeId}
+    getCarModelsByMakeId,getBarMenu}
