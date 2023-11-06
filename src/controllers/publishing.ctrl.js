@@ -131,4 +131,30 @@ async function getPublishingFull(req,res){
         res.status(403).json({"data":{"result":false,"message":"Algo salió mal buscando registro"}});        
     })   
 }
-module.exports={getPublishing,setPublishing,getPublishingCategory,getPublishingClass,getPublishingSubCategory,getPublishingFull};
+async function getPublishingSubCategoryAndText(req,res){    
+    const {subCategoryId,textValue,limit,page}=req.params;  
+    //Busca inventario de un articulo
+    return await model.inventory.findAndCountAll({            
+        where:{
+            category:{
+            subCategory:subCategoryId
+            },
+            isPublished:true,
+            description:{
+                [Op.iLike]: textValue
+            }
+        },
+        limit:parseInt(limit),
+        offset:(parseInt(page) * (limit))
+    }).then(async function(rsPublishing){
+        if(rsPublishing){
+            res.status(200).json({"data":{"result":true,"message":"Busqueda satisfatoria","data":rsPublishing}});        
+        }else{
+            res.status(403).json({"data":{"result":false,"message":"No existe registro con este código"}});            
+        }            
+    }).catch(async function(error){ 
+        console.log(error);           
+        res.status(403).json({"data":{"result":false,"message":"Algo salió mal buscando registro"}});        
+    })   
+}
+module.exports={getPublishing,setPublishing,getPublishingCategory,getPublishingClass,getPublishingSubCategory,getPublishingFull,getPublishingSubCategoryAndText};

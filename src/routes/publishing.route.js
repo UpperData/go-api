@@ -10,6 +10,7 @@ router.get('/invetory/puBLIshING/cat/GET/:categoryId',forceBrute.notBruteSecure,
 router.get('/invetory/pubLIshING/CLAss/GET/:autoTypeId',forceBrute.notBruteSecure,publishing.getPublishingClass); // obtiene una publicación x clase de auto
 router.get('/invetory/pubLIshING/SUBcat/GET/:subCategoryId',forceBrute.notBruteSecure,publishing.getPublishingSubCategory); // obtiene una publicación x clase de auto
 router.get('/invetory/pubLIshING/FULL/GET/:limit/:page',forceBrute.notBruteSecure,publishing.getPublishingFull); // Todas la publicaiones por pagians
+router.get('/invetory/puBLIshING/CategORY/CustoM/:subCategoryId/:textValue/:limit/:page',forceBrute.notBruteSecure,publishing.getPublishingSubCategoryAndText); // producto por categoris 
 
 
 module.exports=router;
