@@ -485,7 +485,7 @@ async function getCarModelsByMakeId(req,res){
 }
 async function getBarMenu(req,res){
 
-    return await model.subCategory.findOne({
+    return await model.subCategory.findAll({
         where:{
             [Op.or]: [{ id: 2 }, { id: 6 },{id:10}], 
         }
