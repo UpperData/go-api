@@ -778,6 +778,122 @@ async function getActiveAccount (req,res){
             res.status(403).json({data:{"result":false,"message":"Algo salió mal, intente nuevamente"}});    
         })
 }
+async function buyerRegisterAccount(req,res){
+    const {email,people,photo}=req.body  
+      //general password 8 dogotpd
+    var now=new Date();                  
+    let pass= crypto.randomBytes(4).toString('hex')+now.getTime();
+    pass = pass.slice(-6);      
+    //genera username
+    let name
+    var aleatorio=crypto.randomBytes(8).toString('hex')+now.getTime();    
+    name=aleatorio.slice(0,2)+email.slice(0,-12)+aleatorio.slice(aleatorio.length-3,aleatorio.length);           
+    const t = await model.sequelize.transaction();  
+    let audit=[]
+    audit.push({"people":"Usario comprador"});
+    audit.push({"account":"Usuario comprador"});
+            
+    // OPtiene todos los administradores del sistema (email) 
+    await model.account.create( {email,name,pass,people,creater:audit,secret:null, token:"null",isConfirmed:true,isActived:true},{transaction:t})
+    .then(async function(rsAccount){   
+        
+        // asocia a perosna si existe con el mismo correo
+        let existPeople=await model.employeeFile.findAndCountAll({attributes:['id'],where:{email}});        
+        if(existPeople.count>0){
+            await model.employeeFile.update({accountId:rsAccount.id},{where:{id:existPeople.rows[0].id}},{transaction:t})
+        }
+         //aplica membresía de comprador
+         await model.accountRole.create({roleId:2,accountId:rsAccount.id,isActived:true},{transaction:t});
+        //Fin aplica membresias
+        
+        //envia notificación a los adminsitradoresd el sistema
+        await model.accountRole.findAll({
+            attributes:['id'],
+            where:{roleId:5}
+            }).then (async function(rsAccountRole){
+                for (let index = 0; index < rsAccountRole.length; index++) {
+                    //console.log(rsAccountRole[index].id);
+                   
+                    await model.notification.create({ 
+                        from:process.env.EMAIL_ADMIN,
+                        body:{
+                            subject:"Cuenta" + process.env.COMPANY + "creada",
+                            text: "ha creado una nueva cuenta de usuario ",
+                            title:"Nueva cuenta" + process.env.COMPANY + "creada satisfactoriamente",
+                            subtitle:rsAccount.name+"("+rsAccount.id+")",
+                            link:"http://"+process.env.HOST_FRONT+"/account/details/"+rsAccount.id
+                            },
+                        read:false,
+                        accountRolesId:rsAccountRole[index].id
+                    })
+                
+                    
+                }                
+            }).then(async function(rsNotification){       
+                 //envia notificaión al usuario                              
+               t.commit();
+                const urlLogin=process.env.HOST_FRONT+"/login";                    
+                var sendMail= await utils.sendMail({ // Notifica al nuevo usuario
+                    from:process.env.COMPANY+"<" + process.env.EMAIL_MANAGER +	'>',
+                    to:rsAccount.email,
+                    subject:"Cuenta Creada",
+                    text:"para iniciar su sesión en "+process.env.COMPANY+" haga click en el enlace, su password es: "+ pass,
+                    title:"Ya eres usuario de "+process.env.COMPANY,
+                    subtitle:null,                
+                    action:urlLogin,
+                    actionLabel:"Iniciar Sesión"
+                });
+                if(sendMail){
+                    res.status(200).json({"data":{"result":true,"message":"Cuenta de usuario registrada satisfactoriamente"}});
+                }else{
+                    res.status(403).json({"data":{"result":false,"message":"Algo salió mal creando cuenta de usuario, intente nuevamente"}}); 
+                }
+                let adminEmail=await model.account.findAll({ //busca lista de email de administradores del sistemas
+                    attributes:['email'],
+                    include:[{
+                        model:model.accountRole,
+                        atributtes:['id'],
+                        where:{roleId:5}
+                    }]
+                })
+                let allAdminEmail
+                for (let index = 0; index < adminEmail.length; index++) {
+                    if(allAdminEmail!=null){
+                        allAdminEmail = allAdminEmail +","+ adminEmail[index].dataValues.email;
+                    }else{
+                        allAdminEmail=adminEmail[index].dataValues.email;
+                    }
+                }             
+                // envia email a administrador                   
+                const tokenProfeile=null;
+                const urlProfile=process.env.HOST_FRONT+"/profile/"+tokenProfeile;                  
+                
+                await utils.sendMail({
+                    from:process.env.COMPANY+"<" + process.env.EMAIL_MANAGER +	'>',
+                    to:allAdminEmail,
+                    subject:"Nuevo usuario creado",                        
+                    text:"Se ha creado una nueva cuenta de usuario con el nombre "+rsAccount.email+"("+rsAccount.id+")",
+                    title:"Nueva cuenta "+process.env.COMPANY+" creada satisfactoriamente",
+                    subtitle:rsAccount.name+"("+rsAccount.id+")",
+                    action:urlProfile,                                       
+                    actionLabel:'Ver Detalles'
+                });                                                            
+            }).catch(async function(error){
+                console.log(error);               
+                res.status(403).json({"data":{"result":false,"message":"Algo salió mal creando cuenta de usuario"}});         
+            })
+            
+    }).catch(async function(error){        
+        console.log(error);
+        if(error.name=='SequelizeUniqueConstraintError'){
+            res.status(403).json({"data":{"result":false,"message":error.parent.detail}})	    
+        }else{
+            res.status(403).json({"data":{"result":false,"message":"Algo salio mal procesando registro:"+error,"code":"P006"}})	
+        }
+        
+    })
+
+}
 module.exports={
     registerAccount,
     loginAccount,
@@ -796,6 +912,7 @@ module.exports={
     emailVerify, //Certifica email
     isCertificated, // Verifica si un email esta certificado
     getSecretCurrent,// obtiene preguntas secretas del usuario actual
-    getActiveAccount  // retorna cuentas activas
+    getActiveAccount,  // retorna cuentas activas
+    buyerRegisterAccount // Regsitra cuenta de comprador
 
 }

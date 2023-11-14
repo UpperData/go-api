@@ -5,6 +5,7 @@ const auth=require('../controllers/middleware/auth.ctrl');
 const forceBrute=require('../controllers/middleware/noBrute.ctrl');
 
 router.post('/accOunT/RegisTER',forceBrute.notBruteSecure,auth.autorizedRole([5]), account.registerAccount); // Registro de cuentas de usuario
+router.post('/accOunT/regisTER/buyer',forceBrute.notBruteSecure, account.buyerRegisterAccount); // Registro de cuentas de usuario de comprador
 router.post('/PASSwORD/RestarRT',forceBrute.notBruteSecure, account.passwordRestart); // Restaura la contraseña
 router.put('/PASSwORD/UPDATE',forceBrute.notBruteSecure,auth.autorizedRole(['*']),account.passwordUpdate); // Actualizar la contraseña
 router.get('/accoUnt/EmAIl/VALIDAtor/:email',forceBrute.notBruteSecure,account.validateEmail); //Valida dirección de correo electronico
