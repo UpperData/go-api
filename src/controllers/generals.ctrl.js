@@ -487,7 +487,7 @@ async function getBarMenu(req,res){
 
     return await model.subCategory.findAll({
         where:{
-            [Op.or]: [{ id: 2 }, { id: 6 },{id:10},{id:16}], 
+            [Op.or]: [{ id: 2 }, { id: 6 },{id:10},{id:16},{id:20},{id:24},{id:28},{id:32},{id:36}], 
         }
     }).then(async function(rsSubCategory){
         res.status(200).json({"data":{"result":true,"message":"Busqueda satisfatoria","data":rsSubCategory}});
