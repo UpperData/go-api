@@ -159,4 +159,35 @@ async function getPublishingSubCategoryAndText(req,res){
         res.status(403).json({"data":{"result":false,"message":"Algo salió mal buscando registro"}});        
     })   
 }
-module.exports={getPublishing,setPublishing,getPublishingCategory,getPublishingClass,getPublishingSubCategory,getPublishingFull,getPublishingSubCategoryAndText};
+async function getPublishingByShopSeven(req,res){  //últimas 7 publicaciones de una tienda  
+    const {shop}=req.params;    
+        //Busca inventario de un articulo
+    return await model.inventory.findOne({            
+        where:{isPublished:true},
+        include:[{
+            model:model.article,
+                atributtes:['id'],
+                where:{storeId:shop}
+        }],
+        order:['updatedAt'],
+        limit:7
+    }).then(async function(rsPublishing){
+        if(rsPublishing){
+            res.status(200).json({"data":{"result":true,"message":"Busqueda satisfatoria","data":rsPublishing}});        
+        }else{
+            res.status(403).json({"data":{"result":false,"message":"No existe registro con este código"}});            
+        }            
+    }).catch(async function(error){ 
+        console.log(error);           
+        res.status(403).json({"data":{"result":false,"message":"Algo salió mal buscando registro"}});        
+    })    
+}
+module.exports={getPublishing,
+    setPublishing,
+    getPublishingCategory,
+    getPublishingClass,
+    getPublishingSubCategory,
+    getPublishingFull,
+    getPublishingSubCategoryAndText,
+    getPublishingByShopSeven
+};
