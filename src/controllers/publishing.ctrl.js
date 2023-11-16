@@ -10,7 +10,7 @@ async function getPublishing(req,res){
     if(articleId!='*'){
         //Busca inventario de un articulo
         return await model.inventory.findOne({            
-            where:{articleId},
+            where:{articleId,isPublished},
             limit:500
         }).then(async function(rsPublishing){
             if(rsPublishing){
@@ -24,10 +24,9 @@ async function getPublishing(req,res){
         })
     }else{
         //Busca todos el inventario de una tienda
-        return await model.inventory.findAll({where:{articleId},order:['updatedAt']})
+        return await model.inventory.findAll({where:{articleId,isPublished},order:['updatedAt']})
         .then(async function(rsPublishing)
-        {
-            
+        {            
             res.status(200).json({"data":{"result":true,"message":"Busqueda satisfatoria","data":rsPublishing}});
         }).catch(async function(error){    
             console.log(error)        
