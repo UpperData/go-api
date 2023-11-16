@@ -2,6 +2,7 @@ const model=require('../db/models/index');
 const { Op } = require("sequelize");
 const serviceToken=require('./serviceToken.ctrl');
 const generals=require('./generals.ctrl');
+const { error } = require('console');
 
 async function getPublishing(req,res){    
     const {articleId}=req.params;
@@ -26,8 +27,10 @@ async function getPublishing(req,res){
         return await model.inventory.findAll({where:{articleId},order:['updatedAt']})
         .then(async function(rsPublishing)
         {
+            
             res.status(200).json({"data":{"result":true,"message":"Busqueda satisfatoria","data":rsPublishing}});
-        }).catch(async function(error){            
+        }).catch(async function(error){    
+            console.log(error)        
             res.status(403).json({"data":{"result":false,"message":"Algo salió mal buscando registro"}});        
         })
     } 
