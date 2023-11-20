@@ -11,7 +11,10 @@ async function getPublishing(req,res){
         //Busca inventario de un articulo
         return await model.inventory.findOne({            
             where:{articleId,isPublished:true},
-            limit:500
+            include:[{
+                model:model.article,
+                attributes:{exclude:['isActived','createdAt','updatedAt','storeId','doctorId']},
+            }]
         }).then(async function(rsPublishing){
             if(rsPublishing){
                 res.status(200).json({"data":{"result":true,"message":"Busqueda satisfatoria","data":rsPublishing}});        
