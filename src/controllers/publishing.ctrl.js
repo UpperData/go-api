@@ -13,7 +13,7 @@ async function getPublishing(req,res){
             where:{articleId,isPublished:true},
             include:[{
                 model:model.article,
-                attributes:{exclude:['isActived','createdAt','updatedAt','storeId','doctorId']},
+                attributes:{exclude:['isActived','createdAt','updatedAt','doctorId']},
             }]
         }).then(async function(rsPublishing){
             if(rsPublishing){
