@@ -273,9 +273,39 @@ async function assignmentRevoke(req,res)  {
     const {id}=req.params;
     // restar de la asignación    
     await model.assignment.update({isActived:false},{where:{id}}).then(async function(rsInventory){         
-        res.status(200).json({"data":{"result":false,"message":"Asignación devuelta con exito"}}); 
+        res.status(200).json({"data":{"result":true,"message":"Asignación devuelta con exito"}}); 
     }).catch(async function(error){
         res.status(403).json({"data":{"result":false,"message":error.message}});  
     })
 }
-module.exports={assignmentNew,assignmentByDoctor,assignmentUpdate,articleNew,articleUpdate,articlelist,inventoryTotal,inventoryUpdate,assignmentRevoke};
+async function returnArticleArray(req,res){
+
+    const articleList=req.query;
+    console.log(articleList.qs);    
+    await model.inventory.findAll({  
+        attributes:{exclude:['updatedAt','createdAt']},  
+        include:[{
+            model:model.article,
+            attributes:['id','name']
+        }],   
+        where:{
+            articleId:{[Op.or]:articleList.qs}
+        }
+    
+    }).then(async function(rsInventory){         
+        res.status(200).json({"data":{"result":true,"message":"Consulta satisfactoria","data":rsInventory}}); 
+    }).catch(async function(error){
+        res.status(403).json({"data":{"result":false,"message":error.message}});  
+    })
+
+}
+module.exports={assignmentNew
+    ,assignmentByDoctor
+    ,assignmentUpdate
+    ,articleNew
+    ,articleUpdate
+    ,articlelist
+    ,inventoryTotal
+    ,inventoryUpdate
+    ,assignmentRevoke
+    ,returnArticleArray};

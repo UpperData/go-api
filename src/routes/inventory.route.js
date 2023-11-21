@@ -13,5 +13,6 @@ router.get('/InVETorY/aRIcLe/list/:id',forceBrute.notBruteSecure,auth.autorizedR
 router.get('/InveTorY/get/ALL',forceBrute.notBruteSecure,auth.autorizedRole([5]),inventory.inventoryTotal);//obtiene inventario actula
 router.put('/InvEToRY/UpdaTE/ARTICLE',forceBrute.notBruteSecure,auth.autorizedRole([5]),inventory.inventoryUpdate);//actualiza inventario 
 router.get('/InvEToRY/revoke/assignament/:id',forceBrute.notBruteSecure,auth.autorizedRole([5]),inventory.assignmentRevoke);//revocar asignación
+router.get('/INVETORY/articles/*',forceBrute.notBruteSecure,inventory.returnArticleArray) // Retorna arreglo de articulos del carriro)
 
 module.exports=router;

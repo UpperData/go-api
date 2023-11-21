@@ -78,6 +78,29 @@ async function getPublishingCategory(req,res){
         })
     }
 }
+async function getPublishingCategoryName(req,res){    
+    const {category,limit,page}=req.params;   
+
+    if(categoryId!='*'){
+        //Busca inventario de un articulo
+        return await model.inventory.findAndCountAll({            
+            where:{category:{
+                categoryId
+            }},
+            limit:parseInt(limit),
+            offset:(parseInt(page) * (limit))
+        }).then(async function(rsPublishing){
+            if(rsPublishing){
+                res.status(200).json({"data":{"result":true,"message":"Busqueda satisfatoria","data":rsPublishing}});        
+            }else{
+                res.status(403).json({"data":{"result":false,"message":"No existe registro con este código"}});            
+            }            
+        }).catch(async function(error){ 
+            console.log(error);           
+            res.status(403).json({"data":{"result":false,"message":"Algo salió mal buscando registro"}});        
+        })
+    }
+}
 async function getPublishingClass(req,res){    
     const {autoTypeId}=req.params;  
     //Busca inventario de un articulo
