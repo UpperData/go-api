@@ -165,7 +165,7 @@ async function getPublishingSubCategoryAndText(req,res){
 async function getPublishingByShopSeven(req,res){  //últimas 7 publicaciones de una tienda  
     const {shop}=req.params;    
         //Busca inventario de un articulo
-    return await model.inventory.findOne({            
+    return await model.inventory.findAll({            
         where:{isPublished:true},
         include:[{
             model:model.article,
