@@ -281,8 +281,12 @@ async function assignmentRevoke(req,res)  {
 }
 async function returnArticleArray(req,res){
 
-    const articleList=req.query;
-    console.log(articleList.qs);    
+    let articleList=req.query;   
+    if(!Array.isArray(articleList.qs)){ // cuando pasa un solo elemento (no es un arreglo) lo convierte en arreglo
+        articleList.qs = new Set([articleList.qs]);
+        articleList.qs = Array.from(articleList.qs, x => String(x));
+        //console.log(articleList.qs);        // Salida: ['2', '4', '6', '8' ]
+    }
     await model.inventory.findAll({  
         attributes:{exclude:['updatedAt','createdAt']},  
         include:[{
