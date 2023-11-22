@@ -2,6 +2,7 @@ const model=require('../db/models/index');
 const { Op } = require("sequelize");
 const serviceToken=require('./serviceToken.ctrl');
 const generals=require('./generals.ctrl');
+const { compareSync } = require('bcryptjs');
 
 
 async function assignmentNew(req,res){
@@ -295,6 +296,7 @@ async function returnArticleArray(req,res){
     }).then(async function(rsInventory){         
         res.status(200).json({"data":{"result":true,"message":"Consulta satisfactoria","data":rsInventory}}); 
     }).catch(async function(error){
+        console.log(error);
         res.status(403).json({"data":{"result":false,"message":error.message}});  
     })
 
