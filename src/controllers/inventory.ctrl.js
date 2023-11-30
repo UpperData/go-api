@@ -288,7 +288,7 @@ async function returnArticleArray(req,res){
         //console.log(articleList.qs);        // Salida: ['2', '4', '6', '8' ]
     }
     await model.inventory.findAll({  
-        attributes:{exclude:['updatedAt','createdAt']},  
+        attributes:{exclude:['updatedAt','createdAt','id']},  
         include:[{
             model:model.article,
             attributes:['id','name']
