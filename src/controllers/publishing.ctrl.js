@@ -80,13 +80,21 @@ async function getPublishingCategory(req,res){
 }
 async function getPublishingCategoryName(req,res){    
     const {category,limit,page}=req.params;   
-
-    if(categoryId!='*'){
+    if(category!='*'){
         //Busca inventario de un articulo
         return await model.inventory.findAndCountAll({            
-            where:{category:{
-                categoryId
+            where:{
+                isPublished:true,
+                category:
+                {
+                    [Op.or]: [
+                        { category:category },                        
+                      ]                
             }},
+            include:[{
+                model:model.article,
+                attributes:{exclude:['updatedAt','createdAt']}
+            }],
             limit:parseInt(limit),
             offset:(parseInt(page) * (limit))
         }).then(async function(rsPublishing){
@@ -97,7 +105,7 @@ async function getPublishingCategoryName(req,res){
             }            
         }).catch(async function(error){ 
             console.log(error);           
-            res.status(403).json({"data":{"result":false,"message":"Algo salió mal buscando registro"}});        
+            res.status(403).json({"data":{"result":false,"message":error.message}});        
         })
     }
 }
@@ -159,7 +167,7 @@ async function getPublishingFull(req,res){
         res.status(403).json({"data":{"result":false,"message":"Algo salió mal buscando registro"}});        
     })   
 }
-async function getPublishingSubCategoryAndText(req,res){    
+async function getPublishingSubCategoryAndText(req,res){    // busca lo escriba el usuario en una categoria
     const {subCategoryId,textValue,limit,page}=req.params;  
     //Busca inventario de un articulo
     return await model.inventory.findAndCountAll({            
@@ -215,5 +223,6 @@ module.exports={getPublishing,
     getPublishingSubCategory,
     getPublishingFull,
     getPublishingSubCategoryAndText,
-    getPublishingByShopSeven
+    getPublishingByShopSeven,
+    getPublishingCategoryName
 };
