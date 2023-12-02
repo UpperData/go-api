@@ -86,10 +86,8 @@ async function getPublishingCategoryName(req,res){
             where:{
                 isPublished:true,
                 category:
-                {
-                    [Op.or]: [
-                        { category:category },                        
-                      ]                
+                {                   
+                    category                                    
             }},
             include:[{
                 model:model.article,
