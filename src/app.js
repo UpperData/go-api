@@ -53,8 +53,8 @@ app.use(require('./routes/categories.route'));
 app.use(require('./routes/publishing.route'));
 app.use(require('./routes/shoppingCar.route'))
 https.createServer({
-  cert:fs.readdirSync(process.env.CER_SSL_DIR),
-  key: fs.readFileSync(process.env.KEY_SSL_DIR)
+  cert:fs.readdirSync('./'+process.env.CER_SSL_DIR),
+  key: fs.readFileSync('./'+process.env.KEY_SSL_DIR)
 },
   app
 ).listen(app.get('SSL_PORT'),function(){
