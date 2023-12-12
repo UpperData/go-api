@@ -3,7 +3,8 @@ const helmet=require('helmet'); // paquete de seguridad para ocultar informació
 const morgan =require('morgan');//
 const cors =require('cors');
 const rateLimit = require("express-rate-limit");
-
+const fs =require('fs');
+const https =require('https');
 
 const app =express(); //incializa el framework
 
@@ -16,6 +17,7 @@ const app =express(); //incializa el framework
 //app.set('trust proxy', 1); // trabaja en conjunto con el limite de peticiones a las ruta
 //app.use(apiLimiter); // Limita conexiones
 app.set('port',process.env.PORT || 4094 ); // comunication port
+app.set('SSL_PORT',process.env.PORT || 443 ); // comunication port
 app.use(helmet()); //ayuda a proteger la aplicación de algunas vulnerabilidades web conocidas mediante el establecimiento correcto de cabeceras HTTP.
 const whiteList=['http:localhost:4094','http:localhost:3000','http:localhost:4000','http:localhost:4001', 'https://carapi.app','http://carapi.app', 'https://repuestosgo.com', 'http://repuestosgo.com', 'https://bk.repuestosgo.com']
 // Middleware
@@ -50,8 +52,16 @@ app.use(require('./routes/store.route'));
 app.use(require('./routes/categories.route'));
 app.use(require('./routes/publishing.route'));
 app.use(require('./routes/shoppingCar.route'))
-
-app.listen(app.get('port'),function(){
-    console.log('repuestosGO is working in port:', app.get('port'));
+https.createServer({
+  cert:fs.readdirSync(process.env.CER_SSL_DIR),
+  key: fs.readFileSync(process.env.KEY_SSL_DIR)
+},
+  app
+).listen(app.get('SSL_PORT'),function(){
+  console.log('repuestosGO is working in port:', app.get('SSL_PORT'), 'de forma segura');
 
 })
+/*app.listen(app.get('port'),function(){
+    console.log('repuestosGO is working in port:', app.get('port'));
+
+})*/
