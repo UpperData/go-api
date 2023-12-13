@@ -16,7 +16,7 @@ const app =express(); //incializa el framework
 
 //app.set('trust proxy', 1); // trabaja en conjunto con el limite de peticiones a las ruta
 //app.use(apiLimiter); // Limita conexiones
-app.set('port',process.env.PORT || 4094 ); // comunication port
+app.set('PORT',process.env.PORT || 4094 ); // comunication port
 app.set('SSL_PORT',process.env.PORT || 443 ); // comunication port
 app.use(helmet()); //ayuda a proteger la aplicación de algunas vulnerabilidades web conocidas mediante el establecimiento correcto de cabeceras HTTP.
 const whiteList=['http:localhost:4094','http:localhost:3000','http:localhost:4000','http:localhost:4001', 'https://carapi.app','http://carapi.app', 'https://repuestosgo.com', 'http://repuestosgo.com', 'https://bk.repuestosgo.com']
@@ -53,15 +53,11 @@ app.use(require('./routes/categories.route'));
 app.use(require('./routes/publishing.route'));
 app.use(require('./routes/shoppingCar.route'))
 console.log(path.join(__dirname+'/cert-api.cer'));
-https.createServer({
-  
-  cert:fs.readFileSync(path.join(__dirname,'cert-api.cer')),
-  key: fs.readFileSync(path.join(__dirname,'cert_key_api.key'))
-},
-  app
-).listen(app.get('SSL_PORT'),function(){
-  console.log('🚀 repuestosGO is working in port:', app.get('SSL_PORT'), 'de forma segura');
-
+https.createServer({  
+  cert:fs.readFileSync(path.join(__dirname+'/certificates/cert-api.cer')),
+  key: fs.readFileSync(path.join(__dirname+'/certificates/cert_key_api.key'))
+}).listen(app.get('PORT'),function(){
+  console.log('🚀 repuestosGO is working in port:', app.get('PORT'), 'de forma segura');
 })
 /*app.listen(app.get('port'),function(){
     console.log(' 🚀 repuestosGO is working in port:', app.get('port'));
