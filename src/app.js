@@ -51,12 +51,11 @@ app.use(require('./routes/reports.route'));
 app.use(require('./routes/store.route'));
 app.use(require('./routes/categories.route'));
 app.use(require('./routes/publishing.route'));
-app.use(require('./routes/shoppingCar.route'))
-console.log(path.join(__dirname+'/cert-api.cer'));
+app.use(require('./routes/shoppingCar.route'));
 https.createServer({  
-  cert:fs.readFileSync(path.join(__dirname+'/certificates/cert-api.cer')),
-  key: fs.readFileSync(path.join(__dirname+'/certificates/cert_key_api.key'))
-}).listen(app.get('PORT'),function(){
+  cert:fs.readFileSync(path.join(__dirname+'/certificates/cert.pem')),
+  key: fs.readFileSync(path.join(__dirname+'/certificates/key.pem'))
+},app).listen(app.get('PORT'),function(){
   console.log('🚀 repuestosGO is working in port:', app.get('PORT'), 'de forma segura');
 })
 /*app.listen(app.get('port'),function(){
